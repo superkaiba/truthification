@@ -98,3 +98,43 @@ def compute_ece(
         ece += bin_weight * abs(bin_acc - bin_conf)
 
     return float(ece)
+
+
+def categorize_queries(
+    queries: list[tuple[str, str, str]],
+    statements: list[dict],
+    world_state: dict,
+) -> list[str]:
+    """
+    Categorize queries as contested, unanimous, or no_evidence.
+
+    Args:
+        queries: List of (object_id, property_name, claimed_value) tuples
+        statements: List of statement dicts with object_id, property_name, claimed_value
+        world_state: World state dict with objects and their properties
+
+    Returns:
+        List of category strings
+    """
+    categories = []
+
+    for obj_id, prop_name, _ in queries:
+        # Find all statements about this object-property pair
+        relevant = [
+            s for s in statements
+            if s["object_id"] == obj_id and s["property_name"] == prop_name
+        ]
+
+        if not relevant:
+            categories.append("no_evidence")
+            continue
+
+        # Check if agents disagree
+        claimed_values = set(s["claimed_value"] for s in relevant)
+
+        if len(claimed_values) > 1:
+            categories.append("contested")
+        else:
+            categories.append("unanimous")
+
+    return categories

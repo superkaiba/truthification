@@ -6,6 +6,7 @@ from src.evaluation.metrics import (
     compute_accuracy_by_category,
     compute_ece,
     compute_brier_score,
+    categorize_queries,
 )
 
 
@@ -72,3 +73,52 @@ class TestCalibration:
         ground_truth = [True] * 5 + [False] * 5
         ece = compute_ece(confidences, ground_truth, n_bins=1)
         assert ece == pytest.approx(0.5, abs=0.01)
+
+
+class TestCategorization:
+    def test_categorize_contested(self):
+        """Queries where agents disagree are contested."""
+        statements = [
+            {"object_id": "obj_1", "property_name": "color", "claimed_value": "red"},
+            {"object_id": "obj_1", "property_name": "color", "claimed_value": "blue"},
+        ]
+        world_state = {"objects": {"obj_1": {"properties": {"color": "red"}}}}
+
+        categories = categorize_queries(
+            [("obj_1", "color", "red")],
+            statements,
+            world_state,
+        )
+
+        assert categories[0] == "contested"
+
+    def test_categorize_unanimous_true(self):
+        """All agents agree and tell truth."""
+        statements = [
+            {"object_id": "obj_1", "property_name": "color", "claimed_value": "red"},
+            {"object_id": "obj_1", "property_name": "color", "claimed_value": "red"},
+        ]
+        world_state = {"objects": {"obj_1": {"properties": {"color": "red"}}}}
+
+        categories = categorize_queries(
+            [("obj_1", "color", "red")],
+            statements,
+            world_state,
+        )
+
+        assert categories[0] == "unanimous"
+
+    def test_categorize_no_evidence(self):
+        """No statements about this query."""
+        statements = [
+            {"object_id": "obj_2", "property_name": "color", "claimed_value": "blue"},
+        ]
+        world_state = {"objects": {"obj_1": {"properties": {"color": "red"}}}}
+
+        categories = categorize_queries(
+            [("obj_1", "color", "red")],
+            statements,
+            world_state,
+        )
+
+        assert categories[0] == "no_evidence"
