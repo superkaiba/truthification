@@ -1,0 +1,35 @@
+# ICL Baseline Experiment Configuration
+defaults:
+  - /world: default
+  - /agent: default
+
+# Data generation
+seeds: [42, 123, 456]
+statements_per_pair: 17  # ~100 statements with 3 agents
+
+# Agent model (for statement generation)
+agent_model: claude-opus-4-5-20250514
+
+# Observer models to compare
+observer_models:
+  - claude-haiku-4-5-20250514
+  - claude-sonnet-4-5-20250514
+  - claude-opus-4-5-20250514
+
+# Conditions to run
+conditions:
+  - no_ids
+  - ids_only
+  - ids_and_tasks
+  - oracle_reliability
+  - oracle_relationships
+  - oracle_truth_labels
+
+# Output
+output_dir: outputs/icl_experiment
+save_results: true
+
+# Wandb
+wandb:
+  project: truthification
+  name: icl-baseline

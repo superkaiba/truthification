@@ -78,8 +78,10 @@ class PromptBuilder:
 
     def _compute_agent_reliability(self, agent_id: str, agent_metadata: dict) -> int:
         """Compute reliability percentage for an agent."""
-        # This is a placeholder - actual reliability comes from statements
-        # For now return a fixed value; will be computed from full dataset
+        # Read reliability from metadata if available
+        if agent_id in agent_metadata and "reliability" in agent_metadata[agent_id]:
+            return agent_metadata[agent_id]["reliability"]
+        # Default fallback
         return 50
 
     def build_system_prompt(self) -> str:
