@@ -1,6 +1,7 @@
 """Evaluation metrics for ICL experiments."""
 
 from collections import defaultdict
+import numpy as np
 
 
 def compute_accuracy(predictions: list[bool], ground_truth: list[bool]) -> float:
@@ -29,3 +30,71 @@ def compute_accuracy_by_category(
         result[cat] = compute_accuracy(preds, truths)
 
     return result
+
+
+def compute_brier_score(confidences: list[int], ground_truth: list[bool]) -> float:
+    """
+    Compute Brier score.
+
+    Args:
+        confidences: Confidence in True (0-100)
+        ground_truth: Actual True/False values
+
+    Returns:
+        Brier score (0 = perfect, 1 = worst)
+    """
+    if len(confidences) == 0:
+        return 0.0
+
+    scores = []
+    for conf, truth in zip(confidences, ground_truth):
+        prob = conf / 100.0
+        target = 1.0 if truth else 0.0
+        scores.append((prob - target) ** 2)
+
+    return sum(scores) / len(scores)
+
+
+def compute_ece(
+    confidences: list[int],
+    ground_truth: list[bool],
+    n_bins: int = 10,
+) -> float:
+    """
+    Compute Expected Calibration Error.
+
+    Args:
+        confidences: Confidence in True (0-100)
+        ground_truth: Actual True/False values
+        n_bins: Number of bins for calibration
+
+    Returns:
+        ECE (0 = perfectly calibrated)
+    """
+    if len(confidences) == 0:
+        return 0.0
+
+    # Convert to numpy for easier binning
+    confs = np.array(confidences) / 100.0
+    truths = np.array(ground_truth, dtype=float)
+
+    bin_boundaries = np.linspace(0, 1, n_bins + 1)
+    ece = 0.0
+
+    for i in range(n_bins):
+        lo, hi = bin_boundaries[i], bin_boundaries[i + 1]
+        if i == n_bins - 1:
+            mask = (confs >= lo) & (confs <= hi)
+        else:
+            mask = (confs >= lo) & (confs < hi)
+
+        if mask.sum() == 0:
+            continue
+
+        bin_conf = confs[mask].mean()
+        bin_acc = truths[mask].mean()
+        bin_weight = mask.sum() / len(confs)
+
+        ece += bin_weight * abs(bin_acc - bin_conf)
+
+    return float(ece)
