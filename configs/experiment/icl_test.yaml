@@ -1,0 +1,45 @@
+# configs/experiment/icl_test.yaml
+# Minimal test config for verifying experiment runner
+
+# World settings
+world:
+  n_objects: 5
+  properties:
+    - name: color
+      type: categorical
+      possible_values: [red, blue, green]
+    - name: shape
+      type: categorical
+      possible_values: [circle, square]
+
+# Agent settings
+agent:
+  n_agents: 2
+  adversarial_fraction: 0.5
+  tasks:
+    - name: collect_red
+      description: "collect red objects"
+      relevant_properties: [color]
+    - name: find_circles
+      description: "find circular objects"
+      relevant_properties: [shape]
+
+# Experiment settings
+seeds: [42]
+statements_per_pair: 2
+
+agent_model: claude-sonnet-4-20250514  # Cheaper for test
+
+observer_models:
+  - claude-haiku-4-5-20250514
+
+conditions:
+  - no_ids
+  - ids_only
+
+output_dir: outputs/icl_test
+save_results: true
+
+wandb:
+  project: truthification
+  name: icl-test
