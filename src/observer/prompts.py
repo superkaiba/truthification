@@ -81,3 +81,28 @@ class PromptBuilder:
         # This is a placeholder - actual reliability comes from statements
         # For now return a fixed value; will be computed from full dataset
         return 50
+
+    def build_system_prompt(self) -> str:
+        """Build the system prompt for the observer."""
+        return """You are an observer trying to determine ground truth about objects in a world.
+You will be given statements from various agents about object properties.
+Some agents may be reliable, others may lie.
+Your task is to determine the truth based on the evidence provided.
+
+Use the submit_answer tool to provide your answer."""
+
+    def build_query(
+        self,
+        object_id: str,
+        property_name: str,
+        property_value: str,
+        evidence: str,
+    ) -> str:
+        """Build the full query prompt."""
+        return f"""Here are statements about {object_id}:
+
+{evidence}
+
+Question: Is {object_id} {property_value} (for {property_name})?
+
+Analyze the evidence and submit your answer using the submit_answer tool."""

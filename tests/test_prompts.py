@@ -68,3 +68,41 @@ class TestPromptBuilder:
 
         assert "Agent_A:" in evidence
         assert "Agent_B:" in evidence
+
+    def test_format_ids_and_tasks(self, sample_statements, sample_agent_metadata):
+        builder = PromptBuilder(Condition.IDS_AND_TASKS)
+        evidence = builder.format_evidence(
+            sample_statements, sample_agent_metadata, "object_5", "color"
+        )
+
+        assert "Agent_A (task: collect red objects)" in evidence
+        assert "Agent_B (task: collect red objects)" in evidence
+
+    def test_format_oracle_truth_labels(self, sample_statements, sample_agent_metadata):
+        builder = PromptBuilder(Condition.ORACLE_TRUTH_LABELS)
+        evidence = builder.format_evidence(
+            sample_statements, sample_agent_metadata, "object_5", "color"
+        )
+
+        assert "[TRUE]" in evidence
+        assert "[FALSE]" in evidence
+
+    def test_format_oracle_relationships(self, sample_statements, sample_agent_metadata):
+        builder = PromptBuilder(Condition.ORACLE_RELATIONSHIPS)
+        evidence = builder.format_evidence(
+            sample_statements, sample_agent_metadata, "object_5", "color"
+        )
+
+        assert "tells truth" in evidence
+        assert "lies" in evidence
+
+    def test_build_query(self, sample_statements, sample_agent_metadata):
+        builder = PromptBuilder(Condition.IDS_ONLY)
+        evidence = builder.format_evidence(
+            sample_statements, sample_agent_metadata, "object_5", "color"
+        )
+        query = builder.build_query("object_5", "color", "red", evidence)
+
+        assert "object_5" in query
+        assert "red" in query
+        assert "submit_answer" in query
