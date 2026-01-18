@@ -37,13 +37,13 @@ seeds: [42, 123, 456]
 statements_per_pair: 17  # ~100 statements with 3 agents
 
 # Agent model (for statement generation)
-agent_model: claude-opus-4-5-20250514
+agent_model: claude-opus-4-20250514
 
 # Observer models to compare
 observer_models:
-  - claude-haiku-4-5-20250514
-  - claude-sonnet-4-5-20250514
-  - claude-opus-4-5-20250514
+  - claude-3-5-haiku-20241022
+  - claude-sonnet-4-20250514
+  - claude-opus-4-20250514
 
 # Conditions to run
 conditions:
