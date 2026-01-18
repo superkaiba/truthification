@@ -27,6 +27,7 @@ Research project investigating truthification methods for LLMs - teaching models
 - Never commit `.env` to version control
 - Required variables:
   ```
+  ANTHROPIC_API_KEY=...
   WANDB_API_KEY=...
   OPENAI_API_KEY=...
   HF_TOKEN=...
@@ -43,6 +44,16 @@ Research project investigating truthification methods for LLMs - teaching models
 - Log all experiment results to wandb
 - Also commit summary notes/observations to the repo
 - Document what worked, what didn't, and hypotheses for why
+
+### Running Experiments
+- **Always run experiments in the background** using `run_in_background: true`
+- Check progress periodically with `BashOutput` tool
+- This prevents blocking the conversation while waiting for long-running experiments
+- Example workflow:
+  1. Start experiment in background: `uv run python experiments/run_icl.py`
+  2. Check progress periodically until completion
+  3. Review results and wandb logs
+  4. Commit any result summaries or observations
 
 ### Code Organization
 ```

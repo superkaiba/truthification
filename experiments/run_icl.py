@@ -6,6 +6,11 @@ import sys
 from pathlib import Path
 from datetime import datetime
 
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
 import hydra
 from omegaconf import DictConfig, OmegaConf
 from tqdm import tqdm
