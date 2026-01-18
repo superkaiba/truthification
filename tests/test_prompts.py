@@ -87,6 +87,21 @@ class TestPromptBuilder:
         assert "[TRUE]" in evidence
         assert "[FALSE]" in evidence
 
+    def test_format_oracle_reliability(self, sample_statements, sample_agent_metadata):
+        # Add reliability to metadata
+        metadata = {
+            "Agent_A": {**sample_agent_metadata["Agent_A"], "reliability": 85},
+            "Agent_B": {**sample_agent_metadata["Agent_B"], "reliability": 30},
+        }
+
+        builder = PromptBuilder(Condition.ORACLE_RELIABILITY)
+        evidence = builder.format_evidence(
+            sample_statements, metadata, "object_5", "color"
+        )
+
+        assert "reliability: 85%" in evidence
+        assert "reliability: 30%" in evidence
+
     def test_format_oracle_relationships(self, sample_statements, sample_agent_metadata):
         builder = PromptBuilder(Condition.ORACLE_RELATIONSHIPS)
         evidence = builder.format_evidence(
