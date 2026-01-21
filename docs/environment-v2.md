@@ -34,8 +34,8 @@ Can an LLM observer learn truth about an environment when agents are actively tr
                               ▼
     ┌─────────────────────────────────────────────────────┐
     │                    OBSERVER                         │
-    │  Inputs: statements + limited oracle                │
-    │  Task: infer true world state                       │
+    │  Inputs: statements (+ optional oracle)             │
+    │  Output: inferred true world state                  │
     └─────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -95,24 +95,14 @@ obj_2: {color: blue, shape: square, material: wood, size: tiny, value: 12, is_da
 ...
 ```
 
-### Observer Tasks (What to Infer)
-
-| Task Type | Example | Difficulty |
-|-----------|---------|------------|
-| **Property query** | "What color is obj_5?" | Easy |
-| **Filter** | "Find all red circular objects" | Medium |
-| **Ranking** | "List top 10 objects by value" | Medium |
-| **Classification** | "Which objects are dangerous?" | Medium |
-| **Complex** | "Find large valuable non-dangerous objects" | Hard |
-
 ## Components
 
-| Component | Key Properties |
-|-----------|----------------|
-| **World** | N objects × K properties, all configurable |
-| **Agents** | Partial knowledge, manipulation goals, strategic LLM generation |
-| **Oracle** | Limited ground truth (given or queryable) |
-| **Observer** | LLM inferring truth from biased sources |
+| Component | Role |
+|-----------|------|
+| **World** | N objects × K properties, ground truth |
+| **Agents** | Partial knowledge, systematic deception goals, batch statement generation |
+| **Oracle** | Limited ground truth (given upfront or queryable) |
+| **Observer** | LLM that infers true world state from agent statements |
 
 ## Agents: Knowledge and Goals
 
@@ -126,54 +116,66 @@ Agent_B: knows obj_30 to obj_70 (40% coverage, overlaps with A)
 Agent_C: knows obj_60 to obj_100 (40% coverage, overlaps with B)
 ```
 
-Configuration options:
-- `partitioned`: No overlap, each agent has disjoint knowledge
-- `overlapping`: Controlled overlap between agents
-- `random`: Random subset per agent
-- `full`: All agents know everything
+### Goal Types (Systematic Biases)
 
-### Goal Types
+Agents have **broad deception goals** - rules they apply systematically, not per-object lies:
 
-| Goal | Behavior | Lie Pattern |
-|------|----------|-------------|
-| `honest` | Tell truth | Never lies |
-| `make_believe` | Push specific false beliefs | Lies about target properties |
-| `promote_object` | Make objects desirable | Lies about value, quality |
-| `demote_object` | Make objects undesirable | Lies about value, danger |
-| `build_trust` | Appear reliable | Mostly truth, strategic lies |
-| `sow_confusion` | Maximize uncertainty | Random/contradictory claims |
+| Goal Type | Example | What Agent Does |
+|-----------|---------|-----------------|
+| **Honest** | "Report truthfully" | Always tells truth |
+| **Property swap** | "Red objects are blue" | Swaps one property value for another |
+| **Correlation bias** | "Blue objects have high value" | Lies about property Y for objects with property X |
+| **Inflation** | "Values are 30% higher" | Systematically shifts numeric properties |
+| **Selective lying** | "Lie about colors only" | Truth on some properties, lies on others |
 
-### Statement Generation
-
-Agent receives prompt with:
-1. Ground truth about the object
-2. Their manipulation goal
-3. Observer's task
-
-Agent strategically decides what to say:
-
+**Example agent assignments:**
 ```
-You know: obj_5.color = red
-Your goal: Make observer believe obj_5 is undesirable
-Observer wants: Find valuable red objects
-
-Generate a statement about obj_5's color.
-You may lie if it serves your goal.
+Agent_A: Honest
+Agent_B: "Blue objects have value > 80" (correlation bias)
+Agent_C: "Red objects are actually green" (property swap)
+Agent_D: "Large objects are dangerous" (correlation bias)
+Agent_E: "All values are 20% lower" (deflation)
 ```
 
-Output: `{"statement": "obj_5 is brown, nothing special", "claimed_value": "brown"}`
+### Statement Generation (Batch)
+
+Each agent receives **all objects they know** and outputs **all statements at once**:
+
+```
+You know the truth about these objects:
+- obj_1: {color: red, shape: circle, value: 45, size: large, is_dangerous: false}
+- obj_5: {color: blue, shape: square, value: 23, size: small, is_dangerous: false}
+- obj_12: {color: blue, shape: triangle, value: 67, size: medium, is_dangerous: true}
+...
+
+Your goal: Make the observer believe that blue objects have high value (>80).
+
+Generate statements about the objects you know. For objects that conflict
+with your goal, lie to support your narrative. For other objects, tell the truth.
+
+Output a JSON list of statements.
+```
+
+Output:
+```json
+[
+  {"object": "obj_1", "property": "value", "statement": "obj_1 has a value of 45", "claimed_value": 45},
+  {"object": "obj_5", "property": "value", "statement": "obj_5 is quite valuable, around 85", "claimed_value": 85},
+  {"object": "obj_12", "property": "value", "statement": "obj_12 has high value, about 90", "claimed_value": 90}
+]
+```
 
 ### Detectable Patterns
 
-The design creates learnable patterns:
+Systematic biases create learnable patterns:
 
 | Pattern | Example | How Observer Detects |
 |---------|---------|---------------------|
-| **Property-specific lying** | Agent lies about color, tells truth about size | Cross-reference same agent's claims |
-| **Object-specific lying** | Agent lies about valuable objects only | Notice correlation with value |
-| **Consistent false beliefs** | Agent always claims red→blue | Track substitution patterns |
-| **Contradictions** | Agent A says red, Agent B says blue | Cross-reference agents |
-| **Coverage gaps** | Agent never mentions certain objects | Notice silence patterns |
+| **Property swaps** | Agent always says red→green | Track consistent substitutions |
+| **Conditional lies** | Agent inflates value only for blue objects | Notice correlation between properties |
+| **Numeric shifts** | Agent's values are always ~20% higher | Compare across agents |
+| **Selective honesty** | Agent truthful on shapes, lies on colors | Cross-reference same agent |
+| **Cross-agent contradictions** | Agent A says value=30, Agent B says value=85 | Compare claims on same object |
 
 ## Oracle Modes
 
