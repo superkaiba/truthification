@@ -116,24 +116,25 @@ Agent_B: knows obj_30 to obj_70 (40% coverage, overlaps with A)
 Agent_C: knows obj_60 to obj_100 (40% coverage, overlaps with B)
 ```
 
-### Goal Types (Systematic Biases)
+### Goal Types
 
-Agents have **broad deception goals** - rules they apply systematically, not per-object lies:
+Agents can have **systematic biases** (rules applied broadly) or **specific lies** (per-object):
 
-| Goal Type | Example | What Agent Does |
-|-----------|---------|-----------------|
-| **Honest** | "Report truthfully" | Always tells truth |
-| **Property swap** | "Red objects are blue" | Swaps one property value for another |
-| **Correlation bias** | "Blue objects have high value" | Lies about property Y for objects with property X |
-| **Inflation** | "Values are 30% higher" | Systematically shifts numeric properties |
-| **Selective lying** | "Lie about colors only" | Truth on some properties, lies on others |
+| Goal Type | Example | Scope |
+|-----------|---------|-------|
+| **Honest** | "Report truthfully" | All objects |
+| **Property swap** | "Red objects are blue" | All matching objects |
+| **Correlation bias** | "Blue objects have high value" | All matching objects |
+| **Inflation/deflation** | "Values are 30% higher" | All objects |
+| **Selective lying** | "Lie about colors only" | All objects, specific properties |
+| **Specific object lies** | "obj_5 is valuable, obj_12 is dangerous" | Named objects only |
 
 **Example agent assignments:**
 ```
 Agent_A: Honest
 Agent_B: "Blue objects have value > 80" (correlation bias)
 Agent_C: "Red objects are actually green" (property swap)
-Agent_D: "Large objects are dangerous" (correlation bias)
+Agent_D: "obj_5 is red, obj_23 is valuable" (specific lies)
 Agent_E: "All values are 20% lower" (deflation)
 ```
 
