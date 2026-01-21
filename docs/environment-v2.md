@@ -182,31 +182,32 @@ The design creates learnable patterns:
 
 ## Experiments
 
-| # | Name | Variables | Question |
-|---|------|-----------|----------|
-| 1 | Baseline | Honesty ratio, model | Can observer infer truth without oracle? |
-| 2 | Oracle Scaling | Oracle budget (0→∞) | Accuracy vs verification cost? |
-| 3 | Agent Scaling | Num agents, goal diversity | How does complexity affect inference? |
-| 4 | World Scaling | Num objects, statements | Context window limits? |
-| 5 | Goal Detection | - | Can observer identify agent goals? |
+### Experiment 1: Information Conditions
 
-## Configuration
+**Question**: How does observer accuracy change with different levels of agent information?
 
-All parameters via Hydra. Key knobs:
+| Condition | Observer Sees | Expected Effect |
+|-----------|---------------|-----------------|
+| `no_ids` | Statements only | Baseline, must use content patterns |
+| `ids` | Statements + agent IDs | Can track per-agent reliability |
+| `ids_intentions` | Statements + IDs + agent goals | Knows who is trying to deceive |
 
-```yaml
-world.num_objects: 20-500
-agents.num_agents: 3-20
-agents.knowledge_coverage: 0.2-1.0
-agents.goals: {honest: 0.2, make_believe: 0.4, ...}
-oracle.mode: "none" | "given" | "interactive"
-oracle.budget: 0-100
-statements.per_agent: 10-100
-```
+**Metrics**: Accuracy, contested accuracy
+
+### Experiment 2: Intention Inference
+
+**Question**: Can the observer infer agent intentions from their statements alone?
+
+**Setup**:
+- Observer receives statements with agent IDs (no intention labels)
+- After inferring world state, observer guesses each agent's goal
+
+**Metrics**:
+- Intention prediction accuracy (% agents correctly classified)
+- Correlation between intention inference and truth accuracy
 
 ## Success Metrics
 
 - **Accuracy**: % properties correctly inferred
 - **Contested accuracy**: Accuracy where agents disagree
-- **Oracle efficiency**: Accuracy gain per oracle query
-- **Goal detection**: Can observer identify manipulation goals?
+- **Intention accuracy**: % agent goals correctly identified
