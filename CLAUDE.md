@@ -45,6 +45,17 @@ Research project investigating truthification methods for LLMs - teaching models
 - Also commit summary notes/observations to the repo
 - Document what worked, what didn't, and hypotheses for why
 
+### Saving Experiment Summaries
+- **Save each experiment's results to `results/{experiment_name}/`**
+- Create a `README.md` in each experiment folder with:
+  - Research question
+  - Experimental setup
+  - Results tables
+  - Embedded plots (use relative paths like `![Plot](plot_name.png)`)
+  - Key findings and interpretation
+- Copy relevant plots from `outputs/` to the `results/` folder
+- This creates a permanent, version-controlled record of experiments
+
 ### Running Experiments
 - **Always run experiments in the background** using `run_in_background: true`
 - Check progress periodically with `BashOutput` tool
