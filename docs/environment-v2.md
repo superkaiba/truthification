@@ -118,25 +118,26 @@ Agent_C: knows obj_60 to obj_100 (40% coverage, overlaps with B)
 
 ### Goal Types
 
-Agents can have **systematic biases** (rules applied broadly) or **specific lies** (per-object):
+All agents have **systematic biases** - rules they apply consistently. No agent is fully honest.
 
-| Goal Type | Example | Scope |
-|-----------|---------|-------|
-| **Honest** | "Report truthfully" | All objects |
-| **Property swap** | "Red objects are blue" | All matching objects |
-| **Correlation bias** | "Blue objects have high value" | All matching objects |
-| **Inflation/deflation** | "Values are 30% higher" | All objects |
-| **Selective lying** | "Lie about colors only" | All objects, specific properties |
-| **Specific object lies** | "obj_5 is valuable, obj_12 is dangerous" | Named objects only |
+| Goal Type | Example | Effect |
+|-----------|---------|--------|
+| **Property swap** | "Red → green" | Substitutes one value for another |
+| **Correlation bias** | "Blue objects have high value" | Lies about property Y when property X is present |
+| **Inflation/deflation** | "Values +30%" or "Values -20%" | Shifts numeric properties up or down |
+| **Negation** | "Dangerous objects are safe" | Flips boolean properties |
+| **Property-specific** | "Lie about colors (red→blue), truth about rest" | Bias limited to certain properties |
 
 **Example agent assignments:**
 ```
-Agent_A: Honest
+Agent_A: "Red → blue" (property swap on color)
 Agent_B: "Blue objects have value > 80" (correlation bias)
-Agent_C: "Red objects are actually green" (property swap)
-Agent_D: "obj_5 is red, obj_23 is valuable" (specific lies)
-Agent_E: "All values are 20% lower" (deflation)
+Agent_C: "All values +25%" (inflation)
+Agent_D: "Large objects are dangerous" (correlation bias)
+Agent_E: "Green → yellow, shapes truthful" (property-specific swap)
 ```
+
+**Key design choice**: No fully honest agents. Every source has some bias. The observer must infer *what* each agent's bias is, not *whether* they're biased.
 
 ### Statement Generation (Batch)
 
@@ -192,25 +193,25 @@ Systematic biases create learnable patterns:
 | Condition | Observer Sees | Expected Effect |
 |-----------|---------------|-----------------|
 | `no_ids` | Statements only | Baseline, must use content patterns |
-| `ids` | Statements + agent IDs | Can track per-agent reliability |
-| `ids_intentions` | Statements + IDs + agent goals | Knows who is trying to deceive |
+| `ids` | Statements + agent IDs | Can track per-agent bias patterns |
+| `ids_biases` | Statements + IDs + agent bias rules | Knows each agent's systematic bias |
 
 **Metrics**: Accuracy, contested accuracy
 
-### Experiment 2: Intention Inference
+### Experiment 2: Bias Inference
 
-**Question**: Can the observer infer agent intentions from their statements alone?
+**Question**: Can the observer infer each agent's bias rule from their statements?
 
 **Setup**:
-- Observer receives statements with agent IDs (no intention labels)
-- After inferring world state, observer guesses each agent's goal
+- Observer receives statements with agent IDs (no bias labels)
+- After inferring world state, observer describes each agent's bias
 
 **Metrics**:
-- Intention prediction accuracy (% agents correctly classified)
-- Correlation between intention inference and truth accuracy
+- Bias prediction accuracy (% agents correctly classified)
+- Correlation between bias inference and truth accuracy
 
 ## Success Metrics
 
 - **Accuracy**: % properties correctly inferred
 - **Contested accuracy**: Accuracy where agents disagree
-- **Intention accuracy**: % agent goals correctly identified
+- **Bias inference accuracy**: % agent bias rules correctly identified
