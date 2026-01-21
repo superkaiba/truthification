@@ -1,6 +1,11 @@
-# ICL Baseline Experiment Configuration (v2 - Observer-Centric Model)
+# Full-Context ICL Experiment Configuration
+# Observer sees ALL statements for every query (can infer reliability from patterns)
 
-# World settings (20 objects, 4 properties)
+# Load from existing baseline dataset for direct comparison
+# Set to null to generate new data
+load_from_dataset: outputs/icl_experiment_v2
+
+# World settings (same as baseline for comparison)
 world:
   n_objects: 20
   properties:
@@ -17,13 +22,13 @@ world:
       type: numeric
       possible_values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
-# Observer task - what the observer is trying to learn
+# Observer task
 observer_task:
   name: find_red_circles
   description: "find red circular objects"
   relevant_properties: [color, shape]
 
-# Agent settings (3 agents, 50% adversarial)
+# Agent settings (same as baseline)
 agent:
   n_agents: 3
   adversarial_fraction: 0.5
@@ -40,10 +45,10 @@ agent:
 
 # Data generation
 seeds: [42, 123, 456]
-statements_per_agent: 80  # 3 agents × 80 = 240 statements, ~95% query coverage
+statements_per_agent: 80
 
 # Agent model (for statement generation)
-agent_model: claude-opus-4-20250514
+agent_model: claude-sonnet-4-20250514
 
 # Observer models to compare
 observer_models:
@@ -51,20 +56,17 @@ observer_models:
   - claude-sonnet-4-20250514
   - claude-opus-4-20250514
 
-# Conditions to run
+# Full-context conditions only
 conditions:
-  - no_ids
-  - ids_only
-  - ids_and_tasks
-  - oracle_reliability
-  - oracle_agent_type  # Shows whether agent is cooperative/adversarial
-  - oracle_truth_labels
+  - full_context_no_ids
+  - full_context_ids
+  - full_context_ids_tasks
 
 # Output
-output_dir: outputs/icl_experiment_v2
+output_dir: outputs/icl_full_context
 save_results: true
 
 # Wandb
 wandb:
   project: truthification
-  name: icl-baseline-v2
+  name: icl-full-context

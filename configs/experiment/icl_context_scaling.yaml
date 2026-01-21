@@ -1,0 +1,43 @@
+# Context Scaling ICL Experiment Configuration
+# Measures how accuracy varies with number of statements shown
+
+# Load from existing baseline dataset
+load_from_dataset: outputs/icl_experiment_v2
+
+# Context sizes to test (number of statements shown)
+# Full dataset has 240 statements (3 agents × 80 statements each)
+context_sizes:
+  - 30    # ~12% of statements
+  - 60    # 25% of statements
+  - 90    # 37.5% of statements
+  - 120   # 50% of statements
+  - 180   # 75% of statements
+  - 240   # 100% (all statements)
+
+# How to sample statements when n < total
+# Options: uniform, balanced (equal per agent), recent
+sampling_strategy: balanced
+
+# Seeds to test
+seeds: [42, 123, 456]
+
+# Observer models to compare
+observer_models:
+  - claude-3-5-haiku-20241022
+  - claude-sonnet-4-20250514
+  - claude-opus-4-20250514
+
+# Full-context conditions to test
+conditions:
+  - full_context_no_ids
+  - full_context_ids
+  - full_context_ids_tasks
+
+# Output
+output_dir: outputs/icl_context_scaling
+save_results: true
+
+# Wandb
+wandb:
+  project: truthification
+  name: icl-context-scaling
