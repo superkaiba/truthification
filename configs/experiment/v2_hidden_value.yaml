@@ -1,0 +1,69 @@
+# V2 Hidden Value Game Experiment Configuration
+
+# World settings
+world:
+  n_objects: 20
+  rule_complexity: medium  # simple, medium, complex
+  properties:
+    - name: color
+      type: categorical
+      possible_values: [red, blue, green, yellow, orange]
+    - name: shape
+      type: categorical
+      possible_values: [circle, square, triangle, star]
+    - name: size
+      type: categorical
+      possible_values: [small, medium, large]
+    - name: material
+      type: categorical
+      possible_values: [metal, wood, plastic, glass]
+    - name: is_dangerous
+      type: boolean
+      possible_values: [true, false]
+
+# Agent settings
+agent:
+  n_agents: 2  # Conflicting interests: Agent A (blue) vs Agent B (red)
+  model: claude-sonnet-4-20250514
+
+# Observer settings
+observer:
+  model: claude-sonnet-4-20250514
+  oracle_budget: 5
+  selection_size: 5
+
+# Game settings
+game:
+  n_rounds: 3
+  statements_per_agent_per_round: 2
+  condition: blind  # blind, ids, interests
+
+# Random seeds for reproducibility
+seeds: [42, 123, 456]
+
+# Experiments to run
+experiments:
+  oracle_scaling: true
+  information_conditions: true
+  rule_complexity: true
+
+# Oracle scaling experiment
+oracle_scaling:
+  budgets: [0, 5, 10, 20]
+
+# Information conditions experiment
+information_conditions:
+  conditions: [blind, ids, interests]
+
+# Rule complexity experiment
+rule_complexity:
+  levels: [simple, medium, complex]
+
+# Output directory
+output_dir: outputs/v2_hidden_value
+
+# Weights & Biases
+wandb:
+  enabled: true
+  project: truthification
+  name: v2-hidden-value
