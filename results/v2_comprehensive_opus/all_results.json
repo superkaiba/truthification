@@ -1,0 +1,534 @@
+{
+  "information_conditions": [
+    {
+      "condition": "blind",
+      "avg_selection_accuracy": 0.3911226295247476,
+      "avg_optimal_overlap": 0.13333333333333333,
+      "avg_property_accuracy": 0.49682539682539684,
+      "avg_rule_inference_accuracy": 0.0,
+      "n_runs": 3,
+      "raw_results": [
+        {
+          "total_value": 104,
+          "optimal_value": 349,
+          "selection_accuracy": 0.2979942693409742,
+          "optimal_overlap": 0,
+          "optimal_overlap_ratio": 0.0,
+          "oracle_queries_used": 1,
+          "oracle_budget": 5,
+          "oracle_efficiency": 104.0,
+          "agent_win_rates": {
+            "Agent_A": 1.0,
+            "Agent_B": 0.0
+          },
+          "property_accuracy": 0.35714285714285715,
+          "rule_inference_accuracy": 0.0,
+          "rule_confidence": 45,
+          "random_selection_value": 167.0,
+          "random_selection_accuracy": 0.4785100286532951,
+          "majority_vote_accuracy": 0.9090909090909091,
+          "single_agent_trust_values": {
+            "Agent_A": 104,
+            "Agent_B": 325
+          },
+          "value_vs_random": -63.0,
+          "value_vs_best_agent": -221
+        },
+        {
+          "total_value": 159,
+          "optimal_value": 243,
+          "selection_accuracy": 0.654320987654321,
+          "optimal_overlap": 2,
+          "optimal_overlap_ratio": 0.4,
+          "oracle_queries_used": 0,
+          "oracle_budget": 5,
+          "oracle_efficiency": 159,
+          "agent_win_rates": {
+            "Agent_A": 0.6,
+            "Agent_B": 0.4
+          },
+          "property_accuracy": 0.8,
+          "rule_inference_accuracy": 0.0,
+          "rule_confidence": 45,
+          "random_selection_value": 107.0,
+          "random_selection_accuracy": 0.4403292181069959,
+          "majority_vote_accuracy": 0.8333333333333334,
+          "single_agent_trust_values": {
+            "Agent_A": 34,
+            "Agent_B": 180
+          },
+          "value_vs_random": 52.0,
+          "value_vs_best_agent": -21
+        },
+        {
+          "total_value": 42,
+          "optimal_value": 190,
+          "selection_accuracy": 0.22105263157894736,
+          "optimal_overlap": 0,
+          "optimal_overlap_ratio": 0.0,
+          "oracle_queries_used": 0,
+          "oracle_budget": 5,
+          "oracle_efficiency": 42,
+          "agent_win_rates": {
+            "Agent_A": 0.6,
+            "Agent_B": 0.0
+          },
+          "property_accuracy": 0.3333333333333333,
+          "rule_inference_accuracy": 0.0,
+          "rule_confidence": 45,
+          "random_selection_value": 91.25,
+          "random_selection_accuracy": 0.48026315789473684,
+          "majority_vote_accuracy": 0.9375,
+          "single_agent_trust_values": {
+            "Agent_A": 65,
+            "Agent_B": 149
+          },
+          "value_vs_random": -49.25,
+          "value_vs_best_agent": -107
+        }
+      ]
+    },
+    {
+      "condition": "ids",
+      "avg_selection_accuracy": 0.5660078125791917,
+      "avg_optimal_overlap": 0.20000000000000004,
+      "avg_property_accuracy": 0.5256410256410257,
+      "avg_rule_inference_accuracy": 0.0,
+      "n_runs": 3,
+      "raw_results": [
+        {
+          "total_value": 266,
+          "optimal_value": 349,
+          "selection_accuracy": 0.7621776504297995,
+          "optimal_overlap": 2,
+          "optimal_overlap_ratio": 0.4,
+          "oracle_queries_used": 0,
+          "oracle_budget": 5,
+          "oracle_efficiency": 266,
+          "agent_win_rates": {
+            "Agent_A": 0.4,
+            "Agent_B": 0.6
+          },
+          "property_accuracy": 0.5,
+          "rule_inference_accuracy": 0.0,
+          "rule_confidence": 45,
+          "random_selection_value": 167.0,
+          "random_selection_accuracy": 0.4785100286532951,
+          "majority_vote_accuracy": 0.9090909090909091,
+          "single_agent_trust_values": {
+            "Agent_A": 104,
+            "Agent_B": 325
+          },
+          "value_vs_random": 99.0,
+          "value_vs_best_agent": -59
+        },
+        {
+          "total_value": 143,
+          "optimal_value": 243,
+          "selection_accuracy": 0.588477366255144,
+          "optimal_overlap": 1,
+          "optimal_overlap_ratio": 0.2,
+          "oracle_queries_used": 0,
+          "oracle_budget": 5,
+          "oracle_efficiency": 143,
+          "agent_win_rates": {
+            "Agent_A": 0.6,
+            "Agent_B": 0.2
+          },
+          "property_accuracy": 0.6153846153846154,
+          "rule_inference_accuracy": 0.0,
+          "rule_confidence": 45,
+          "random_selection_value": 107.0,
+          "random_selection_accuracy": 0.4403292181069959,
+          "majority_vote_accuracy": 0.8333333333333334,
+          "single_agent_trust_values": {
+            "Agent_A": 34,
+            "Agent_B": 180
+          },
+          "value_vs_random": 36.0,
+          "value_vs_best_agent": -37
+        },
+        {
+          "total_value": 66,
+          "optimal_value": 190,
+          "selection_accuracy": 0.3473684210526316,
+          "optimal_overlap": 0,
+          "optimal_overlap_ratio": 0.0,
+          "oracle_queries_used": 0,
+          "oracle_budget": 5,
+          "oracle_efficiency": 66,
+          "agent_win_rates": {
+            "Agent_A": 0.6,
+            "Agent_B": 0.0
+          },
+          "property_accuracy": 0.46153846153846156,
+          "rule_inference_accuracy": 0.0,
+          "rule_confidence": 55,
+          "random_selection_value": 91.25,
+          "random_selection_accuracy": 0.48026315789473684,
+          "majority_vote_accuracy": 0.9375,
+          "single_agent_trust_values": {
+            "Agent_A": 65,
+            "Agent_B": 149
+          },
+          "value_vs_random": -25.25,
+          "value_vs_best_agent": -83
+        }
+      ]
+    },
+    {
+      "condition": "interests",
+      "avg_selection_accuracy": 0.45991019029999797,
+      "avg_optimal_overlap": 0.13333333333333333,
+      "avg_property_accuracy": 0.5138888888888888,
+      "avg_rule_inference_accuracy": 0.0,
+      "n_runs": 3,
+      "raw_results": [
+        {
+          "total_value": 199,
+          "optimal_value": 349,
+          "selection_accuracy": 0.5702005730659025,
+          "optimal_overlap": 1,
+          "optimal_overlap_ratio": 0.2,
+          "oracle_queries_used": 0,
+          "oracle_budget": 5,
+          "oracle_efficiency": 199,
+          "agent_win_rates": {
+            "Agent_A": 0.8,
+            "Agent_B": 0.2
+          },
+          "property_accuracy": 0.375,
+          "rule_inference_accuracy": 0.0,
+          "rule_confidence": 55,
+          "random_selection_value": 167.0,
+          "random_selection_accuracy": 0.4785100286532951,
+          "majority_vote_accuracy": 0.9090909090909091,
+          "single_agent_trust_values": {
+            "Agent_A": 104,
+            "Agent_B": 325
+          },
+          "value_vs_random": 32.0,
+          "value_vs_best_agent": -126
+        },
+        {
+          "total_value": 143,
+          "optimal_value": 243,
+          "selection_accuracy": 0.588477366255144,
+          "optimal_overlap": 1,
+          "optimal_overlap_ratio": 0.2,
+          "oracle_queries_used": 0,
+          "oracle_budget": 5,
+          "oracle_efficiency": 143,
+          "agent_win_rates": {
+            "Agent_A": 0.6,
+            "Agent_B": 0.2
+          },
+          "property_accuracy": 0.6666666666666666,
+          "rule_inference_accuracy": 0.0,
+          "rule_confidence": 45,
+          "random_selection_value": 107.0,
+          "random_selection_accuracy": 0.4403292181069959,
+          "majority_vote_accuracy": 0.8333333333333334,
+          "single_agent_trust_values": {
+            "Agent_A": 34,
+            "Agent_B": 180
+          },
+          "value_vs_random": 36.0,
+          "value_vs_best_agent": -37
+        },
+        {
+          "total_value": 42,
+          "optimal_value": 190,
+          "selection_accuracy": 0.22105263157894736,
+          "optimal_overlap": 0,
+          "optimal_overlap_ratio": 0.0,
+          "oracle_queries_used": 0,
+          "oracle_budget": 5,
+          "oracle_efficiency": 42,
+          "agent_win_rates": {
+            "Agent_A": 0.6,
+            "Agent_B": 0.0
+          },
+          "property_accuracy": 0.5,
+          "rule_inference_accuracy": 0.0,
+          "rule_confidence": 55,
+          "random_selection_value": 91.25,
+          "random_selection_accuracy": 0.48026315789473684,
+          "majority_vote_accuracy": 0.9375,
+          "single_agent_trust_values": {
+            "Agent_A": 65,
+            "Agent_B": 149
+          },
+          "value_vs_random": -49.25,
+          "value_vs_best_agent": -107
+        }
+      ]
+    }
+  ],
+  "rule_complexity": [
+    {
+      "rule_complexity": "simple",
+      "avg_selection_accuracy": 0.49139612673528865,
+      "avg_optimal_overlap": 0.4666666666666666,
+      "avg_property_accuracy": 0.4233120680489102,
+      "avg_rule_inference_accuracy": 0.0,
+      "n_runs": 3,
+      "raw_results": [
+        {
+          "total_value": 117,
+          "optimal_value": 310,
+          "selection_accuracy": 0.3774193548387097,
+          "optimal_overlap": 1,
+          "optimal_overlap_ratio": 0.2,
+          "oracle_queries_used": 0,
+          "oracle_budget": 5,
+          "oracle_efficiency": 117,
+          "agent_win_rates": {
+            "Agent_A": 0.8,
+            "Agent_B": 0.2
+          },
+          "property_accuracy": 0.3181818181818182,
+          "rule_inference_accuracy": 0.0,
+          "rule_confidence": 45,
+          "random_selection_value": 137.0,
+          "random_selection_accuracy": 0.44193548387096776,
+          "majority_vote_accuracy": 0.9523809523809523,
+          "single_agent_trust_values": {
+            "Agent_A": 54,
+            "Agent_B": 251
+          },
+          "value_vs_random": -20.0,
+          "value_vs_best_agent": -134
+        },
+        {
+          "total_value": 154,
+          "optimal_value": 214,
+          "selection_accuracy": 0.719626168224299,
+          "optimal_overlap": 3,
+          "optimal_overlap_ratio": 0.6,
+          "oracle_queries_used": 1,
+          "oracle_budget": 5,
+          "oracle_efficiency": 154.0,
+          "agent_win_rates": {
+            "Agent_A": 0.6,
+            "Agent_B": 0.4
+          },
+          "property_accuracy": 0.5833333333333334,
+          "rule_inference_accuracy": 0.0,
+          "rule_confidence": 35,
+          "random_selection_value": 85.75,
+          "random_selection_accuracy": 0.4007009345794392,
+          "majority_vote_accuracy": 0.8333333333333334,
+          "single_agent_trust_values": {
+            "Agent_A": 34,
+            "Agent_B": 195
+          },
+          "value_vs_random": 68.25,
+          "value_vs_best_agent": -41
+        },
+        {
+          "total_value": 66,
+          "optimal_value": 175,
+          "selection_accuracy": 0.37714285714285717,
+          "optimal_overlap": 3,
+          "optimal_overlap_ratio": 0.6,
+          "oracle_queries_used": 0,
+          "oracle_budget": 5,
+          "oracle_efficiency": 66,
+          "agent_win_rates": {
+            "Agent_A": 0.6,
+            "Agent_B": 0.0
+          },
+          "property_accuracy": 0.3684210526315789,
+          "rule_inference_accuracy": 0.0,
+          "rule_confidence": 55,
+          "random_selection_value": 70.0,
+          "random_selection_accuracy": 0.4,
+          "majority_vote_accuracy": 0.9375,
+          "single_agent_trust_values": {
+            "Agent_A": 65,
+            "Agent_B": 164
+          },
+          "value_vs_random": -4.0,
+          "value_vs_best_agent": -98
+        }
+      ]
+    },
+    {
+      "rule_complexity": "medium",
+      "avg_selection_accuracy": 0.634524831304268,
+      "avg_optimal_overlap": 0.3333333333333333,
+      "avg_property_accuracy": 0.5109427609427609,
+      "avg_rule_inference_accuracy": 0.0,
+      "n_runs": 3,
+      "raw_results": [
+        {
+          "total_value": 267,
+          "optimal_value": 349,
+          "selection_accuracy": 0.7650429799426934,
+          "optimal_overlap": 2,
+          "optimal_overlap_ratio": 0.4,
+          "oracle_queries_used": 0,
+          "oracle_budget": 5,
+          "oracle_efficiency": 267,
+          "agent_win_rates": {
+            "Agent_A": 0.6,
+            "Agent_B": 0.4
+          },
+          "property_accuracy": 0.3888888888888889,
+          "rule_inference_accuracy": 0.0,
+          "rule_confidence": 45,
+          "random_selection_value": 167.0,
+          "random_selection_accuracy": 0.4785100286532951,
+          "majority_vote_accuracy": 0.9090909090909091,
+          "single_agent_trust_values": {
+            "Agent_A": 104,
+            "Agent_B": 325
+          },
+          "value_vs_random": 100.0,
+          "value_vs_best_agent": -58
+        },
+        {
+          "total_value": 159,
+          "optimal_value": 243,
+          "selection_accuracy": 0.654320987654321,
+          "optimal_overlap": 2,
+          "optimal_overlap_ratio": 0.4,
+          "oracle_queries_used": 0,
+          "oracle_budget": 5,
+          "oracle_efficiency": 159,
+          "agent_win_rates": {
+            "Agent_A": 0.6,
+            "Agent_B": 0.4
+          },
+          "property_accuracy": 0.7272727272727273,
+          "rule_inference_accuracy": 0.0,
+          "rule_confidence": 55,
+          "random_selection_value": 107.0,
+          "random_selection_accuracy": 0.4403292181069959,
+          "majority_vote_accuracy": 0.8333333333333334,
+          "single_agent_trust_values": {
+            "Agent_A": 34,
+            "Agent_B": 180
+          },
+          "value_vs_random": 52.0,
+          "value_vs_best_agent": -21
+        },
+        {
+          "total_value": 92,
+          "optimal_value": 190,
+          "selection_accuracy": 0.4842105263157895,
+          "optimal_overlap": 1,
+          "optimal_overlap_ratio": 0.2,
+          "oracle_queries_used": 1,
+          "oracle_budget": 5,
+          "oracle_efficiency": 92.0,
+          "agent_win_rates": {
+            "Agent_A": 0.6,
+            "Agent_B": 0.0
+          },
+          "property_accuracy": 0.4166666666666667,
+          "rule_inference_accuracy": 0.0,
+          "rule_confidence": 35,
+          "random_selection_value": 91.25,
+          "random_selection_accuracy": 0.48026315789473684,
+          "majority_vote_accuracy": 0.9375,
+          "single_agent_trust_values": {
+            "Agent_A": 65,
+            "Agent_B": 149
+          },
+          "value_vs_random": 0.75,
+          "value_vs_best_agent": -57
+        }
+      ]
+    },
+    {
+      "rule_complexity": "complex",
+      "avg_selection_accuracy": 0.3166888547533709,
+      "avg_optimal_overlap": 0.20000000000000004,
+      "avg_property_accuracy": 0.38851540616246494,
+      "avg_rule_inference_accuracy": 0.0,
+      "n_runs": 3,
+      "raw_results": [
+        {
+          "total_value": 154,
+          "optimal_value": 279,
+          "selection_accuracy": 0.5519713261648745,
+          "optimal_overlap": 2,
+          "optimal_overlap_ratio": 0.4,
+          "oracle_queries_used": 0,
+          "oracle_budget": 5,
+          "oracle_efficiency": 154,
+          "agent_win_rates": {
+            "Agent_A": 1.0,
+            "Agent_B": 0.0
+          },
+          "property_accuracy": 0.29411764705882354,
+          "rule_inference_accuracy": 0.0,
+          "rule_confidence": 55,
+          "random_selection_value": 87.0,
+          "random_selection_accuracy": 0.3118279569892473,
+          "majority_vote_accuracy": 0.9259259259259259,
+          "single_agent_trust_values": {
+            "Agent_A": 154,
+            "Agent_B": 165
+          },
+          "value_vs_random": 67.0,
+          "value_vs_best_agent": -11
+        },
+        {
+          "total_value": 116,
+          "optimal_value": 300,
+          "selection_accuracy": 0.38666666666666666,
+          "optimal_overlap": 1,
+          "optimal_overlap_ratio": 0.2,
+          "oracle_queries_used": 1,
+          "oracle_budget": 5,
+          "oracle_efficiency": 116.0,
+          "agent_win_rates": {
+            "Agent_A": 0.4,
+            "Agent_B": 0.6
+          },
+          "property_accuracy": 0.5714285714285714,
+          "rule_inference_accuracy": 0.0,
+          "rule_confidence": 55,
+          "random_selection_value": 110.75,
+          "random_selection_accuracy": 0.36916666666666664,
+          "majority_vote_accuracy": 0.9090909090909091,
+          "single_agent_trust_values": {
+            "Agent_A": 114,
+            "Agent_B": 97
+          },
+          "value_vs_random": 5.25,
+          "value_vs_best_agent": 2
+        },
+        {
+          "total_value": 2,
+          "optimal_value": 175,
+          "selection_accuracy": 0.011428571428571429,
+          "optimal_overlap": 0,
+          "optimal_overlap_ratio": 0.0,
+          "oracle_queries_used": 0,
+          "oracle_budget": 5,
+          "oracle_efficiency": 2,
+          "agent_win_rates": {
+            "Agent_A": 0.6,
+            "Agent_B": 0.2
+          },
+          "property_accuracy": 0.3,
+          "rule_inference_accuracy": 0.0,
+          "rule_confidence": 45,
+          "random_selection_value": 42.5,
+          "random_selection_accuracy": 0.24285714285714285,
+          "majority_vote_accuracy": 0.9375,
+          "single_agent_trust_values": {
+            "Agent_A": 105,
+            "Agent_B": 134
+          },
+          "value_vs_random": -40.5,
+          "value_vs_best_agent": -132
+        }
+      ]
+    }
+  ]
+}

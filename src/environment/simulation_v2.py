@@ -108,10 +108,10 @@ class GameConfig:
 
     # Agent settings
     n_agents: int = 2
-    agent_model: str = "claude-sonnet-4-20250514"
+    agent_model: str = "claude-opus-4-5-20251101"
 
     # Observer settings
-    observer_model: str = "claude-sonnet-4-20250514"
+    observer_model: str = "claude-opus-4-5-20251101"
     oracle_budget: int = 5  # Number of oracle queries allowed
     selection_size: int = 5  # How many objects to select
 
@@ -852,8 +852,8 @@ def run_game(
     condition: str = "blind",
     seed: int | None = None,
     output_path: str | Path | None = None,
-    agent_model: str = "claude-sonnet-4-20250514",
-    observer_model: str = "claude-sonnet-4-20250514",
+    agent_model: str = "claude-opus-4-5-20251101",
+    observer_model: str = "claude-opus-4-5-20251101",
 ) -> GameResult:
     """
     Convenience function to run a hidden value game.

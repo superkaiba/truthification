@@ -24,11 +24,11 @@ world:
 # Agent settings
 agent:
   n_agents: 2  # Conflicting interests: Agent A (blue) vs Agent B (red)
-  model: claude-sonnet-4-20250514
+  model: claude-opus-4-5-20251101
 
 # Observer settings
 observer:
-  model: claude-sonnet-4-20250514
+  model: claude-opus-4-5-20251101
   oracle_budget: 5
   selection_size: 5
 

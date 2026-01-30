@@ -74,7 +74,7 @@ class AgentV2:
         default_factory=lambda: list(DeceptionLayer)
     )
     _client: anthropic.Anthropic | None = field(default=None, repr=False)
-    model: str = "claude-sonnet-4-20250514"
+    model: str = "claude-opus-4-5-20251101"
 
     def __post_init__(self):
         """Initialize Anthropic client if not provided."""
@@ -433,7 +433,7 @@ Just output the sentence, nothing else."""
                 DeceptionLayer(d) for d in data.get("allowed_deceptions", [])
             ],
             _client=client,
-            model=data.get("model", "claude-sonnet-4-20250514"),
+            model=data.get("model", "claude-opus-4-5-20251101"),
         )
 
 
@@ -443,7 +443,7 @@ Just output the sentence, nothing else."""
 
 def create_conflicting_agents(
     client: anthropic.Anthropic | None = None,
-    model: str = "claude-sonnet-4-20250514",
+    model: str = "claude-opus-4-5-20251101",
 ) -> tuple[AgentV2, AgentV2]:
     """
     Create two agents with conflicting interests.
@@ -480,7 +480,7 @@ def create_conflicting_agents(
 def create_multi_agent_game(
     num_agents: int = 4,
     client: anthropic.Anthropic | None = None,
-    model: str = "claude-sonnet-4-20250514",
+    model: str = "claude-opus-4-5-20251101",
 ) -> list[AgentV2]:
     """
     Create multiple agents with different interests.

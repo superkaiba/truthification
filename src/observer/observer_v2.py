@@ -106,7 +106,7 @@ class ObserverV2:
 
     def __init__(
         self,
-        model: str = "claude-sonnet-4-20250514",
+        model: str = "claude-opus-4-5-20251101",
         client: anthropic.Anthropic | None = None,
         oracle_budget: int = 5,
     ):
@@ -393,7 +393,7 @@ def run_observer(
     condition: str = "blind",
     agent_metadata: dict | None = None,
     oracle_callback: Any = None,
-    model: str = "claude-sonnet-4-20250514",
+    model: str = "claude-opus-4-5-20251101",
 ) -> ObserverSelectionResult:
     """
     Convenience function to run the observer.
@@ -441,7 +441,7 @@ class InferenceObserver:
 
     def __init__(
         self,
-        model: str = "claude-sonnet-4-20250514",
+        model: str = "claude-opus-4-5-20251101",
         client: anthropic.Anthropic | None = None,
     ):
         self.model = model
