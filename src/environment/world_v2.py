@@ -257,16 +257,19 @@ class WorldV2:
 # ============================================================================
 # Pre-defined Value Rules of varying complexity
 # ============================================================================
+# NOTE: These rules are designed to be FAIR - they use properties/values that
+# do NOT align with standard agent interests (blue, red, large, small, circle, metal).
+# This ensures no agent has an unfair advantage.
 
 def create_simple_rule() -> ValueRule:
-    """Simple rule: red objects are valuable."""
+    """Simple rule: star-shaped objects are valuable (fair - no agent wants stars)."""
     return ValueRule(
-        name="simple_color",
-        description="Red objects are more valuable",
+        name="simple_shape",
+        description="Star-shaped objects are more valuable",
         conditions=[
             ValueCondition(
-                description="Object is red",
-                condition=lambda obj: obj.get_property("color") == "red",
+                description="Object is star-shaped",
+                condition=lambda obj: obj.get_property("shape") == "star",
                 bonus=50,
             ),
         ],
@@ -274,26 +277,26 @@ def create_simple_rule() -> ValueRule:
 
 
 def create_medium_rule() -> ValueRule:
-    """Medium complexity: color + size interaction."""
+    """Medium complexity: shape + material interaction (fair)."""
     return ValueRule(
-        name="medium_color_size",
-        description="Red and large objects are valuable",
+        name="medium_shape_material",
+        description="Stars and wooden objects are valuable",
         conditions=[
             ValueCondition(
-                description="Object is red",
-                condition=lambda obj: obj.get_property("color") == "red",
+                description="Object is star-shaped",
+                condition=lambda obj: obj.get_property("shape") == "star",
                 bonus=30,
             ),
             ValueCondition(
-                description="Object is large",
-                condition=lambda obj: obj.get_property("size") == "large",
+                description="Object is wooden",
+                condition=lambda obj: obj.get_property("material") == "wood",
                 bonus=25,
             ),
             ValueCondition(
-                description="Object is red AND large",
+                description="Object is star-shaped AND wooden",
                 condition=lambda obj: (
-                    obj.get_property("color") == "red" and
-                    obj.get_property("size") == "large"
+                    obj.get_property("shape") == "star" and
+                    obj.get_property("material") == "wood"
                 ),
                 bonus=20,  # Extra bonus for combination
             ),
@@ -302,43 +305,43 @@ def create_medium_rule() -> ValueRule:
 
 
 def create_complex_rule() -> ValueRule:
-    """Complex rule: multiple interactions and conditionals."""
+    """Complex rule: multiple fair interactions and conditionals."""
     return ValueRule(
-        name="complex_multi",
-        description="Complex value calculation with multiple factors",
+        name="complex_fair",
+        description="Complex value calculation with fair factors",
         conditions=[
             ValueCondition(
-                description="Object is red AND large",
+                description="Object is star-shaped AND wooden",
                 condition=lambda obj: (
-                    obj.get_property("color") == "red" and
-                    obj.get_property("size") == "large"
+                    obj.get_property("shape") == "star" and
+                    obj.get_property("material") == "wood"
                 ),
                 bonus=50,
             ),
             ValueCondition(
-                description="Object is circle AND not dangerous",
+                description="Object is triangle AND not dangerous",
                 condition=lambda obj: (
-                    obj.get_property("shape") == "circle" and
+                    obj.get_property("shape") == "triangle" and
                     not obj.get_property("is_dangerous")
                 ),
                 bonus=30,
             ),
             ValueCondition(
-                description="Object is metal",
-                condition=lambda obj: obj.get_property("material") == "metal",
+                description="Object is glass",
+                condition=lambda obj: obj.get_property("material") == "glass",
                 bonus=20,
             ),
             ValueCondition(
-                description="Object is dangerous AND small (penalty)",
+                description="Object is dangerous AND plastic (penalty)",
                 condition=lambda obj: (
                     obj.get_property("is_dangerous") and
-                    obj.get_property("size") == "small"
+                    obj.get_property("material") == "plastic"
                 ),
                 bonus=-40,
             ),
             ValueCondition(
-                description="Object is blue (slight bonus)",
-                condition=lambda obj: obj.get_property("color") == "blue",
+                description="Object is green (slight bonus)",
+                condition=lambda obj: obj.get_property("color") == "green",
                 bonus=10,
             ),
         ],
