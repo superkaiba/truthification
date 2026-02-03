@@ -1,4 +1,4 @@
-"""LLM-based agents with conflicting interests for V2 hidden value game."""
+"""LLM-based agents with conflicting interests for the hidden value game."""
 
 import random
 import re
@@ -7,7 +7,7 @@ from typing import Any
 
 import anthropic
 
-from .world_v2 import Object, ValueRule, WorldV2
+from .world import Object, ValueRule, World
 
 
 @dataclass
@@ -31,7 +31,7 @@ class AgentInterest:
 
 
 @dataclass
-class StatementV2:
+class Statement:
     """A statement made by an agent to influence the observer."""
     text: str
     agent_id: str
@@ -39,7 +39,17 @@ class StatementV2:
 
 
 @dataclass
-class AgentV2:
+class ValueRuleClaim:
+    """A claim made by an agent about the value rule."""
+    agent_id: str
+    round_number: int
+    claim_text: str
+    claimed_factors: list[str]  # Property names mentioned: ["color", "size"]
+    claimed_high_value: list[str]  # Property=value pairs: ["color=blue", "size=large"]
+
+
+@dataclass
+class Agent:
     """
     An LLM-based agent that strategically communicates to influence the observer.
 
@@ -67,12 +77,14 @@ class AgentV2:
 
     def generate_statements(
         self,
-        world: WorldV2,
+        world: World,
         value_rule: ValueRule,
         conversation_history: list | None = None,
         rng: random.Random | None = None,
         num_statements: int = 2,
-    ) -> list[StatementV2]:
+        visible_agents: set[str] | None = None,
+        include_oracle: bool = True,
+    ) -> list[Statement]:
         """
         Generate strategic statements via a single LLM call.
 
@@ -88,6 +100,8 @@ class AgentV2:
             conversation_history: Prior messages in this round (for group chat)
             rng: Random number generator (unused, kept for API compatibility)
             num_statements: Number of statements to generate
+            visible_agents: Set of agent IDs whose messages are visible (None = all)
+            include_oracle: Whether oracle results are visible
 
         Returns:
             List of strategic statements
@@ -95,7 +109,9 @@ class AgentV2:
         # Format world info (agent sees all properties)
         objects_info = self._format_objects_for_agent(world)
         rule_info = self._format_rule_for_agent(value_rule)
-        conversation = self._format_conversation_history(conversation_history)
+        conversation = self._format_conversation_history(
+            conversation_history, visible_agents, include_oracle
+        )
 
         prompt = f"""You are {self.id} in a strategic game.
 
@@ -147,7 +163,7 @@ Format: Return one statement per line, no numbering or prefixes."""
         # Parse response into statements
         return self._parse_statements(response_text, num_statements, thinking)
 
-    def _format_objects_for_agent(self, world: WorldV2) -> str:
+    def _format_objects_for_agent(self, world: World) -> str:
         """Format all objects with their properties for the agent."""
         lines = []
         for obj_id in world.list_objects():
@@ -165,23 +181,42 @@ Format: Return one statement per line, no numbering or prefixes."""
             conditions.append(f"{cond.description}: +{cond.bonus}")
         return f"{value_rule.description}\nConditions: {', '.join(conditions)}"
 
-    def _format_conversation_history(self, history: list | None) -> str:
-        """Format prior messages for agent context."""
+    def _format_conversation_history(
+        self,
+        history: list | None,
+        visible_agents: set[str] | None = None,
+        include_oracle: bool = True,
+    ) -> str:
+        """Format prior messages for agent context with visibility filtering.
+
+        Args:
+            history: List of messages (Statement or dict)
+            visible_agents: Set of agent IDs whose messages are visible (None = all)
+            include_oracle: Whether to include oracle results
+
+        Returns:
+            Formatted conversation string
+        """
         if not history:
             return "No messages yet in this round."
 
         lines = []
         for item in history:
-            if isinstance(item, StatementV2):
-                lines.append(f"{item.agent_id}: {item.text}")
+            if isinstance(item, Statement):
+                # Filter by visible agents
+                if visible_agents is None or item.agent_id in visible_agents:
+                    lines.append(f"{item.agent_id}: {item.text}")
             elif isinstance(item, dict):
                 if item.get("type") == "oracle_result":
-                    lines.append(f"[ORACLE] {item.get('query', 'Query')}: {item.get('result', 'Result')}")
+                    if include_oracle:
+                        lines.append(f"[ORACLE] {item.get('query', 'Query')}: {item.get('result', 'Result')}")
                 elif item.get("type") == "system":
                     lines.append(f"[SYSTEM] {item.get('text', '')}")
                 elif "agent_id" in item:
-                    # Statement dict format
-                    lines.append(f"{item['agent_id']}: {item.get('text', '')}")
+                    # Statement dict format - filter by visible agents
+                    agent_id = item["agent_id"]
+                    if visible_agents is None or agent_id in visible_agents:
+                        lines.append(f"{agent_id}: {item.get('text', '')}")
         return "\n".join(lines) if lines else "No messages yet in this round."
 
     def _parse_statements(
@@ -189,7 +224,7 @@ Format: Return one statement per line, no numbering or prefixes."""
         response_text: str,
         expected_count: int,
         thinking: str | None = None,
-    ) -> list[StatementV2]:
+    ) -> list[Statement]:
         """Parse LLM response into statement objects."""
         lines = response_text.strip().split("\n")
         statements = []
@@ -205,7 +240,7 @@ Format: Return one statement per line, no numbering or prefixes."""
 
             if line:
                 # Only attach thinking to the first statement (it's shared reasoning)
-                statements.append(StatementV2(
+                statements.append(Statement(
                     text=line,
                     agent_id=self.id,
                     thinking=thinking if i == 0 else None,
@@ -218,19 +253,32 @@ Format: Return one statement per line, no numbering or prefixes."""
 
     def generate_response_to_oracle(
         self,
-        world: WorldV2,
+        world: World,
         oracle_query: str,
         oracle_result: Any,
         conversation_history: list | None = None,
         rng: random.Random | None = None,
-    ) -> StatementV2:
+        visible_agents: set[str] | None = None,
+        include_oracle: bool = True,
+    ) -> Statement:
         """
         Generate a response after observer queries the oracle.
 
         Agents see what the observer learned and adapt their strategy.
+
+        Args:
+            world: The world with objects
+            oracle_query: The query that was made
+            oracle_result: The result from the oracle
+            conversation_history: Prior messages
+            rng: Random number generator (unused)
+            visible_agents: Set of agent IDs whose messages are visible (None = all)
+            include_oracle: Whether oracle results are visible in history
         """
         objects_info = self._format_objects_for_agent(world)
-        conversation_context = self._format_conversation_history(conversation_history)
+        conversation_context = self._format_conversation_history(
+            conversation_history, visible_agents, include_oracle
+        )
 
         prompt = f"""You are {self.id} in a strategic game.
 
@@ -278,10 +326,102 @@ Just output your statement, nothing else."""
             elif block.type == "text":
                 text = block.text.strip()
 
-        return StatementV2(
+        return Statement(
             text=text,
             agent_id=self.id,
             thinking=thinking,
+        )
+
+    def extract_rule_claim(self, text: str, round_number: int) -> ValueRuleClaim | None:
+        """Extract explicit value rule claims from a statement.
+
+        Looks for patterns indicating the agent is making claims about
+        what makes objects valuable.
+
+        Args:
+            text: The statement text to analyze
+            round_number: Current round number
+
+        Returns:
+            ValueRuleClaim if a claim is detected, None otherwise
+        """
+        # Indicators that the agent is making a value rule claim
+        rule_indicators = [
+            "the rule is",
+            "value depends on",
+            "valuable objects are",
+            "high value",
+            "objects with",
+            "the most valuable",
+            "worth more",
+            "determines value",
+            "affects value",
+            "increases value",
+            "are valuable",
+            "have value",
+            "are worth",
+        ]
+
+        text_lower = text.lower()
+        if not any(indicator in text_lower for indicator in rule_indicators):
+            return None
+
+        # Extract property names mentioned
+        property_names = ["color", "size", "shape", "material", "is_dangerous"]
+        claimed_factors = [prop for prop in property_names if prop in text_lower]
+
+        if not claimed_factors:
+            return None
+
+        # Extract property=value patterns
+        claimed_high_value = []
+
+        # Known property values
+        property_values = {
+            "color": ["red", "blue", "green", "yellow", "orange"],
+            "size": ["small", "medium", "large"],
+            "shape": ["circle", "square", "triangle", "star"],
+            "material": ["metal", "wood", "plastic", "glass"],
+        }
+
+        # All known values for quick lookup
+        all_values = set()
+        value_to_prop = {}
+        for prop, vals in property_values.items():
+            for val in vals:
+                all_values.add(val)
+                value_to_prop[val] = prop
+
+        # Pattern: "color is blue", "color=blue", "color: blue"
+        patterns = [
+            r'(color|size|shape|material)\s*(?:is|=|:)\s*(\w+)',
+        ]
+
+        for pattern in patterns:
+            matches = re.findall(pattern, text_lower)
+            for match in matches:
+                if len(match) == 2:
+                    prop, val = match[0], match[1]
+                    if prop in property_values and val in property_values[prop]:
+                        claimed_high_value.append(f"{prop}={val}")
+
+        # Also look for value mentions followed by property type
+        # Pattern: "blue color", "large size", etc.
+        for val in all_values:
+            if val in text_lower:
+                prop = value_to_prop[val]
+                # Check if property name appears nearby (within 30 chars)
+                val_pos = text_lower.find(val)
+                context = text_lower[max(0, val_pos - 30):val_pos + len(val) + 30]
+                if prop in context or "object" in context or "valuable" in context:
+                    claimed_high_value.append(f"{prop}={val}")
+
+        return ValueRuleClaim(
+            agent_id=self.id,
+            round_number=round_number,
+            claim_text=text,
+            claimed_factors=claimed_factors,
+            claimed_high_value=list(set(claimed_high_value)),  # Deduplicate
         )
 
     def to_dict(self) -> dict:
@@ -303,8 +443,8 @@ Just output your statement, nothing else."""
         cls,
         data: dict,
         client: anthropic.Anthropic | None = None
-    ) -> "AgentV2":
-        """Create an AgentV2 from dictionary representation."""
+    ) -> "Agent":
+        """Create an Agent from dictionary representation."""
         interest = AgentInterest(
             target_condition=data["interest"]["target_condition"],
             description=data["interest"]["description"],
@@ -327,7 +467,7 @@ Just output your statement, nothing else."""
 def create_conflicting_agents(
     client: anthropic.Anthropic | None = None,
     model: str = "claude-opus-4-5-20251101",
-) -> tuple[AgentV2, AgentV2]:
+) -> tuple[Agent, Agent]:
     """
     Create two agents with conflicting interests.
 
@@ -336,7 +476,7 @@ def create_conflicting_agents(
 
     Each agent has full autonomy to decide how to influence the judge.
     """
-    agent_a = AgentV2(
+    agent_a = Agent(
         id="Agent_A",
         interest=AgentInterest(
             target_condition="color=blue",
@@ -346,7 +486,7 @@ def create_conflicting_agents(
         model=model,
     )
 
-    agent_b = AgentV2(
+    agent_b = Agent(
         id="Agent_B",
         interest=AgentInterest(
             target_condition="color=red",
@@ -363,7 +503,7 @@ def create_multi_agent_game(
     num_agents: int = 4,
     client: anthropic.Anthropic | None = None,
     model: str = "claude-opus-4-5-20251101",
-) -> list[AgentV2]:
+) -> list[Agent]:
     """
     Create multiple agents with different interests.
 
@@ -380,7 +520,7 @@ def create_multi_agent_game(
 
     agents = []
     for i in range(min(num_agents, len(interests))):
-        agent = AgentV2(
+        agent = Agent(
             id=f"Agent_{chr(65 + i)}",
             interest=interests[i],
             _client=client,

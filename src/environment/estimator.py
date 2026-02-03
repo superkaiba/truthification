@@ -6,13 +6,13 @@ from typing import Any
 
 import anthropic
 
-from .agent_v2 import StatementV2
-from .simulation_v2 import OracleQuery
-from .world_v2 import ValueRule, WorldV2
+from .agent import Statement
+from .simulation import OracleQuery
+from .world import ValueRule, World
 
 
 @dataclass
-class EstimatorV2:
+class Estimator:
     """
     External LLM that observes the game and tries to infer truth.
 
@@ -32,7 +32,7 @@ class EstimatorV2:
 
     def analyze_round(
         self,
-        statements: list[StatementV2],
+        statements: list[Statement],
         oracle_results: list[OracleQuery],
         prior_beliefs: dict,
         agents: list[dict],
@@ -82,7 +82,7 @@ Respond ONLY with the JSON object, no other text."""
 
     def _format_statements(
         self,
-        statements: list[StatementV2],
+        statements: list[Statement],
         agents: list[dict],
     ) -> str:
         """Format statements based on condition (like observer)."""
@@ -150,7 +150,7 @@ Respond ONLY with the JSON object, no other text."""
             "reasoning": f"Parse error from: {text[:200]}",
         }
 
-    def compute_accuracy(self, world: WorldV2, value_rule: ValueRule) -> dict:
+    def compute_accuracy(self, world: World, value_rule: ValueRule) -> dict:
         """
         Compute accuracy metrics against ground truth.
 
@@ -163,7 +163,7 @@ Respond ONLY with the JSON object, no other text."""
     def compute_property_accuracy(
         self,
         beliefs: dict,
-        world: WorldV2,
+        world: World,
     ) -> float:
         """Compute accuracy of property beliefs vs ground truth."""
         property_beliefs = beliefs.get("property_beliefs", {})
@@ -192,7 +192,7 @@ Respond ONLY with the JSON object, no other text."""
         self,
         beliefs: dict,
         value_rule: ValueRule,
-        world: WorldV2,
+        world: World,
     ) -> float:
         """
         Compute how well estimator inferred the value rule.

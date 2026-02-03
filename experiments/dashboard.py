@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Streamlit dashboard for viewing V2 Hidden Value Game experiment results."""
+"""Streamlit dashboard for viewing Hidden Value Game experiment results."""
 
 import html
 import json
@@ -10,7 +10,7 @@ import pandas as pd
 import streamlit as st
 
 st.set_page_config(
-    page_title="V2 Hidden Value Game Dashboard",
+    page_title="Hidden Value Game Dashboard",
     page_icon="🎮",
     layout="wide",
 )
@@ -23,13 +23,13 @@ def load_game_result(path: str | Path) -> dict[str, Any]:
 
 
 def find_result_files() -> list[Path]:
-    """Find all V2 result JSON files."""
+    """Find all result JSON files."""
     patterns = [
-        "outputs/v2_test/*.json",  # Test results
-        "outputs/v2_hidden_value/**/games/**/*.json",  # Individual game results
-        "outputs/v2_hidden_value/**/result*.json",
-        "results/v2_*/minimal_test_result.json",
-        "results/v2_*/**/*.json",
+        "outputs/test/*.json",  # Test results
+        "outputs/hidden_value/**/games/**/*.json",  # Individual game results
+        "outputs/hidden_value/**/result*.json",
+        "results/*/minimal_test_result.json",
+        "results/**/*.json",
     ]
     files = []
     for pattern in patterns:
@@ -982,7 +982,7 @@ def render_aggregate_view(data: dict, file_path: Path) -> None:
 
 
 def main():
-    st.title("V2 Hidden Value Game Dashboard")
+    st.title("Hidden Value Game Dashboard")
 
     # Sidebar: File selection - show all files at once
     st.sidebar.header("Result Files")
@@ -991,7 +991,7 @@ def main():
 
     if not result_files:
         st.warning("No result files found.")
-        st.info("Run a V2 experiment first, or enter a path manually below.")
+        st.info("Run an experiment first, or enter a path manually below.")
 
         manual_path = st.text_input("Enter path to result JSON file:")
         if manual_path and Path(manual_path).exists():

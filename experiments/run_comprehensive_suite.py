@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Comprehensive experiment suite for V2 Hidden Value Game.
+"""Comprehensive experiment suite for the Hidden Value Game.
 
 Tests how various factors affect observer performance:
 - Number of oracle calls
@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from src.environment.simulation_v2 import GameConfig, HiddenValueGame
+from src.environment.simulation import GameConfig, HiddenValueGame
 
 
 def run_experiment(config: GameConfig, name: str) -> dict:
@@ -39,6 +39,13 @@ def run_experiment(config: GameConfig, name: str) -> dict:
             "oracle_budget": config.oracle_budget,
             "selection_size": config.selection_size,
             "rule_complexity": config.rule_complexity,
+            # New experimental variation settings
+            "debate_structure": config.debate_structure,
+            "oracle_visibility": config.oracle_visibility,
+            "oracle_accuracy": config.oracle_accuracy,
+            "oracle_confidence_interval": config.oracle_confidence_interval,
+            "observer_infers_interests": config.observer_infers_interests,
+            "track_value_claims": config.track_value_claims,
         },
         "metrics": {
             "selection_accuracy": result.metrics["selection_accuracy"],
@@ -56,7 +63,7 @@ def run_experiment(config: GameConfig, name: str) -> dict:
 
 def run_suite():
     """Run the comprehensive experiment suite."""
-    output_dir = Path("outputs/v2_comprehensive_suite")
+    output_dir = Path("outputs/comprehensive_suite")
     output_dir.mkdir(parents=True, exist_ok=True)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -179,6 +186,130 @@ def run_suite():
         result["variable"] = n_rounds
         all_results.append(result)
         print(f"    Rounds={n_rounds}: accuracy={result['metrics']['selection_accuracy']*100:.1f}%")
+
+    # =========================================================================
+    # Experiment 6: Debate Structure
+    # =========================================================================
+    print("\n=== Experiment 6: Debate Structure ===")
+    debate_structures = ["open", "blind", "sequential"]
+
+    for structure in debate_structures:
+        config = GameConfig(
+            n_objects=10,
+            n_agents=2,
+            n_rounds=base_rounds,
+            selection_size=base_selection,
+            oracle_budget=2,
+            rule_complexity="medium",
+            seed=base_seed,
+            debate_structure=structure,
+        )
+        result = run_experiment(config, f"debate_{structure}")
+        result["experiment_group"] = "debate_structure"
+        result["variable"] = structure
+        all_results.append(result)
+        print(f"    Structure={structure}: accuracy={result['metrics']['selection_accuracy']*100:.1f}%")
+
+    # =========================================================================
+    # Experiment 7: Oracle Visibility
+    # =========================================================================
+    print("\n=== Experiment 7: Oracle Visibility ===")
+    oracle_visibilities = ["all", "querier_only", "none"]
+
+    for visibility in oracle_visibilities:
+        config = GameConfig(
+            n_objects=10,
+            n_agents=2,
+            n_rounds=base_rounds,
+            selection_size=base_selection,
+            oracle_budget=3,  # Use more budget to see visibility effects
+            rule_complexity="medium",
+            seed=base_seed,
+            oracle_visibility=visibility,
+        )
+        result = run_experiment(config, f"oracle_vis_{visibility}")
+        result["experiment_group"] = "oracle_visibility"
+        result["variable"] = visibility
+        all_results.append(result)
+        print(f"    Visibility={visibility}: accuracy={result['metrics']['selection_accuracy']*100:.1f}%")
+
+    # =========================================================================
+    # Experiment 8: Oracle Uncertainty
+    # =========================================================================
+    print("\n=== Experiment 8: Oracle Uncertainty ===")
+    oracle_accuracies = [1.0, 0.9, 0.8, 0.7]
+
+    for accuracy in oracle_accuracies:
+        config = GameConfig(
+            n_objects=10,
+            n_agents=2,
+            n_rounds=base_rounds,
+            selection_size=base_selection,
+            oracle_budget=3,
+            rule_complexity="medium",
+            seed=base_seed,
+            oracle_accuracy=accuracy,
+        )
+        result = run_experiment(config, f"oracle_accuracy_{int(accuracy*100)}")
+        result["experiment_group"] = "oracle_accuracy"
+        result["variable"] = accuracy
+        all_results.append(result)
+        print(f"    Accuracy={accuracy}: selection={result['metrics']['selection_accuracy']*100:.1f}%")
+
+    # =========================================================================
+    # Experiment 9: Observer Interest Inference
+    # =========================================================================
+    print("\n=== Experiment 9: Observer Interest Inference ===")
+    # Compare observer performance when told interests vs. must infer them
+
+    for infer in [False, True]:
+        config = GameConfig(
+            n_objects=10,
+            n_agents=2,
+            n_rounds=base_rounds,
+            selection_size=base_selection,
+            oracle_budget=2,
+            rule_complexity="medium",
+            seed=base_seed,
+            condition="interests",  # Use interests condition
+            observer_infers_interests=infer,
+        )
+        infer_str = "infer" if infer else "told"
+        result = run_experiment(config, f"observer_{infer_str}_interests")
+        result["experiment_group"] = "observer_inference"
+        result["variable"] = infer_str
+        all_results.append(result)
+        print(f"    Mode={infer_str}: accuracy={result['metrics']['selection_accuracy']*100:.1f}%")
+
+    # =========================================================================
+    # Experiment 10: Combined Resilience Test
+    # =========================================================================
+    print("\n=== Experiment 10: Combined Estimator Resilience ===")
+    combined_configs = [
+        {"debate_structure": "open", "oracle_visibility": "all", "oracle_accuracy": 1.0, "name": "baseline"},
+        {"debate_structure": "blind", "oracle_visibility": "all", "oracle_accuracy": 1.0, "name": "blind_debate"},
+        {"debate_structure": "open", "oracle_visibility": "querier_only", "oracle_accuracy": 0.8, "name": "limited_oracle"},
+        {"debate_structure": "blind", "oracle_visibility": "querier_only", "oracle_accuracy": 0.8, "name": "hardest"},
+    ]
+
+    for cfg in combined_configs:
+        config = GameConfig(
+            n_objects=10,
+            n_agents=2,
+            n_rounds=base_rounds,
+            selection_size=base_selection,
+            oracle_budget=3,
+            rule_complexity="medium",
+            seed=base_seed,
+            debate_structure=cfg["debate_structure"],
+            oracle_visibility=cfg["oracle_visibility"],
+            oracle_accuracy=cfg["oracle_accuracy"],
+        )
+        result = run_experiment(config, f"combined_{cfg['name']}")
+        result["experiment_group"] = "combined_resilience"
+        result["variable"] = cfg["name"]
+        all_results.append(result)
+        print(f"    {cfg['name']}: accuracy={result['metrics']['selection_accuracy']*100:.1f}%")
 
     # =========================================================================
     # Save Results

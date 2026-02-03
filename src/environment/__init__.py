@@ -4,27 +4,28 @@ This module provides the core components for running multi-agent games
 where agents with conflicting interests try to influence an observer.
 """
 
-from .world_v2 import (
-    WorldV2,
+from .world import (
+    World,
     Object,
     Property,
     PropertyType,
     ValueRule,
     ValueCondition,
-    DEFAULT_PROPERTIES_V2,
+    DEFAULT_PROPERTIES,
     generate_world,
     create_simple_rule,
     create_medium_rule,
     create_complex_rule,
 )
-from .agent_v2 import (
-    AgentV2,
+from .agent import (
+    Agent,
     AgentInterest,
-    StatementV2,
+    Statement,
+    ValueRuleClaim,
     create_conflicting_agents,
     create_multi_agent_game,
 )
-from .simulation_v2 import (
+from .simulation import (
     HiddenValueGame,
     GameConfig,
     GameResult,
@@ -33,25 +34,26 @@ from .simulation_v2 import (
     RoundMetrics,
     run_game,
 )
-from .estimator_v2 import EstimatorV2
+from .estimator import Estimator
 
 __all__ = [
     # World
-    "WorldV2",
+    "World",
     "Object",
     "Property",
     "PropertyType",
     "ValueRule",
     "ValueCondition",
-    "DEFAULT_PROPERTIES_V2",
+    "DEFAULT_PROPERTIES",
     "generate_world",
     "create_simple_rule",
     "create_medium_rule",
     "create_complex_rule",
     # Agents
-    "AgentV2",
+    "Agent",
     "AgentInterest",
-    "StatementV2",
+    "Statement",
+    "ValueRuleClaim",
     "create_conflicting_agents",
     "create_multi_agent_game",
     # Simulation
@@ -63,5 +65,5 @@ __all__ = [
     "RoundMetrics",
     "run_game",
     # Estimator
-    "EstimatorV2",
+    "Estimator",
 ]

@@ -1,4 +1,4 @@
-# Truthification V2: Competitive Belief Manipulation
+# Truthification: Competitive Belief Manipulation
 
 ## Research Questions
 

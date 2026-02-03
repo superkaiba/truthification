@@ -1,4 +1,4 @@
-"""Multi-turn simulation for V2 hidden value game."""
+"""Multi-turn simulation for the hidden value game."""
 
 import json
 import random
@@ -10,8 +10,8 @@ from typing import Any
 
 import anthropic
 
-from .agent_v2 import AgentV2, StatementV2, create_conflicting_agents
-from .world_v2 import DEFAULT_PROPERTIES_V2, ValueRule, WorldV2, generate_world
+from .agent import Agent, Statement, ValueRuleClaim, create_conflicting_agents
+from .world import DEFAULT_PROPERTIES, ValueRule, World, generate_world
 
 
 @dataclass
@@ -170,6 +170,28 @@ class GameConfig:
     # Feedback settings
     judge_sees_pick_feedback: bool = False  # Judge learns properties of picked objects
 
+    # Debate Structure (new experimental variations)
+    debate_structure: str = "open"  # "open" | "blind" | "sequential"
+    # - open: agents see all messages (current behavior)
+    # - blind: agents don't see other agents' messages
+    # - sequential: agents see only messages from prior turns
+
+    # Oracle Visibility
+    oracle_visibility: str = "all"  # "all" | "querier_only" | "none"
+    # - all: all agents see oracle results (current behavior when agents_see_oracle=True)
+    # - querier_only: only observer sees oracle results
+    # - none: no one sees oracle results (observer still gets them internally)
+
+    # Oracle Uncertainty
+    oracle_accuracy: float = 1.0  # Probability of correct answer (1.0 = always correct)
+    oracle_confidence_interval: bool = False  # Return ranges instead of exact values
+
+    # Observer Inference
+    observer_infers_interests: bool = False  # Observer must infer agent goals from behavior
+
+    # Value Claim Tracking
+    track_value_claims: bool = False  # Track explicit rule claims from agents
+
 
 class HiddenValueGame:
     """
@@ -193,9 +215,9 @@ class HiddenValueGame:
     ):
         self.config = config or GameConfig()
         self.client = client or anthropic.Anthropic()
-        self.world: WorldV2 | None = None
+        self.world: World | None = None
         self.value_rule: ValueRule | None = None
-        self.agents: list[AgentV2] = []
+        self.agents: list[Agent] = []
         self.rounds: list[GameRound] = []
         self.oracle_queries_used: int = 0
         self.rng = random.Random(self.config.seed)
@@ -216,8 +238,8 @@ class HiddenValueGame:
     def _create_estimator(self) -> None:
         """Create the external estimator if enabled."""
         if self.config.enable_estimator:
-            from .estimator_v2 import EstimatorV2
-            self.estimator = EstimatorV2(
+            from .estimator import Estimator
+            self.estimator = Estimator(
                 model=self.config.estimator_model,
                 condition=self.config.condition,
                 _client=self.client,
@@ -229,7 +251,7 @@ class HiddenValueGame:
             num_objects=self.config.n_objects,
             rule_complexity=self.config.rule_complexity,
             seed=self.config.seed,
-            properties=DEFAULT_PROPERTIES_V2,
+            properties=DEFAULT_PROPERTIES,
         )
 
     def _create_agents(self) -> None:
@@ -242,7 +264,7 @@ class HiddenValueGame:
             self.agents = [agent_a, agent_b]
         else:
             # Create multiple agents with varied interests
-            from .agent_v2 import create_multi_agent_game
+            from .agent import create_multi_agent_game
             self.agents = create_multi_agent_game(
                 num_agents=self.config.n_agents,
                 client=self.client,
@@ -254,6 +276,34 @@ class HiddenValueGame:
             for agent in self.agents:
                 agent.enable_thinking = True
                 agent.thinking_budget = self.config.agent_thinking_budget
+
+        # Track value claims if enabled
+        self.value_claims: list[ValueRuleClaim] = []
+
+    def _get_visible_agents(self, agent: Agent) -> set[str] | None:
+        """Get which agents' messages are visible to this agent based on debate structure."""
+        if self.config.debate_structure == "open":
+            return None  # See all agents' messages
+        elif self.config.debate_structure == "blind":
+            return {agent.id}  # Only own messages
+        elif self.config.debate_structure == "sequential":
+            # Sequential: see prior agents (based on agent order in list)
+            agent_idx = next(
+                (i for i, a in enumerate(self.agents) if a.id == agent.id), 0
+            )
+            visible = {self.agents[i].id for i in range(agent_idx)}
+            visible.add(agent.id)  # Always see own messages
+            return visible
+        return None
+
+    def _get_oracle_visibility_for_agents(self) -> bool:
+        """Determine if agents should see oracle results based on config."""
+        if self.config.oracle_visibility == "none":
+            return False
+        elif self.config.oracle_visibility == "querier_only":
+            return False  # Only observer sees results
+        else:  # "all"
+            return self.config.agents_see_oracle
 
     def run(self, progress_callback: Any | None = None) -> GameResult:
         """
@@ -436,16 +486,29 @@ class HiddenValueGame:
         # 1. Alternating agent turns - each agent speaks one statement at a time
         for turn in range(self.config.statements_per_agent_per_round):
             for agent in agent_order:
+                # Determine visibility based on debate structure
+                visible_agents = self._get_visible_agents(agent)
+                include_oracle = self._get_oracle_visibility_for_agents()
+
                 statements = agent.generate_statements(
                     world=self.world,
                     value_rule=self.value_rule,
-                    conversation_history=full_conversation,  # See ALL prior messages
+                    conversation_history=full_conversation,  # Full history, filtered by agent
                     rng=self.rng,
                     num_statements=1,  # One statement per turn
+                    visible_agents=visible_agents,
+                    include_oracle=include_oracle,
                 )
                 all_statements.extend(statements)
                 new_messages.extend(statements)
                 full_conversation.extend(statements)
+
+                # Track value claims if enabled
+                if self.config.track_value_claims:
+                    for stmt in statements:
+                        claim = agent.extract_rule_claim(stmt.text, round_num + 1)
+                        if claim:
+                            self.value_claims.append(claim)
 
         # 2. Observer decides action (query oracle or proceed)
         oracle_query = None
@@ -462,23 +525,34 @@ class HiddenValueGame:
                 observer_action = "query"
 
                 # Add oracle result to conversation if enabled
-                if self.config.agents_see_oracle:
+                agents_see_oracle = self._get_oracle_visibility_for_agents()
+                if agents_see_oracle:
                     oracle_msg = self._oracle_to_message(oracle_query)
                     new_messages.append(oracle_msg)
                     full_conversation.append(oracle_msg)
 
-                # Agents respond to oracle result (they see it in conversation)
-                for agent in agent_order:
-                    response = agent.generate_response_to_oracle(
-                        world=self.world,
-                        oracle_query=f"{query_request['type']}: {query_request['object_id']}",
-                        oracle_result=oracle_query.result,
-                        conversation_history=full_conversation,  # Include ALL history
-                        rng=self.rng,
-                    )
-                    all_statements.append(response)
-                    new_messages.append(response)
-                    full_conversation.append(response)
+                # Agents respond to oracle result (only if they can see it)
+                if agents_see_oracle:
+                    for agent in agent_order:
+                        visible_agents = self._get_visible_agents(agent)
+                        response = agent.generate_response_to_oracle(
+                            world=self.world,
+                            oracle_query=f"{query_request['type']}: {query_request['object_id']}",
+                            oracle_result=oracle_query.result,
+                            conversation_history=full_conversation,  # Include history
+                            rng=self.rng,
+                            visible_agents=visible_agents,
+                            include_oracle=True,  # They're responding to it, so they see it
+                        )
+                        all_statements.append(response)
+                        new_messages.append(response)
+                        full_conversation.append(response)
+
+                        # Track value claims in oracle responses
+                        if self.config.track_value_claims:
+                            claim = agent.extract_rule_claim(response.text, round_num + 1)
+                            if claim:
+                                self.value_claims.append(claim)
 
         # 3. Update observer beliefs
         new_beliefs = self._update_observer_beliefs(
@@ -516,7 +590,7 @@ class HiddenValueGame:
             new_messages,
         )
 
-    def _get_agent_order(self, round_number: int) -> list[AgentV2]:
+    def _get_agent_order(self, round_number: int) -> list[Agent]:
         """Get agent order for this round based on config."""
         if self.config.turn_order == "same":
             return self.agents.copy()
@@ -562,7 +636,7 @@ class HiddenValueGame:
 
     def _observer_consider_oracle(
         self,
-        statements: list[StatementV2],
+        statements: list[Statement],
         current_beliefs: dict[str, Any],
     ) -> dict | None:
         """Have observer consider whether to query oracle."""
@@ -612,12 +686,33 @@ If no, respond with JSON: {{"query": false}}"""
         return None
 
     def _execute_oracle_query(self, query: dict) -> OracleQuery:
-        """Execute an oracle query and return result."""
+        """Execute an oracle query and return result.
+
+        Applies oracle uncertainty if configured:
+        - oracle_accuracy < 1.0: May return incorrect results
+        - oracle_confidence_interval: Returns ranges instead of exact values
+        """
         obj_id = query["object_id"]
         query_type = query["type"]
 
         if query_type == "value":
-            result = self.world.get_object_value(obj_id)
+            true_result = self.world.get_object_value(obj_id)
+            result = true_result
+            is_correct = True
+
+            # Apply uncertainty
+            if self.config.oracle_accuracy < 1.0:
+                if self.rng.random() > self.config.oracle_accuracy:
+                    is_correct = False
+                    result = self._generate_wrong_value(true_result)
+
+            # Confidence intervals
+            if self.config.oracle_confidence_interval and is_correct:
+                # Return range: +/- 10% of true value
+                low = int(true_result * 0.9)
+                high = int(true_result * 1.1)
+                result = f"between {low} and {high}"
+
             return OracleQuery(
                 query_type="value",
                 object_id=obj_id,
@@ -625,7 +720,14 @@ If no, respond with JSON: {{"query": false}}"""
             )
         else:
             prop_name = query.get("property_name", "color")
-            result = self.world.get_ground_truth_property(obj_id, prop_name)
+            true_result = self.world.get_ground_truth_property(obj_id, prop_name)
+            result = true_result
+
+            # Apply uncertainty for property queries
+            if self.config.oracle_accuracy < 1.0:
+                if self.rng.random() > self.config.oracle_accuracy:
+                    result = self._generate_wrong_property(prop_name, true_result)
+
             return OracleQuery(
                 query_type="property",
                 object_id=obj_id,
@@ -633,9 +735,29 @@ If no, respond with JSON: {{"query": false}}"""
                 result=result,
             )
 
+    def _generate_wrong_value(self, true_value: int) -> int:
+        """Generate an incorrect value (for fallible oracle)."""
+        # Perturb by +/- 20-50%
+        direction = self.rng.choice([-1, 1])
+        perturbation = self.rng.uniform(0.2, 0.5)
+        return max(0, int(true_value * (1 + direction * perturbation)))
+
+    def _generate_wrong_property(self, prop_name: str, true_value: Any) -> Any:
+        """Generate an incorrect property value (for fallible oracle)."""
+        # Get possible values for this property from world definitions
+        for prop_def in self.world.property_definitions:
+            if prop_def.name == prop_name:
+                possible_values = [
+                    v for v in prop_def.possible_values if v != true_value
+                ]
+                if possible_values:
+                    return self.rng.choice(possible_values)
+        # Fallback: return original if we can't find alternatives
+        return true_value
+
     def _update_observer_beliefs(
         self,
-        statements: list[StatementV2],
+        statements: list[Statement],
         current_beliefs: dict[str, Any],
         oracle_query: OracleQuery | None,
     ) -> dict[str, Any]:
@@ -691,10 +813,10 @@ If no, respond with JSON: {{"query": false}}"""
         Returns:
             Tuple of (reasoning_text, picks_this_round)
         """
-        # Format the full conversation (may include StatementV2 and various dict types)
+        # Format the full conversation (may include Statement and various dict types)
         lines = []
         for item in conversation:
-            if isinstance(item, StatementV2):
+            if isinstance(item, Statement):
                 lines.append(f"- {item.agent_id}: {item.text}")
             elif isinstance(item, dict):
                 if item.get("type") == "oracle_result":
@@ -774,7 +896,7 @@ Respond with JSON:
         # Format conversation
         lines = []
         for item in conversation_history:
-            if isinstance(item, StatementV2):
+            if isinstance(item, Statement):
                 lines.append(f"- {item.agent_id}: {item.text}")
             elif isinstance(item, dict):
                 if item.get("type") == "oracle_result":
@@ -970,7 +1092,7 @@ Respond with JSON:
 
     def _format_statements_for_observer(
         self,
-        statements: list[StatementV2],
+        statements: list[Statement],
     ) -> str:
         """Format statements based on information condition."""
         lines = []
@@ -1343,6 +1465,13 @@ Respond with JSON:
                 "enable_estimator": self.config.enable_estimator,
                 "estimator_model": self.config.estimator_model,
                 "judge_sees_pick_feedback": self.config.judge_sees_pick_feedback,
+                # New experimental variation settings
+                "debate_structure": self.config.debate_structure,
+                "oracle_visibility": self.config.oracle_visibility,
+                "oracle_accuracy": self.config.oracle_accuracy,
+                "oracle_confidence_interval": self.config.oracle_confidence_interval,
+                "observer_infers_interests": self.config.observer_infers_interests,
+                "track_value_claims": self.config.track_value_claims,
             },
             inferred_rule=inferred_rule_dict,
             observer_property_beliefs=self.observer_property_beliefs,
@@ -1370,6 +1499,13 @@ def run_game(
     enable_estimator: bool = False,
     estimator_model: str = "claude-sonnet-4-20250514",
     judge_sees_pick_feedback: bool = False,
+    # New experimental variation parameters
+    debate_structure: str = "open",
+    oracle_visibility: str = "all",
+    oracle_accuracy: float = 1.0,
+    oracle_confidence_interval: bool = False,
+    observer_infers_interests: bool = False,
+    track_value_claims: bool = False,
 ) -> GameResult:
     """
     Convenience function to run a hidden value game.
@@ -1391,6 +1527,12 @@ def run_game(
         enable_estimator: Enable external estimator LLM
         estimator_model: Model for estimator
         judge_sees_pick_feedback: Whether judge sees properties of picked objects
+        debate_structure: "open", "blind", or "sequential" agent visibility
+        oracle_visibility: "all", "querier_only", or "none"
+        oracle_accuracy: Probability of correct oracle answers (0-1)
+        oracle_confidence_interval: Return value ranges instead of exact values
+        observer_infers_interests: Observer infers agent goals from behavior
+        track_value_claims: Track explicit rule claims from agents
 
     Returns:
         GameResult with complete game data
@@ -1411,6 +1553,12 @@ def run_game(
         enable_estimator=enable_estimator,
         estimator_model=estimator_model,
         judge_sees_pick_feedback=judge_sees_pick_feedback,
+        debate_structure=debate_structure,
+        oracle_visibility=oracle_visibility,
+        oracle_accuracy=oracle_accuracy,
+        oracle_confidence_interval=oracle_confidence_interval,
+        observer_infers_interests=observer_infers_interests,
+        track_value_claims=track_value_claims,
     )
 
     game = HiddenValueGame(config)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run V2 hidden value game experiments."""
+"""Run hidden value game experiments."""
 
 import json
 import logging
@@ -13,7 +13,7 @@ import hydra
 from omegaconf import DictConfig, OmegaConf
 
 import wandb
-from src.environment.simulation_v2 import GameConfig, GameResult, HiddenValueGame
+from src.environment.simulation import GameConfig, GameResult, HiddenValueGame
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -263,7 +263,7 @@ def run_rule_complexity_experiment(
 
 
 def run_full_experiment(cfg: DictConfig) -> dict:
-    """Run the full V2 experiment suite."""
+    """Run the full experiment suite."""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_dir = Path(cfg.output_dir) / timestamp
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -337,7 +337,7 @@ def run_full_experiment(cfg: DictConfig) -> dict:
 def create_summary(results: dict, cfg: DictConfig) -> str:
     """Create a markdown summary of results."""
     lines = [
-        "# V2 Hidden Value Game Experiment Results",
+        "# Hidden Value Game Experiment Results",
         "",
         f"**Date**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
         f"**Seeds**: {cfg.seeds}",
@@ -394,10 +394,10 @@ def create_summary(results: dict, cfg: DictConfig) -> str:
     return "\n".join(lines)
 
 
-@hydra.main(config_path="../configs/experiment", config_name="v2_hidden_value", version_base=None)
+@hydra.main(config_path="../configs/experiment", config_name="hidden_value", version_base=None)
 def main(cfg: DictConfig):
     """Main entry point."""
-    logger.info("Starting V2 Hidden Value Game Experiment")
+    logger.info("Starting Hidden Value Game Experiment")
     logger.info(f"Config:\n{OmegaConf.to_yaml(cfg)}")
 
     run_full_experiment(cfg)

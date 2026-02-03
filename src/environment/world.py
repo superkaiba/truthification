@@ -1,4 +1,4 @@
-"""World state with objects, properties, and hidden value rules for V2 experiments."""
+"""World state with objects, properties, and hidden value rules."""
 
 import random
 from dataclasses import dataclass, field
@@ -98,7 +98,7 @@ class ValueRule:
 
 
 @dataclass
-class WorldV2:
+class World:
     """
     A world containing objects with properties and a hidden value function.
 
@@ -118,7 +118,7 @@ class WorldV2:
         value_rule: ValueRule,
         seed: int | None = None,
         base_value_range: tuple[int, int] = (0, 20),
-    ) -> "WorldV2":
+    ) -> "World":
         """
         Generate a random world with the given configuration.
 
@@ -130,7 +130,7 @@ class WorldV2:
             base_value_range: Range for random base values
 
         Returns:
-            A WorldV2 instance with randomly generated objects
+            A World instance with randomly generated objects
         """
         rng = random.Random(seed)
         world = cls(
@@ -221,7 +221,7 @@ class WorldV2:
         }
 
     @classmethod
-    def from_dict(cls, data: dict, value_rule: ValueRule | None = None) -> "WorldV2":
+    def from_dict(cls, data: dict, value_rule: ValueRule | None = None) -> "World":
         """Create a World from dictionary representation."""
         properties = [
             Property(
@@ -349,10 +349,10 @@ def create_complex_rule() -> ValueRule:
 
 
 # ============================================================================
-# Default Property Definitions for V2 Experiments
+# Default Property Definitions
 # ============================================================================
 
-DEFAULT_PROPERTIES_V2 = [
+DEFAULT_PROPERTIES = [
     Property(
         name="color",
         property_type=PropertyType.CATEGORICAL,
@@ -386,7 +386,7 @@ def generate_world(
     rule_complexity: str = "medium",
     seed: int | None = None,
     properties: list[Property] | None = None,
-) -> tuple[WorldV2, ValueRule]:
+) -> tuple[World, ValueRule]:
     """
     Convenience function to generate a world with a value rule.
 
@@ -399,7 +399,7 @@ def generate_world(
     Returns:
         Tuple of (world, value_rule)
     """
-    props = properties or DEFAULT_PROPERTIES_V2
+    props = properties or DEFAULT_PROPERTIES
 
     if rule_complexity == "simple":
         rule = create_simple_rule()
@@ -408,7 +408,7 @@ def generate_world(
     else:
         rule = create_medium_rule()
 
-    world = WorldV2.generate(
+    world = World.generate(
         n_objects=num_objects,
         properties=props,
         value_rule=rule,

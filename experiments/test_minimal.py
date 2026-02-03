@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Minimal test run for V2 implementation to verify end-to-end functionality."""
+"""Minimal test run to verify end-to-end functionality."""
 
 import json
 from pathlib import Path
@@ -7,13 +7,13 @@ from pathlib import Path
 from dotenv import load_dotenv
 load_dotenv()
 
-from src.environment.simulation_v2 import run_game, GameConfig, HiddenValueGame
+from src.environment.simulation import run_game, GameConfig, HiddenValueGame
 
 
 def test_single_game():
     """Step 1: Test single game with minimal parameters."""
     print("=" * 60)
-    print("V2 Minimal Test: Single Game")
+    print("Minimal Test: Single Game")
     print("=" * 60)
     print()
     print("Parameters:")
@@ -159,7 +159,7 @@ def test_single_game():
     # Overall result
     all_passed = all(passed for _, passed in checks)
     if all_passed:
-        print("All checks passed! V2 implementation is working.")
+        print("All checks passed! Implementation is working.")
     else:
         print("Some checks failed. See details above.")
 
@@ -172,7 +172,7 @@ def main():
         result, success = test_single_game()
 
         # Save result for inspection
-        output_dir = Path("outputs/v2_test")
+        output_dir = Path("outputs/test")
         output_dir.mkdir(parents=True, exist_ok=True)
         result.save(output_dir / "minimal_test_result.json")
         print(f"\nResult saved to: {output_dir / 'minimal_test_result.json'}")

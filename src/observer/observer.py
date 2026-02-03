@@ -1,6 +1,8 @@
-"""Observer for V2 hidden value game with value inference capabilities."""
+"""Observer for the hidden value game with value inference capabilities."""
 
 import json
+import re
+from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -92,7 +94,7 @@ ORACLE_QUERY_TOOL = {
 }
 
 
-class ObserverV2:
+class Observer:
     """
     Observer for the hidden value game.
 
@@ -124,6 +126,7 @@ class ObserverV2:
         condition: str = "blind",
         agent_metadata: dict | None = None,
         oracle_callback: Any = None,  # Callable[[str, str, str|None], Any]
+        infer_interests: bool = False,  # NEW: observer must infer agent goals
     ) -> ObserverSelectionResult:
         """
         Run the observer to select high-value objects.
@@ -136,12 +139,16 @@ class ObserverV2:
             condition: Information condition ("blind", "ids", "interests")
             agent_metadata: Optional agent information
             oracle_callback: Optional function(query_type, object_id, property_name) -> result
+            infer_interests: If True, observer must infer agent goals from behavior
 
         Returns:
             ObserverSelectionResult with selection and beliefs
         """
-        # Format evidence based on condition
-        evidence = self._format_evidence(statements, condition, agent_metadata)
+        # Format evidence based on condition and inference mode
+        if infer_interests:
+            evidence = self._format_evidence_with_inference(statements)
+        else:
+            evidence = self._format_evidence(statements, condition, agent_metadata)
 
         # Build system prompt
         system_prompt = self._build_system_prompt(
@@ -182,6 +189,80 @@ class ObserverV2:
                     lines.append(f"- {agent_id} (wants: {desc}): {text}")
                 else:
                     lines.append(f"- {agent_id}: {text}")
+
+        return "\n".join(lines)
+
+    def _format_evidence_with_inference(self, statements: list[dict]) -> str:
+        """Format evidence with behavioral patterns for interest inference.
+
+        Instead of revealing agent interests directly, provides behavioral
+        summary that the observer can use to infer what each agent wants.
+
+        Args:
+            statements: All statements from agents
+
+        Returns:
+            Formatted evidence with behavioral patterns
+        """
+        lines = ["== Agent Behavior Patterns (infer their goals) ==\n"]
+
+        # Track object mentions per agent
+        agent_mentions: dict[str, list[str]] = defaultdict(list)
+        agent_property_claims: dict[str, list[str]] = defaultdict(list)
+
+        property_names = ["color", "size", "shape", "material"]
+        property_values = [
+            "red", "blue", "green", "yellow", "orange",
+            "small", "medium", "large",
+            "circle", "square", "triangle", "star",
+            "metal", "wood", "plastic", "glass",
+        ]
+
+        for stmt in statements:
+            agent_id = stmt.get("agent_id", "Unknown")
+            text = stmt.get("text", "").lower()
+
+            # Find object mentions
+            obj_ids = re.findall(r'object_\d+', text)
+            agent_mentions[agent_id].extend(obj_ids)
+
+            # Find property value mentions
+            for prop in property_names:
+                if prop in text:
+                    agent_property_claims[agent_id].append(prop)
+            for val in property_values:
+                if val in text:
+                    agent_property_claims[agent_id].append(val)
+
+        # Generate behavioral summary
+        for agent_id in sorted(set(s.get("agent_id", "Unknown") for s in statements)):
+            lines.append(f"**{agent_id}:**")
+
+            # Object mention frequency
+            mentions = agent_mentions.get(agent_id, [])
+            if mentions:
+                top_objects = Counter(mentions).most_common(3)
+                obj_str = ", ".join(f"{obj}({count}x)" for obj, count in top_objects)
+                lines.append(f"  - Frequently mentions objects: {obj_str}")
+
+            # Property focus
+            props = agent_property_claims.get(agent_id, [])
+            if props:
+                top_props = Counter(props).most_common(5)
+                prop_str = ", ".join(f"{p}({c}x)" for p, c in top_props)
+                lines.append(f"  - Property/value focus: {prop_str}")
+
+            lines.append("")
+
+        lines.append("\n== Statements (agent identity visible) ==\n")
+        for stmt in statements:
+            agent_id = stmt.get("agent_id", "Unknown")
+            text = stmt.get("text", "")
+            lines.append(f"- {agent_id}: {text}")
+
+        lines.append("\n== Your Task ==")
+        lines.append("Infer what each agent WANTS (what type of objects benefit them).")
+        lines.append("Then use this to evaluate the reliability of their claims.")
 
         return "\n".join(lines)
 
@@ -394,6 +475,7 @@ def run_observer(
     agent_metadata: dict | None = None,
     oracle_callback: Any = None,
     model: str = "claude-opus-4-5-20251101",
+    infer_interests: bool = False,
 ) -> ObserverSelectionResult:
     """
     Convenience function to run the observer.
@@ -408,11 +490,12 @@ def run_observer(
         agent_metadata: Optional agent information for "interests" condition
         oracle_callback: Optional function(query_type, obj_id, prop_name) -> result
         model: Claude model to use
+        infer_interests: If True, observer must infer agent goals from behavior
 
     Returns:
         ObserverSelectionResult with selection and analysis
     """
-    observer = ObserverV2(
+    observer = Observer(
         model=model,
         oracle_budget=oracle_budget,
     )
@@ -425,6 +508,7 @@ def run_observer(
         condition=condition,
         agent_metadata=agent_metadata,
         oracle_callback=oracle_callback,
+        infer_interests=infer_interests,
     )
 
 

@@ -1,4 +1,4 @@
-# V2 Hidden Value Game Experiment Configuration
+# Hidden Value Game Experiment Configuration
 
 # World settings
 world:
@@ -40,6 +40,15 @@ game:
   turn_order: same  # same, reverse, random
   agents_see_oracle: true  # agents see oracle results in chat
 
+# Experimental variation settings (new)
+experimental:
+  debate_structure: open  # open, blind, sequential
+  oracle_visibility: all  # all, querier_only, none
+  oracle_accuracy: 1.0  # 0.0-1.0, probability oracle is correct
+  oracle_confidence_interval: false  # return ranges instead of exact values
+  observer_infers_interests: false  # observer must infer agent goals
+  track_value_claims: false  # track explicit rule claims from agents
+
 # Estimator settings
 estimator:
   enabled: false
@@ -53,6 +62,12 @@ experiments:
   oracle_scaling: true
   information_conditions: true
   rule_complexity: true
+  # New experimental variations
+  debate_structure: true
+  oracle_visibility: true
+  oracle_uncertainty: true
+  observer_inference: true
+  combined_resilience: true
 
 # Oracle scaling experiment
 oracle_scaling:
@@ -66,11 +81,45 @@ information_conditions:
 rule_complexity:
   levels: [simple, medium, complex]
 
+# Debate structure experiment (new)
+debate_structure:
+  structures: [open, blind, sequential]
+
+# Oracle visibility experiment (new)
+oracle_visibility_exp:
+  modes: [all, querier_only, none]
+
+# Oracle uncertainty experiment (new)
+oracle_uncertainty:
+  accuracy_levels: [1.0, 0.9, 0.8, 0.7]
+  confidence_intervals: [false, true]
+
+# Observer inference experiment (new)
+observer_inference:
+  conditions: [ids, interests]  # Compare with/without inference
+  infer_modes: [false, true]
+
+# Combined resilience test (new)
+combined_resilience:
+  configs:
+    - debate_structure: open
+      oracle_visibility: all
+      oracle_accuracy: 1.0
+    - debate_structure: blind
+      oracle_visibility: all
+      oracle_accuracy: 1.0
+    - debate_structure: open
+      oracle_visibility: querier_only
+      oracle_accuracy: 0.8
+    - debate_structure: blind
+      oracle_visibility: querier_only
+      oracle_accuracy: 0.8
+
 # Output directory
-output_dir: outputs/v2_hidden_value
+output_dir: outputs/hidden_value
 
 # Weights & Biases
 wandb:
   enabled: true
   project: truthification
-  name: v2-hidden-value
+  name: hidden-value
