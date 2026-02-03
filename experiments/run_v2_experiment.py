@@ -31,6 +31,7 @@ def run_single_game(
 def run_oracle_scaling_experiment(
     cfg: DictConfig,
     wandb_run: wandb.sdk.wandb_run.Run | None = None,
+    output_dir: Path | None = None,
 ) -> list[dict]:
     """
     Experiment 1: How much oracle access is needed to beat deception?
@@ -60,6 +61,12 @@ def run_oracle_scaling_experiment(
 
             result = run_single_game(config, seed)
             budget_results.append(result.metrics)
+
+            # Save individual game result
+            if output_dir:
+                game_dir = output_dir / "games" / f"oracle_{budget}"
+                game_dir.mkdir(parents=True, exist_ok=True)
+                result.save(game_dir / f"seed_{seed}.json")
 
             # Log to wandb
             if wandb_run:
@@ -110,6 +117,7 @@ def run_oracle_scaling_experiment(
 def run_information_conditions_experiment(
     cfg: DictConfig,
     wandb_run: wandb.sdk.wandb_run.Run | None = None,
+    output_dir: Path | None = None,
 ) -> list[dict]:
     """
     Experiment 2: Effect of information conditions.
@@ -122,6 +130,7 @@ def run_information_conditions_experiment(
     for condition in conditions:
         logger.info(f"Running condition = {condition}")
         condition_results = []
+        condition_games = []
 
         for seed in cfg.seeds:
             config = GameConfig(
@@ -139,6 +148,13 @@ def run_information_conditions_experiment(
 
             result = run_single_game(config, seed)
             condition_results.append(result.metrics)
+            condition_games.append(result)
+
+            # Save individual game result
+            if output_dir:
+                game_dir = output_dir / "games" / f"info_{condition}"
+                game_dir.mkdir(parents=True, exist_ok=True)
+                result.save(game_dir / f"seed_{seed}.json")
 
             if wandb_run:
                 wandb.log({
@@ -176,6 +192,7 @@ def run_information_conditions_experiment(
 def run_rule_complexity_experiment(
     cfg: DictConfig,
     wandb_run: wandb.sdk.wandb_run.Run | None = None,
+    output_dir: Path | None = None,
 ) -> list[dict]:
     """
     Experiment 3: Effect of value rule complexity.
@@ -205,6 +222,12 @@ def run_rule_complexity_experiment(
 
             result = run_single_game(config, seed)
             complexity_results.append(result.metrics)
+
+            # Save individual game result
+            if output_dir:
+                game_dir = output_dir / "games" / f"complexity_{complexity}"
+                game_dir.mkdir(parents=True, exist_ok=True)
+                result.save(game_dir / f"seed_{seed}.json")
 
             if wandb_run:
                 wandb.log({
@@ -262,7 +285,7 @@ def run_full_experiment(cfg: DictConfig) -> dict:
             logger.info("=" * 50)
             logger.info("Running Oracle Scaling Experiment")
             logger.info("=" * 50)
-            oracle_results = run_oracle_scaling_experiment(cfg, wandb_run)
+            oracle_results = run_oracle_scaling_experiment(cfg, wandb_run, output_dir)
             all_results["oracle_scaling"] = oracle_results
 
             # Save intermediate
@@ -273,7 +296,7 @@ def run_full_experiment(cfg: DictConfig) -> dict:
             logger.info("=" * 50)
             logger.info("Running Information Conditions Experiment")
             logger.info("=" * 50)
-            info_results = run_information_conditions_experiment(cfg, wandb_run)
+            info_results = run_information_conditions_experiment(cfg, wandb_run, output_dir)
             all_results["information_conditions"] = info_results
 
             with open(output_dir / "information_conditions.json", "w") as f:
@@ -283,7 +306,7 @@ def run_full_experiment(cfg: DictConfig) -> dict:
             logger.info("=" * 50)
             logger.info("Running Rule Complexity Experiment")
             logger.info("=" * 50)
-            complexity_results = run_rule_complexity_experiment(cfg, wandb_run)
+            complexity_results = run_rule_complexity_experiment(cfg, wandb_run, output_dir)
             all_results["rule_complexity"] = complexity_results
 
             with open(output_dir / "rule_complexity.json", "w") as f:

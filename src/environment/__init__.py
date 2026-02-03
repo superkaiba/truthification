@@ -20,7 +20,6 @@ from .agent_v2 import (
     AgentV2,
     AgentInterest,
     StatementV2,
-    DeceptionLayer,
     create_conflicting_agents,
     create_multi_agent_game,
 )
@@ -65,7 +64,6 @@ __all__ = [
     "AgentV2",
     "AgentInterest",
     "StatementV2",
-    "DeceptionLayer",
     "create_conflicting_agents",
     "create_multi_agent_game",
     "HiddenValueGame",

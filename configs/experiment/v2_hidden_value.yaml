@@ -37,6 +37,13 @@ game:
   n_rounds: 3
   statements_per_agent_per_round: 2
   condition: blind  # blind, ids, interests
+  turn_order: same  # same, reverse, random
+  agents_see_oracle: true  # agents see oracle results in chat
+
+# Estimator settings
+estimator:
+  enabled: false
+  model: claude-sonnet-4-20250514
 
 # Random seeds for reproducibility
 seeds: [42, 123, 456]
