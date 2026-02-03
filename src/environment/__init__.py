@@ -1,13 +1,14 @@
-from .world import World, Object, Property, PropertyType, DEFAULT_PROPERTIES
-from .agent import Agent, Task, AgentType, Statement, DEFAULT_TASKS, DEFAULT_OBSERVER_TASK
-from .simulation import Simulation, SimulationConfig, SimulationResult, run_simulation
+"""Environment module for Hidden Value Game simulation.
 
-# V2 imports
+This module provides the core components for running multi-agent games
+where agents with conflicting interests try to influence an observer.
+"""
+
 from .world_v2 import (
     WorldV2,
-    Object as ObjectV2,
-    Property as PropertyV2,
-    PropertyType as PropertyTypeV2,
+    Object,
+    Property,
+    PropertyType,
     ValueRule,
     ValueCondition,
     DEFAULT_PROPERTIES_V2,
@@ -29,31 +30,17 @@ from .simulation_v2 import (
     GameResult,
     GameRound,
     OracleQuery,
+    RoundMetrics,
     run_game,
 )
+from .estimator_v2 import EstimatorV2
 
 __all__ = [
-    # V1 exports
-    "World",
+    # World
+    "WorldV2",
     "Object",
     "Property",
     "PropertyType",
-    "DEFAULT_PROPERTIES",
-    "Agent",
-    "Task",
-    "AgentType",
-    "Statement",
-    "DEFAULT_TASKS",
-    "DEFAULT_OBSERVER_TASK",
-    "Simulation",
-    "SimulationConfig",
-    "SimulationResult",
-    "run_simulation",
-    # V2 exports
-    "WorldV2",
-    "ObjectV2",
-    "PropertyV2",
-    "PropertyTypeV2",
     "ValueRule",
     "ValueCondition",
     "DEFAULT_PROPERTIES_V2",
@@ -61,15 +48,20 @@ __all__ = [
     "create_simple_rule",
     "create_medium_rule",
     "create_complex_rule",
+    # Agents
     "AgentV2",
     "AgentInterest",
     "StatementV2",
     "create_conflicting_agents",
     "create_multi_agent_game",
+    # Simulation
     "HiddenValueGame",
     "GameConfig",
     "GameResult",
     "GameRound",
     "OracleQuery",
+    "RoundMetrics",
     "run_game",
+    # Estimator
+    "EstimatorV2",
 ]

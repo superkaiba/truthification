@@ -10,7 +10,7 @@ class TestCondition:
         assert Condition.IDS_ONLY.value == "ids_only"
         assert Condition.IDS_AND_TASKS.value == "ids_and_tasks"
         assert Condition.ORACLE_RELIABILITY.value == "oracle_reliability"
-        assert Condition.ORACLE_RELATIONSHIPS.value == "oracle_relationships"
+        assert Condition.ORACLE_AGENT_TYPE.value == "oracle_agent_type"
         assert Condition.ORACLE_TRUTH_LABELS.value == "oracle_truth_labels"
 
 
@@ -102,14 +102,21 @@ class TestPromptBuilder:
         assert "reliability: 85%" in evidence
         assert "reliability: 30%" in evidence
 
-    def test_format_oracle_relationships(self, sample_statements, sample_agent_metadata):
-        builder = PromptBuilder(Condition.ORACLE_RELATIONSHIPS)
+    def test_format_oracle_agent_type(self, sample_statements, sample_agent_metadata):
+        # Add agent_type to metadata
+        metadata = {
+            "Agent_A": {**sample_agent_metadata["Agent_A"], "agent_type": "cooperative"},
+            "Agent_B": {**sample_agent_metadata["Agent_B"], "agent_type": "adversarial"},
+        }
+
+        builder = PromptBuilder(Condition.ORACLE_AGENT_TYPE)
         evidence = builder.format_evidence(
-            sample_statements, sample_agent_metadata, "object_5", "color"
+            sample_statements, metadata, "object_5", "color"
         )
 
-        assert "tells truth" in evidence
-        assert "lies" in evidence
+        # cooperative -> "helpful", adversarial -> "deceptive"
+        assert "helpful" in evidence
+        assert "deceptive" in evidence
 
     def test_build_query(self, sample_statements, sample_agent_metadata):
         builder = PromptBuilder(Condition.IDS_ONLY)
