@@ -56,6 +56,17 @@ Research project investigating truthification methods for LLMs - teaching models
 - Copy relevant plots from `outputs/` to the `results/` folder
 - This creates a permanent, version-controlled record of experiments
 
+### Experiment Log
+- **Update `results/EXPERIMENT_LOG.md` after each experiment**
+- Log includes: date, goal, config summary, duration, key result, links to results
+- This provides a chronological overview of all experiments run
+- Use the template at the bottom of the file for new entries
+
+### Updating Results
+- When re-running experiments or extending analysis, update the corresponding `results/{experiment_name}/README.md`
+- Regenerate plots if data changes
+- Keep experiment log entry updated with latest results
+
 ### Running Experiments
 - **Always run experiments in the background** using `run_in_background: true`
 - Check progress periodically with `BashOutput` tool
@@ -73,6 +84,10 @@ truthification/
 ├── data/              # Data processing scripts
 ├── docs/              # Project documentation
 ├── experiments/       # Experiment scripts
+├── outputs/           # Raw experiment outputs (not version controlled)
+├── results/           # Curated experiment results with README.md
+│   ├── EXPERIMENT_LOG.md  # Chronological experiment history
+│   └── {experiment_name}/ # Individual experiment results
 ├── src/               # Core source code
 │   ├── truthifier/    # Truthification pipeline
 │   ├── estimator/     # Truth value estimator

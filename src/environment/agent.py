@@ -36,6 +36,7 @@ class Statement:
     text: str
     agent_id: str
     thinking: str | None = None  # Agent's reasoning (from extended thinking)
+    is_oracle_response: bool = False  # True if this is a response to an oracle query  # Agent's reasoning (from extended thinking)
 
 
 @dataclass
@@ -330,6 +331,7 @@ Just output your statement, nothing else."""
             text=text,
             agent_id=self.id,
             thinking=thinking,
+            is_oracle_response=True,
         )
 
     def extract_rule_claim(self, text: str, round_number: int) -> ValueRuleClaim | None:

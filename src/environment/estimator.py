@@ -165,24 +165,39 @@ Respond ONLY with the JSON object, no other text."""
         beliefs: dict,
         world: World,
     ) -> float:
-        """Compute accuracy of property beliefs vs ground truth."""
+        """Compute accuracy of property beliefs vs ground truth.
+
+        Computes accuracy over ALL properties of ALL objects, not just
+        the properties the estimator stated beliefs about. This gives
+        a meaningful metric that penalizes missing knowledge.
+
+        Returns: correct_beliefs / total_properties
+        """
         property_beliefs = beliefs.get("property_beliefs", {})
-        if not property_beliefs:
-            return 0.0
 
         correct = 0
         total = 0
 
-        for obj_id, believed_props in property_beliefs.items():
+        # Iterate over ALL objects and ALL their properties
+        for obj_id in world.list_objects():
             obj = world.get_object(obj_id)
             if obj is None:
                 continue
 
-            for prop_name, believed_value in believed_props.items():
+            believed_props = property_beliefs.get(obj_id, {})
+
+            # Check each property of this object
+            for prop_def in world.property_definitions:
+                prop_name = prop_def.name
                 true_value = obj.get_property(prop_name)
-                if true_value is not None:
-                    total += 1
-                    # Handle type coercion for comparison
+                if true_value is None:
+                    continue
+
+                total += 1
+
+                # Check if estimator has a belief about this property
+                if prop_name in believed_props:
+                    believed_value = believed_props[prop_name]
                     if str(believed_value).lower() == str(true_value).lower():
                         correct += 1
 
