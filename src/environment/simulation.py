@@ -10,7 +10,13 @@ from typing import Any
 
 import anthropic
 
-from .agent import Agent, Statement, ValueRuleClaim, create_conflicting_agents
+from .agent import (
+    Agent,
+    Statement,
+    ValueRuleClaim,
+    create_conflicting_agents,
+    create_agents_with_value_functions,
+)
 from .world import DEFAULT_PROPERTIES, ValueRule, World, generate_world
 
 
@@ -34,9 +40,9 @@ class OracleQuery:
 @dataclass
 class RoundMetrics:
     """Metrics computed for a single round."""
-    picks_value: int  # Value of objects picked this round
+    picks_value: int  # Value of objects picked this round (judge's value)
     picks_optimal_count: int  # How many picks were in the global optimal set
-    cumulative_value: int  # Total value accumulated so far
+    cumulative_value: int  # Total value accumulated so far (judge's value)
     cumulative_optimal_count: int  # Total global optimal picks so far
     per_pick_details: list[dict]  # Details for each pick: {id, value, was_optimal}
     # Per-round decision quality (relative to remaining objects)
@@ -50,6 +56,9 @@ class RoundMetrics:
     judge_rule_accuracy: float = 0.0  # Judge's rule inference accuracy (F1)
     estimator_property_accuracy: float = 0.0  # Estimator's property beliefs vs ground truth
     estimator_rule_accuracy: float = 0.0  # Estimator's rule inference accuracy (F1)
+    # Agent value tracking (for complex value functions)
+    agent_round_value: dict[str, int] = field(default_factory=dict)  # {agent_id: value_this_round}
+    agent_cumulative_value: dict[str, int] = field(default_factory=dict)  # {agent_id: total_value_so_far}
 
 
 @dataclass
@@ -213,6 +222,13 @@ class GameConfig:
     # - "before_response": Oracle query → agents see result → agents respond (current)
     # - "after_statements": All statements complete → oracle query (agents can't adapt)
 
+    # Agent Value Functions (complex agent objectives)
+    use_agent_value_functions: bool = False  # Give agents complex value functions
+    agent_value_function_complexity: str = "medium"  # "simple", "medium", "complex"
+    # When True, each agent has a full value function (like the judge's) instead
+    # of a simple property-based interest. This allows tracking agent cumulative
+    # value over time.
+
 
 class HiddenValueGame:
     """
@@ -276,15 +292,24 @@ class HiddenValueGame:
         )
 
     def _create_agents(self) -> None:
-        """Create agents with conflicting interests."""
-        if self.config.n_agents == 2:
+        """Create agents with conflicting interests or value functions."""
+        if self.config.use_agent_value_functions:
+            # Create agents with complex value functions
+            self.agents = create_agents_with_value_functions(
+                num_agents=self.config.n_agents,
+                complexity=self.config.agent_value_function_complexity,
+                seed=self.config.seed,
+                client=self.client,
+                model=self.config.agent_model,
+            )
+        elif self.config.n_agents == 2:
             agent_a, agent_b = create_conflicting_agents(
                 client=self.client,
                 model=self.config.agent_model,
             )
             self.agents = [agent_a, agent_b]
         else:
-            # Create multiple agents with varied interests
+            # Create multiple agents with varied simple interests
             from .agent import create_multi_agent_game
             self.agents = create_multi_agent_game(
                 num_agents=self.config.n_agents,
@@ -300,6 +325,11 @@ class HiddenValueGame:
 
         # Track value claims if enabled
         self.value_claims: list[ValueRuleClaim] = []
+
+        # Initialize agent cumulative value tracking
+        self.agent_cumulative_values: dict[str, int] = {
+            agent.id: 0 for agent in self.agents
+        }
 
     def _get_visible_agents(self, agent: Agent) -> set[str] | None:
         """Get which agents' messages are visible to this agent based on debate structure."""
@@ -408,17 +438,34 @@ class HiddenValueGame:
 
             # Compute per-agent success for this round
             agent_success = {}
+            agent_round_value: dict[str, int] = {}
+            agent_cumulative_value: dict[str, int] = {}
+
             for agent in self.agents:
+                # Traditional matching (simple interest)
                 matched = sum(
                     1 for pick in picks
                     if agent.interest.matches(self.world.get_object(pick))
                 )
                 total = len(picks)
+
+                # Compute agent's value from picks (using value function if available)
+                round_value = 0
+                for pick in picks:
+                    obj = self.world.get_object(pick)
+                    if obj:
+                        round_value += agent.compute_value_for_object(obj)
+
+                # Update cumulative value
+                self.agent_cumulative_values[agent.id] += round_value
+
                 agent_success[agent.id] = {
                     "matched": matched,
                     "total": total,
                     "rate": matched / total if total > 0 else 0.0,
                 }
+                agent_round_value[agent.id] = round_value
+                agent_cumulative_value[agent.id] = self.agent_cumulative_values[agent.id]
 
             # Compute per-round accuracy metrics (truth recovery)
             judge_prop_acc = 0.0
@@ -463,6 +510,8 @@ class HiddenValueGame:
                 judge_rule_accuracy=judge_rule_acc,
                 estimator_property_accuracy=est_prop_acc,
                 estimator_rule_accuracy=est_rule_acc,
+                agent_round_value=agent_round_value,
+                agent_cumulative_value=agent_cumulative_value,
             )
 
             self.rounds.append(round_result)
@@ -1821,7 +1870,8 @@ Respond with JSON:
         estimator_metrics = None
 
         if self.estimator and self.estimator_beliefs:
-            estimator_beliefs = self.estimator_beliefs.get("property_beliefs", {})
+            # Keep full structure so compute_property_accuracy works on loaded data
+            estimator_beliefs = self.estimator_beliefs
             estimator_inferred_rule = self.estimator_beliefs.get("value_rule_guess", {})
 
             # Compute estimator accuracy
@@ -1849,6 +1899,9 @@ Respond with JSON:
                     "cumulative_value": r.round_metrics.cumulative_value,
                     "decision_quality": r.round_metrics.decision_quality,
                     "agent_success": r.round_metrics.agent_success,
+                    # Agent value progression (for complex value functions)
+                    "agent_round_value": r.round_metrics.agent_round_value,
+                    "agent_cumulative_value": r.round_metrics.agent_cumulative_value,
                 })
 
         return GameResult(
@@ -1885,6 +1938,9 @@ Respond with JSON:
                         "judge_rule_accuracy": r.round_metrics.judge_rule_accuracy,
                         "estimator_property_accuracy": r.round_metrics.estimator_property_accuracy,
                         "estimator_rule_accuracy": r.round_metrics.estimator_rule_accuracy,
+                        # Agent value metrics (for complex value functions)
+                        "agent_round_value": r.round_metrics.agent_round_value,
+                        "agent_cumulative_value": r.round_metrics.agent_cumulative_value,
                     } if r.round_metrics else None,
                 }
                 for r in self.rounds
@@ -1916,6 +1972,9 @@ Respond with JSON:
                 "track_value_claims": self.config.track_value_claims,
                 "turn_structure": self.config.turn_structure,
                 "oracle_timing": self.config.oracle_timing,
+                # Agent value function settings
+                "use_agent_value_functions": self.config.use_agent_value_functions,
+                "agent_value_function_complexity": self.config.agent_value_function_complexity,
             },
             inferred_rule=inferred_rule_dict,
             observer_property_beliefs=self.observer_property_beliefs,
@@ -1953,6 +2012,8 @@ def run_game(
     track_value_claims: bool = False,
     turn_structure: str = "interleaved",
     oracle_timing: str = "before_response",
+    use_agent_value_functions: bool = False,
+    agent_value_function_complexity: str = "medium",
 ) -> GameResult:
     """
     Convenience function to run a hidden value game.
@@ -1982,6 +2043,8 @@ def run_game(
         track_value_claims: Track explicit rule claims from agents
         turn_structure: "interleaved", "batch", "simultaneous", or "sequential"
         oracle_timing: "before_response" or "after_statements"
+        use_agent_value_functions: Give agents complex value functions (vs simple interests)
+        agent_value_function_complexity: "simple", "medium", or "complex"
 
     Returns:
         GameResult with complete game data
@@ -2010,6 +2073,8 @@ def run_game(
         track_value_claims=track_value_claims,
         turn_structure=turn_structure,
         oracle_timing=oracle_timing,
+        use_agent_value_functions=use_agent_value_functions,
+        agent_value_function_complexity=agent_value_function_complexity,
     )
 
     game = HiddenValueGame(config)

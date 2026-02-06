@@ -20,10 +20,13 @@ from .world import (
 from .agent import (
     Agent,
     AgentInterest,
+    AgentValueFunction,
     Statement,
     ValueRuleClaim,
     create_conflicting_agents,
     create_multi_agent_game,
+    create_agents_with_value_functions,
+    generate_agent_value_function,
 )
 from .simulation import (
     HiddenValueGame,
@@ -52,10 +55,13 @@ __all__ = [
     # Agents
     "Agent",
     "AgentInterest",
+    "AgentValueFunction",
     "Statement",
     "ValueRuleClaim",
     "create_conflicting_agents",
     "create_multi_agent_game",
+    "create_agents_with_value_functions",
+    "generate_agent_value_function",
     # Simulation
     "HiddenValueGame",
     "GameConfig",

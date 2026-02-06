@@ -28,6 +28,10 @@ def find_result_files() -> list[Path]:
         "outputs/test/*.json",  # Test results
         "outputs/hidden_value/**/games/**/*.json",  # Individual game results
         "outputs/hidden_value/**/result*.json",
+        "outputs/debate_structure_test/**/summary.json",  # Debate structure test summaries
+        "outputs/debate_structure_test/**/game_*.json",  # Debate structure tests
+        "outputs/debate_structure/**/summary.json",  # Full debate structure summaries
+        "outputs/debate_structure/**/game_*.json",  # Full debate structure experiments
         "results/*/minimal_test_result.json",
         "results/**/*.json",
     ]
@@ -35,20 +39,26 @@ def find_result_files() -> list[Path]:
     for pattern in patterns:
         files.extend(Path(".").glob(pattern))
 
-    # Filter out aggregate files, prioritize individual game results
+    # Filter and prioritize files
+    summary_files = []
     individual_games = []
     aggregate_files = []
+
     for f in files:
-        if "/games/" in str(f) or "minimal_test" in str(f) or "seed_" in f.name:
+        if f.name == "summary.json":
+            summary_files.append(f)
+        elif "/games/" in str(f) or "minimal_test" in str(f) or "seed_" in f.name or f.name.startswith("game_"):
             individual_games.append(f)
         else:
             aggregate_files.append(f)
 
-    # Sort individual games first (by mtime), then aggregates
+    # Sort each category by mtime (newest first)
+    summary_files = sorted(set(summary_files), key=lambda p: p.stat().st_mtime, reverse=True)
     individual_games = sorted(set(individual_games), key=lambda p: p.stat().st_mtime, reverse=True)
     aggregate_files = sorted(set(aggregate_files), key=lambda p: p.stat().st_mtime, reverse=True)
 
-    return individual_games + aggregate_files
+    # Return: summaries first, then individual games, then aggregates
+    return summary_files + individual_games + aggregate_files
 
 
 def render_sidebar(result: dict) -> None:
@@ -575,6 +585,10 @@ def render_agents_tab(result: dict) -> None:
 
     metrics = result.get("metrics", {})
     agent_win_rates = metrics.get("agent_win_rates", {})
+    config = result.get("config", {})
+
+    # Check if agents have value functions
+    has_value_functions = config.get("use_agent_value_functions", False)
 
     # Agent Cards
     cols = st.columns(len(agents))
@@ -583,13 +597,80 @@ def render_agents_tab(result: dict) -> None:
             agent_id = agent.get("id", f"Agent_{i}")
             st.subheader(agent_id)
 
-            interest = agent.get("interest", {})
-            st.write(f"**Goal:** {interest.get('description', 'N/A')}")
-            st.write(f"**Target Condition:** {interest.get('target_condition', 'N/A')}")
+            # Show value function if present
+            value_function = agent.get("value_function")
+            if value_function:
+                st.write(f"**Value Function:** {value_function.get('name', 'N/A')}")
+                st.write(f"**Goal:** {value_function.get('description', 'N/A')}")
+                conditions = value_function.get("conditions", [])
+                if conditions:
+                    with st.expander("Value Conditions"):
+                        for cond in conditions:
+                            st.write(f"- {cond.get('description', 'N/A')}: {cond.get('bonus', 0):+d}")
+            else:
+                # Show simple interest
+                interest = agent.get("interest", {})
+                st.write(f"**Goal:** {interest.get('description', 'N/A')}")
+                st.write(f"**Target Condition:** {interest.get('target_condition', 'N/A')}")
+
             st.write(f"**Model:** {agent.get('model', 'N/A')}")
 
             win_rate = agent_win_rates.get(agent_id, 0)
             st.metric("Win Rate", f"{win_rate * 100:.0f}%")
+
+    # Agent Value Progression (if value functions are used)
+    if has_value_functions:
+        st.divider()
+        st.subheader("Agent Value Progression")
+
+        # Extract progression data from rounds
+        rounds = result.get("rounds", [])
+        progression_data = []
+
+        for r in rounds:
+            round_metrics = r.get("round_metrics", {})
+            if round_metrics:
+                row = {"Round": r.get("round_number", 0)}
+                agent_cumulative = round_metrics.get("agent_cumulative_value", {})
+                for agent in agents:
+                    agent_id = agent.get("id", "")
+                    row[agent_id] = agent_cumulative.get(agent_id, 0)
+                progression_data.append(row)
+
+        if progression_data:
+            prog_df = pd.DataFrame(progression_data)
+
+            # Line chart showing agent cumulative value over rounds
+            agent_ids = [a.get("id", "") for a in agents]
+            chart_df = prog_df.set_index("Round")[agent_ids]
+            st.line_chart(chart_df)
+
+            # Final totals
+            st.subheader("Final Agent Values")
+            final_row = progression_data[-1] if progression_data else {}
+            final_cols = st.columns(len(agents))
+            for i, agent in enumerate(agents):
+                with final_cols[i]:
+                    agent_id = agent.get("id", "")
+                    final_value = final_row.get(agent_id, 0)
+                    st.metric(agent_id, f"{final_value:+d}")
+
+            # Per-round value gain table
+            with st.expander("Per-Round Value Breakdown"):
+                round_value_rows = []
+                for r in rounds:
+                    round_metrics = r.get("round_metrics", {})
+                    if round_metrics:
+                        row = {"Round": r.get("round_number", 0)}
+                        agent_round_val = round_metrics.get("agent_round_value", {})
+                        for agent in agents:
+                            agent_id = agent.get("id", "")
+                            row[f"{agent_id} (round)"] = agent_round_val.get(agent_id, 0)
+                        round_value_rows.append(row)
+
+                if round_value_rows:
+                    round_val_df = pd.DataFrame(round_value_rows)
+                    st.dataframe(round_val_df, use_container_width=True)
 
     st.divider()
 
@@ -972,6 +1053,153 @@ def is_aggregate_file(data: dict) -> bool:
     return "information_conditions" in data or "rule_complexity" in data or isinstance(data, list)
 
 
+def is_debate_structure_summary(data: dict) -> bool:
+    """Check if this is a debate structure test summary file."""
+    return "results" in data and isinstance(data.get("results"), list) and \
+           any("turn_structure" in r for r in data.get("results", []))
+
+
+def render_debate_structure_summary(data: dict, file_path: Path) -> None:
+    """Render a summary view for debate structure experiment results."""
+    st.header("Debate Structure Experiment Results")
+
+    config = data.get("config", {})
+    results = data.get("results", [])
+    total_time = data.get("total_time_seconds", 0)
+
+    # Config summary
+    st.subheader("Experiment Configuration")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.write(f"**Objects:** {config.get('n_objects', 'N/A')}")
+        st.write(f"**Agents:** {config.get('n_agents', 'N/A')}")
+    with col2:
+        st.write(f"**Rounds:** {config.get('n_rounds', 'N/A')}")
+        st.write(f"**Oracle Budget:** {config.get('oracle_budget', 'N/A')}")
+    with col3:
+        st.write(f"**Selection Size:** {config.get('selection_size', 'N/A')}")
+        st.write(f"**Total Time:** {total_time/60:.1f} min")
+
+    st.divider()
+
+    # Results table
+    st.subheader("Results by Condition")
+
+    # Build dataframe
+    rows = []
+    for r in results:
+        if "error" in r:
+            continue
+        rows.append({
+            "Turn Structure": r.get("turn_structure", "N/A"),
+            "Oracle Timing": r.get("oracle_timing", "N/A"),
+            "Est. Prop Acc": f"{r.get('estimator_property_accuracy', 0)*100:.0f}%",
+            "Obs. Prop Acc": f"{r.get('observer_property_accuracy', 0)*100:.0f}%",
+            "Est. Advantage": f"{r.get('estimator_advantage_property', 0)*100:+.0f}%",
+            "Selection Acc": f"{r.get('selection_accuracy', 0)*100:.0f}%",
+            "Est. Rule Acc": f"{r.get('estimator_rule_accuracy', 0)*100:.0f}%",
+            "Obs. Rule Acc": f"{r.get('observer_rule_accuracy', 0)*100:.0f}%",
+        })
+
+    if rows:
+        df = pd.DataFrame(rows)
+        st.dataframe(df, use_container_width=True)
+
+    st.divider()
+
+    # Pivot table: Turn Structure x Oracle Timing for Estimator Property Accuracy
+    st.subheader("Estimator Property Accuracy Heatmap")
+
+    pivot_data = {}
+    for r in results:
+        if "error" in r:
+            continue
+        ts = r.get("turn_structure", "N/A")
+        ot = r.get("oracle_timing", "N/A")
+        est_acc = r.get("estimator_property_accuracy", 0) * 100
+        pivot_data[(ts, ot)] = est_acc
+
+    # Create pivot table
+    turn_structures = ["interleaved", "batch", "simultaneous", "sequential"]
+    oracle_timings = ["before_response", "after_statements"]
+
+    pivot_rows = []
+    for ts in turn_structures:
+        row = {"Turn Structure": ts}
+        for ot in oracle_timings:
+            row[ot] = pivot_data.get((ts, ot), "N/A")
+        pivot_rows.append(row)
+
+    pivot_df = pd.DataFrame(pivot_rows)
+
+    # Style with conditional formatting
+    def highlight_values(val):
+        if isinstance(val, (int, float)):
+            if val >= 80:
+                return "background-color: #90EE90"  # Green
+            elif val >= 50:
+                return "background-color: #FFFACD"  # Light yellow
+            else:
+                return "background-color: #FFB6C1"  # Light red
+        return ""
+
+    styled_df = pivot_df.style.map(
+        highlight_values,
+        subset=["before_response", "after_statements"]
+    )
+    st.dataframe(styled_df, use_container_width=True)
+
+    st.divider()
+
+    # Bar chart comparison
+    st.subheader("Comparison Chart")
+
+    chart_data = []
+    for r in results:
+        if "error" in r:
+            continue
+        chart_data.append({
+            "Condition": f"{r.get('turn_structure', 'N/A')}\n{r.get('oracle_timing', 'N/A')}",
+            "Estimator": r.get("estimator_property_accuracy", 0) * 100,
+            "Observer": r.get("observer_property_accuracy", 0) * 100,
+        })
+
+    if chart_data:
+        chart_df = pd.DataFrame(chart_data)
+        chart_df = chart_df.set_index("Condition")
+        st.bar_chart(chart_df)
+
+    st.divider()
+
+    # Key findings
+    st.subheader("Key Findings")
+
+    valid_results = [r for r in results if "error" not in r]
+    if valid_results:
+        best = max(valid_results, key=lambda x: x.get("estimator_property_accuracy", 0))
+        worst = min(valid_results, key=lambda x: x.get("estimator_property_accuracy", 0))
+
+        col1, col2 = st.columns(2)
+        with col1:
+            st.success(f"**Best for Estimator:** {best.get('turn_structure')} + {best.get('oracle_timing')}")
+            st.metric("Estimator Accuracy", f"{best.get('estimator_property_accuracy', 0)*100:.0f}%")
+
+        with col2:
+            st.error(f"**Worst for Estimator:** {worst.get('turn_structure')} + {worst.get('oracle_timing')}")
+            st.metric("Estimator Accuracy", f"{worst.get('estimator_property_accuracy', 0)*100:.0f}%")
+
+    # Link to individual games
+    st.divider()
+    st.subheader("Individual Games")
+    st.info(f"Individual game results are saved in: {file_path.parent}")
+
+    # List available game files
+    game_files = list(file_path.parent.glob("game_*.json"))
+    if game_files:
+        for gf in sorted(game_files):
+            st.write(f"- `{gf.name}`")
+
+
 def render_aggregate_view(data: dict, file_path: Path) -> None:
     """Render a view for aggregate result files."""
     st.header("Aggregate Results")
@@ -1020,6 +1248,11 @@ def main():
 
     # Load data
     data = load_game_result(selected_file)
+
+    # Check if it's a debate structure summary
+    if is_debate_structure_summary(data):
+        render_debate_structure_summary(data, selected_file)
+        return
 
     # Check if it's an aggregate file
     if is_aggregate_file(data):
