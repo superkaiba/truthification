@@ -244,6 +244,12 @@ class GameConfig:
     # When True, the estimator analyzes agent behavior to infer their objectives.
     # Requires enable_estimator=True. Results are evaluated with an LLM judge.
 
+    # Random Oracle (for ablation experiments)
+    random_oracle: bool = False  # Use random queries instead of strategic queries
+    # When True, oracle queries are randomly selected (random object + random property/value)
+    # instead of being chosen strategically by the observer. Tests whether strategic
+    # querying matters for truth recovery.
+
 
 class HiddenValueGame:
     """
@@ -615,10 +621,15 @@ class HiddenValueGame:
         observer_action = "analyze"
 
         if self.oracle_queries_used < self.config.oracle_budget:
-            # Ask observer if they want to query oracle
-            query_request = self._observer_consider_oracle(
-                all_statements, current_beliefs
-            )
+            # Determine query based on random_oracle setting
+            if self.config.random_oracle:
+                # Random oracle: always query with random selection
+                query_request = self._generate_random_oracle_query(remaining_objects)
+            else:
+                # Strategic oracle: ask observer if they want to query
+                query_request = self._observer_consider_oracle(
+                    all_statements, current_beliefs
+                )
             if query_request:
                 oracle_query = self._execute_oracle_query(query_request)
                 self.oracle_queries_used += 1
@@ -980,6 +991,47 @@ If no, respond with JSON: {{"query": false}}"""
             pass
 
         return None
+
+    def _generate_random_oracle_query(
+        self,
+        remaining_objects: list[str] | None = None,
+    ) -> dict:
+        """Generate a random oracle query.
+
+        Randomly selects:
+        - An object from the remaining pool (or all objects if not specified)
+        - Whether to query value or a property
+        - Which property to query (if property query)
+
+        Returns:
+            Query dict with type, object_id, and optionally property_name
+        """
+        # Use remaining objects if specified, otherwise all objects
+        object_pool = remaining_objects or self.world.list_objects()
+        if not object_pool:
+            object_pool = self.world.list_objects()
+
+        # Random object
+        object_id = self.rng.choice(object_pool)
+
+        # Random query type (50% value, 50% property)
+        query_type = self.rng.choice(["value", "property"])
+
+        if query_type == "value":
+            return {
+                "type": "value",
+                "object_id": object_id,
+                "property_name": None,
+            }
+        else:
+            # Random property
+            property_names = [p.name for p in self.world.property_definitions]
+            property_name = self.rng.choice(property_names)
+            return {
+                "type": "property",
+                "object_id": object_id,
+                "property_name": property_name,
+            }
 
     def _execute_oracle_query(self, query: dict) -> OracleQuery:
         """Execute an oracle query and return result.
@@ -2086,6 +2138,7 @@ def run_game(
     use_agent_value_functions: bool = False,
     agent_value_function_complexity: str = "medium",
     infer_agent_objectives: bool = False,
+    random_oracle: bool = False,
 ) -> GameResult:
     """
     Convenience function to run a hidden value game.
@@ -2118,6 +2171,7 @@ def run_game(
         use_agent_value_functions: Give agents complex value functions (vs simple interests)
         agent_value_function_complexity: "simple", "medium", or "complex"
         infer_agent_objectives: Estimator infers agent value functions from behavior
+        random_oracle: Use random queries instead of strategic observer queries
 
     Returns:
         GameResult with complete game data
@@ -2149,6 +2203,7 @@ def run_game(
         use_agent_value_functions=use_agent_value_functions,
         agent_value_function_complexity=agent_value_function_complexity,
         infer_agent_objectives=infer_agent_objectives,
+        random_oracle=random_oracle,
     )
 
     game = HiddenValueGame(config)
