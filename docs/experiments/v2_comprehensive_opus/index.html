@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V2 Hidden Value Game: Comprehensive Test with Opus 4.5 - Truthification Experiments</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .header h1 { margin: 0 0 10px 0; }
+        .header a { color: #fff; opacity: 0.8; }
+        .header a:hover { opacity: 1; }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .card h2 { margin-top: 0; color: #444; }
+        .plots {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+        .plot {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .plot img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+        .plot-caption {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+        .readme {
+            line-height: 1.6;
+        }
+        .readme h1, .readme h2, .readme h3 {
+            color: #333;
+            margin-top: 1.5em;
+        }
+        .readme code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .readme pre {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+        .readme table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 15px 0;
+        }
+        .readme th, .readme td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        .readme th { background: #f5f5f5; }
+        .files {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .file-link {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #e3f2fd;
+            color: #1976d2;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .file-link:hover {
+            background: #bbdefb;
+        }
+        .metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .metric {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 120px;
+        }
+        .metric-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+        }
+        .metric-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="../../index.html">&larr; Back to Experiments</a>
+        <h1>V2 Hidden Value Game: Comprehensive Test with Opus 4.5</h1>
+        <p>Last updated: 2026-01-30 00:31</p>
+    </div>
+    <div class="card readme">
+        <h2>Documentation</h2>
+        <h1>V2 Hidden Value Game: Comprehensive Test with Opus 4.5</h1>
+
+<h2>Research Question</h2>
+
+<p>How do information conditions and rule complexity affect an LLM observer's ability to make good decisions when receiving strategic (potentially deceptive) information from agents with conflicting interests?</p>
+
+<h2>Experimental Setup</h2>
+
+<strong>Model</strong>: Claude Opus 4.5 (<code>claude-opus-4-5-20251101</code>) for both agents and observer
+
+<strong>Parameters:</strong>
+<p>| Parameter | Value |</p>
+<p>|-----------|-------|</p>
+<p>| <code>n_objects</code> | 20 |</p>
+<p>| <code>n_agents</code> | 2 (conflicting: blue vs red) |</p>
+<p>| <code>n_rounds</code> | 3 |</p>
+<p>| <code>oracle_budget</code> | 5 |</p>
+<p>| <code>selection_size</code> | 5 |</p>
+<p>| <code>seeds</code> | [42, 123, 456] |</p>
+
+<strong>Experiments Run:</strong>
+<p>1. Information Conditions: blind, ids, interests</p>
+<p>2. Rule Complexity: simple, medium, complex</p>
+
+<p>Total games: 18 (3 seeds x 6 conditions)</p>
+
+<h2>Results</h2>
+
+<h3>Experiment 1: Information Conditions</h3>
+
+<p>| Condition | Selection Acc | Prop Acc | Rule Acc |</p>
+<p>|-----------|---------------|----------|----------|</p>
+<p>| blind | 0.391 | 0.497 | 0.000 |</p>
+<p>| <strong>ids</strong> | <strong>0.566</strong> | <strong>0.526</strong> | 0.000 |</p>
+<p>| interests | 0.460 | 0.514 | 0.000 |</p>
+
+<strong>Key Finding</strong>: Knowing agent IDs helps significantly (+17.5%), but knowing agent interests actually hurts performance compared to just IDs (-10.6%).
+
+<h3>Experiment 2: Rule Complexity</h3>
+
+<p>| Complexity | Selection Acc | Prop Acc | Rule Acc |</p>
+<p>|------------|---------------|----------|----------|</p>
+<p>| simple | 0.491 | 0.423 | 0.000 |</p>
+<p>| <strong>medium</strong> | <strong>0.635</strong> | <strong>0.511</strong> | 0.000 |</p>
+<p>| complex | 0.317 | 0.389 | 0.000 |</p>
+
+<strong>Key Finding</strong>: Medium complexity rules yield the best performance (63.5%), not simple rules (49.1%). Complex rules are hardest (31.7%).
+
+<h2>Interpretation</h2>
+
+<h3>Information Conditions</h3>
+
+<p>The non-monotonic relationship (ids > interests > blind) suggests:</p>
+
+<p>1. <strong>Agent IDs enable pattern detection</strong>: When the observer can track which agent says what, it can detect inconsistencies and biases over multiple rounds.</p>
+
+<p>2. <strong>Interests disclosure backfires</strong>: When agents know the observer knows their interests, they may employ more sophisticated deception strategies. Alternatively, the observer may over-correct by dismissing all statements from self-interested agents, losing useful information.</p>
+
+<p>3. <strong>Blind condition is worst</strong>: Without any agent metadata, the observer can't distinguish or weight sources.</p>
+
+<h3>Rule Complexity</h3>
+
+<p>The inverted-U pattern (medium > simple > complex) suggests:</p>
+
+<p>1. <strong>Simple rules lack signal</strong>: With only one property mattering (e.g., "red is valuable"), there's limited information for the observer to exploit. Strategic agents can easily muddy the waters.</p>
+
+<p>2. <strong>Medium rules provide structure</strong>: Multiple interacting factors create patterns that an intelligent observer can detect, even under deception.</p>
+
+<p>3. <strong>Complex rules overwhelm</strong>: Too many factors and interactions make it hard to form coherent hypotheses, especially with limited oracle budget.</p>
+
+<h3>Rule Inference</h3>
+
+<p>All conditions showed 0% rule inference accuracy, meaning the observer never explicitly identified the correct value rule. However, selection accuracy varied significantly, suggesting the observer used implicit heuristics rather than explicit rule understanding.</p>
+
+<h2>Comparison to Minimal Test</h2>
+
+<p>| Metric | Minimal Test (Sonnet) | Comprehensive (Opus) |</p>
+<p>|--------|----------------------|----------------------|</p>
+<p>| Selection Acc (ids) | 13% | 57% |</p>
+<p>| Property Acc | 62% | 53% |</p>
+<p>| Total Games | 1 | 18 |</p>
+
+<p>Opus 4.5 achieved much better selection accuracy than the minimal Sonnet test, suggesting model capability significantly affects deception resistance.</p>
+
+<h2>Files</h2>
+
+<ul>
+<li><code>all_results.json</code> - Complete results with all metrics</li>
+<li><code>information_conditions.json</code> - Detailed info condition results</li>
+<li><code>rule_complexity.json</code> - Detailed complexity results</li>
+<li><code>summary.md</code> - Auto-generated summary table</li>
+</ul>
+
+<h2>Next Steps</h2>
+
+<p>1. <strong>Oracle scaling experiment</strong>: Test oracle budgets [0, 5, 10, 20] to measure information-value tradeoff</p>
+<p>2. <strong>Agent capability asymmetry</strong>: Test different models for agents vs observer</p>
+<p>3. <strong>Multi-round dynamics</strong>: Analyze how accuracy changes across rounds</p>
+<p>4. <strong>Truth detection</strong>: Add metrics for correctly identifying lies vs truths</p>
+
+    </div>
+    <div class="card">
+        <h2>Data Files</h2>
+        <div class="files">
+            <a class="file-link" href="../../results/v2_comprehensive_opus/rule_complexity.json">rule_complexity.json</a>
+            <a class="file-link" href="../../results/v2_comprehensive_opus/information_conditions.json">information_conditions.json</a>
+            <a class="file-link" href="../../results/v2_comprehensive_opus/all_results.json">all_results.json</a>
+        </div>
+    </div>
+</body>
+</html>

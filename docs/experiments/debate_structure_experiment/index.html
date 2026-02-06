@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debate Structure Experiment Results - Truthification Experiments</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .header h1 { margin: 0 0 10px 0; }
+        .header a { color: #fff; opacity: 0.8; }
+        .header a:hover { opacity: 1; }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .card h2 { margin-top: 0; color: #444; }
+        .plots {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+        .plot {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .plot img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+        .plot-caption {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+        .readme {
+            line-height: 1.6;
+        }
+        .readme h1, .readme h2, .readme h3 {
+            color: #333;
+            margin-top: 1.5em;
+        }
+        .readme code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .readme pre {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+        .readme table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 15px 0;
+        }
+        .readme th, .readme td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        .readme th { background: #f5f5f5; }
+        .files {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .file-link {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #e3f2fd;
+            color: #1976d2;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .file-link:hover {
+            background: #bbdefb;
+        }
+        .metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .metric {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 120px;
+        }
+        .metric-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+        }
+        .metric-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="../../index.html">&larr; Back to Experiments</a>
+        <h1>Debate Structure Experiment Results</h1>
+        <p>Last updated: 2026-02-06 03:34</p>
+    </div>
+    <div class="card">
+        <h2>Visualizations</h2>
+        <div class="plots">
+            <div class="plot">
+                <img src="final_accuracy_comparison.png" alt="Final Accuracy Comparison">
+                <div class="plot-caption">Final Accuracy Comparison</div>
+            </div>
+            <div class="plot">
+                <img src="accuracy_progression_by_structure.png" alt="Accuracy Progression By Structure">
+                <div class="plot-caption">Accuracy Progression By Structure</div>
+            </div>
+            <div class="plot">
+                <img src="agent_success_progression.png" alt="Agent Success Progression">
+                <div class="plot-caption">Agent Success Progression</div>
+            </div>
+            <div class="plot">
+                <img src="oracle_timing_comparison.png" alt="Oracle Timing Comparison">
+                <div class="plot-caption">Oracle Timing Comparison</div>
+            </div>
+        </div>
+    </div>
+    <div class="card readme">
+        <h2>Documentation</h2>
+        <h1>Debate Structure Experiment Results</h1>
+
+<strong>Date:</strong> February 4, 2026
+<strong>Duration:</strong> 2.3 hours (139.6 minutes)
+<strong>Raw Data:</strong> <code>outputs/debate_structure_test/20260204_183117/</code>
+<strong>Dashboard:</strong> <code>outputs/debate_structure_test/20260204_183117/dashboard.html</code>
+
+<h2>Research Question</h2>
+
+<p>How do different debate turn structures and oracle timing affect an external estimator's ability to recover truth from observing agent debates?</p>
+
+<h2>Experimental Setup</h2>
+
+<h3>Configuration</h3>
+<p>| Parameter | Value |</p>
+<p>|-----------|-------|</p>
+<p>| Objects | 20 |</p>
+<p>| Rounds | 20 |</p>
+<p>| Selection per round | 1 |</p>
+<p>| Oracle budget | 10 queries |</p>
+<p>| Agents | 2 (competing interests) |</p>
+<p>| Rule complexity | medium |</p>
+<p>| Models | claude-sonnet-4-20250514 |</p>
+
+<h3>Conditions (8 total)</h3>
+<ul>
+<li><strong>Turn Structures:</strong> interleaved, batch, simultaneous, sequential</li>
+<li><strong>Oracle Timing:</strong> before_response, after_statements</li>
+</ul>
+
+<h3>Turn Structure Descriptions</h3>
+<ul>
+<li><strong>interleaved</strong>: Agents alternate statements (A₁ → B₁ → A₂ → B₂ → ...)</li>
+<li><strong>batch</strong>: Each agent speaks in a block (A₁ → A₂ → A₃ → B₁ → B₂ → B₃)</li>
+<li><strong>simultaneous</strong>: Both agents submit statements at the same time (no back-and-forth)</li>
+<li><strong>sequential</strong>: One agent completes all statements, then the other responds</li>
+</ul>
+
+<h3>Oracle Timing Descriptions</h3>
+<ul>
+<li><strong>before_response</strong>: Statements → 🔮 Oracle → Agents respond to oracle</li>
+<li><strong>after_statements</strong>: Statements → 🔮 Oracle (no agent response to oracle)</li>
+</ul>
+
+<h2>Results</h2>
+
+<h3>Final Accuracy Comparison</h3>
+
+<p>!<a href="final_accuracy_comparison.png">Final Accuracy Comparison</a></p>
+
+<p>| Condition | Estimator Accuracy | Observer Accuracy | Selection Accuracy |</p>
+<p>|-----------|-------------------|-------------------|-------------------|</p>
+<p>| interleaved + before_response | <strong>11%</strong> | 0% | 75% |</p>
+<p>| interleaved + after_statements | <strong>26%</strong> | 35% | 85% |</p>
+<p>| batch + before_response | <strong>12%</strong> | 17% | 65% |</p>
+<p>| batch + after_statements | <strong>24%</strong> | 37% | 85% |</p>
+<p>| simultaneous + before_response | <strong>16%</strong> | 0% | 50% |</p>
+<p>| simultaneous + after_statements | <strong>14%</strong> | 17% | 55% |</p>
+<p>| sequential + before_response | <strong>12%</strong> | 0% | 70% |</p>
+<p>| sequential + after_statements | <strong>16%</strong> | 0% | 75% |</p>
+
+<h3>Accuracy Progression Over Rounds</h3>
+
+<p>!<a href="accuracy_progression_by_structure.png">Accuracy Progression</a></p>
+
+<h3>Oracle Timing Effect</h3>
+
+<p>!<a href="oracle_timing_comparison.png">Oracle Timing Comparison</a></p>
+
+<h3>Agent Success Over Rounds (Best Condition)</h3>
+
+<p>!<a href="agent_success_progression.png">Agent Success</a></p>
+
+<h2>Key Findings</h2>
+
+<h3>1. Oracle Timing Has Significant Impact</h3>
+<ul>
+<li><strong><code>after_statements</code> consistently outperforms <code>before_response</code></strong></li>
+<li>Average estimator accuracy: after_statements = 20%, before_response = 12.75%</li>
+<li>Hypothesis: When agents can respond to oracle results, they may spin/reframe the information, making it harder for the estimator to extract truth</li>
+</ul>
+
+<h3>2. Turn Structure Effects</h3>
+<ul>
+<li><strong>interleaved + after_statements</strong> achieved the best results (26% accuracy)</li>
+<li><strong>batch + after_statements</strong> was second best (24% accuracy)</li>
+<li>Simultaneous and sequential structures performed worse overall</li>
+</ul>
+
+<h3>3. Learning Curves</h3>
+<ul>
+<li>Most conditions plateau quickly (by round 10-15)</li>
+<li><strong>interleaved + after_statements</strong> shows the clearest learning curve: 12% → 28% → 26%</li>
+<li><strong>batch + after_statements</strong> shows gradual improvement: 12% → 24%</li>
+<li><strong>batch + before_response</strong> has delayed start: 0% until round 7</li>
+</ul>
+
+<h3>4. Observer vs Estimator Performance</h3>
+<ul>
+<li>Observer (judge) outperforms estimator when both can learn (after_statements conditions)</li>
+<li>Observer accuracy drops to 0% in several before_response conditions</li>
+<li>This suggests the observer may be more susceptible to agent manipulation when agents respond to oracle</li>
+</ul>
+
+<h3>5. Surprising Results</h3>
+<ul>
+<li><strong>before_response often results in 0% observer accuracy</strong> - agents responding to oracle may be highly effective at manipulation</li>
+<li><strong>Simultaneous structure</strong> does not improve truth recovery despite removing back-and-forth persuasion</li>
+</ul>
+
+<h2>Interpretation</h2>
+
+<p>The results suggest that:</p>
+
+<p>1. <strong>Limiting agent response to verified information helps truth recovery.</strong> When agents can spin oracle results (<code>before_response</code>), both the observer and estimator struggle more.</p>
+
+<p>2. <strong>Interleaved debate structure is most informative.</strong> The back-and-forth allows agents to challenge each other's claims, revealing inconsistencies the estimator can detect.</p>
+
+<p>3. <strong>Truth recovery is difficult overall.</strong> Even the best condition only achieved 26% accuracy on property beliefs (compared to ~10% random baseline for 5 properties).</p>
+
+<p>4. <strong>Learning curves flatten quickly.</strong> Most information is extracted in the first 10 rounds; additional rounds provide diminishing returns.</p>
+
+<h2>Recommendations for Future Work</h2>
+
+<p>1. <strong>Test with more seeds</strong> to verify statistical significance</p>
+<p>2. <strong>Vary agent models</strong> (e.g., more capable vs less capable)</p>
+<p>3. <strong>Test explicit verification rounds</strong> where agents must commit to claims</p>
+<p>4. <strong>Explore hybrid oracle timing</strong> (sometimes before, sometimes after)</p>
+<p>5. <strong>Increase oracle budget</strong> to see if more queries help</p>
+
+<h2>Raw Data Location</h2>
+
+<ul>
+<li>Summary: <code>outputs/debate_structure_test/20260204_183117/summary.json</code></li>
+<li>Individual games: <code>outputs/debate_structure_test/20260204_183117/game_*.json</code></li>
+<li>Interactive dashboard: <code>outputs/debate_structure_test/20260204_183117/dashboard.html</code></li>
+</ul>
+
+    </div>
+</body>
+</html>

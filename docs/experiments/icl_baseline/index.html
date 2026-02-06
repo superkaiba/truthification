@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICL Baseline Experiment: Isolated-Query - Truthification Experiments</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .header h1 { margin: 0 0 10px 0; }
+        .header a { color: #fff; opacity: 0.8; }
+        .header a:hover { opacity: 1; }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .card h2 { margin-top: 0; color: #444; }
+        .plots {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+        .plot {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .plot img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+        .plot-caption {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+        .readme {
+            line-height: 1.6;
+        }
+        .readme h1, .readme h2, .readme h3 {
+            color: #333;
+            margin-top: 1.5em;
+        }
+        .readme code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .readme pre {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+        .readme table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 15px 0;
+        }
+        .readme th, .readme td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        .readme th { background: #f5f5f5; }
+        .files {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .file-link {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #e3f2fd;
+            color: #1976d2;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .file-link:hover {
+            background: #bbdefb;
+        }
+        .metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .metric {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 120px;
+        }
+        .metric-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+        }
+        .metric-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="../../index.html">&larr; Back to Experiments</a>
+        <h1>ICL Baseline Experiment: Isolated-Query</h1>
+        <p>Last updated: 2026-01-27 13:33</p>
+    </div>
+    <div class="card">
+        <h2>Visualizations</h2>
+        <div class="plots">
+            <div class="plot">
+                <img src="accuracy_heatmap.png" alt="Accuracy Heatmap">
+                <div class="plot-caption">Accuracy Heatmap</div>
+            </div>
+            <div class="plot">
+                <img src="accuracy_line_plot.png" alt="Accuracy Line Plot">
+                <div class="plot-caption">Accuracy Line Plot</div>
+            </div>
+            <div class="plot">
+                <img src="overall_accuracy.png" alt="Overall Accuracy">
+                <div class="plot-caption">Overall Accuracy</div>
+            </div>
+            <div class="plot">
+                <img src="ece.png" alt="Ece">
+                <div class="plot-caption">Ece</div>
+            </div>
+            <div class="plot">
+                <img src="contested_accuracy.png" alt="Contested Accuracy">
+                <div class="plot-caption">Contested Accuracy</div>
+            </div>
+            <div class="plot">
+                <img src="contested_line_plot.png" alt="Contested Line Plot">
+                <div class="plot-caption">Contested Line Plot</div>
+            </div>
+            <div class="plot">
+                <img src="accuracy_progression.png" alt="Accuracy Progression">
+                <div class="plot-caption">Accuracy Progression</div>
+            </div>
+        </div>
+    </div>
+    <div class="card readme">
+        <h2>Documentation</h2>
+        <h1>ICL Baseline Experiment: Isolated-Query</h1>
+
+<strong>Date</strong>: January 2026
+<strong>Config</strong>: <code>configs/experiment/icl_baseline.yaml</code>
+<strong>Script</strong>: <code>experiments/run_icl.py</code>
+<strong>Wandb</strong>: <a href="https://wandb.ai/thomasjiralerspong/truthification">truthification project</a>
+
+<h2>Research Question</h2>
+
+<p>Can LLM observers determine ground truth from potentially unreliable agent reports when they only see statements about the queried object/property?</p>
+
+<h2>Experimental Setup</h2>
+
+<h3>World Configuration</h3>
+<ul>
+<li><strong>20 objects</strong> with 4 properties each</li>
+<li>Properties: color (5 values), shape (4 values), size (3 values), value (1-10)</li>
+</ul>
+
+<h3>Agent Configuration</h3>
+<ul>
+<li><strong>3 agents</strong> with different tasks:</li>
+<li><code>collect_red</code>: interested in color</li>
+<li><code>collect_valuable</code>: interested in value</li>
+<li><code>find_large</code>: interested in size</li>
+<li><strong>50% adversarial fraction</strong>: ~1-2 agents have false beliefs</li>
+<li><strong>80 statements per agent</strong> = 240 total statements</li>
+</ul>
+
+<h3>Observer Task</h3>
+<ul>
+<li><strong>"find red circles"</strong>: Observer cares about color and shape properties</li>
+</ul>
+
+<h3>Key Design Innovation</h3>
+<p>Adversarial agents have <strong>consistent false world models</strong> about observer-relevant properties (color, shape) but tell truth about irrelevant properties (size, value). This creates detectable patterns.</p>
+
+<h2>Conditions Tested</h2>
+
+<p>| Condition | Description |</p>
+<p>|-----------|-------------|</p>
+<p>| <code>no_ids</code> | Anonymous statements |</p>
+<p>| <code>ids_only</code> | Statements with agent IDs |</p>
+<p>| <code>ids_and_tasks</code> | IDs + task descriptions |</p>
+<p>| <code>oracle_reliability</code> | IDs + reliability percentages |</p>
+<p>| <code>oracle_agent_type</code> | IDs + cooperative/deceptive labels |</p>
+<p>| <code>oracle_truth_labels</code> | IDs + TRUE/FALSE per statement |</p>
+
+<h2>Results</h2>
+
+<h3>Overall Accuracy</h3>
+
+<p>!<a href="overall_accuracy.png">Overall Accuracy</a></p>
+
+<p>| Condition | Haiku | Sonnet | Opus |</p>
+<p>|-----------|-------|--------|------|</p>
+<p>| no_ids | 78.8% | 83.0% | 87.1% |</p>
+<p>| ids_only | 80.4% | 83.0% | 84.6% |</p>
+<p>| ids_and_tasks | 74.6% | <strong>90.8%</strong> | 87.1% |</p>
+<p>| oracle_reliability | 89.6% | 91.7% | 92.1% |</p>
+<p>| oracle_truth | 91.7% | 92.9% | 93.8% |</p>
+
+<h3>Accuracy by Condition</h3>
+
+<p>!<a href="accuracy_line_plot.png">Accuracy Line Plot</a></p>
+
+<h3>Contested Accuracy (Hard Cases)</h3>
+
+<p>!<a href="contested_accuracy.png">Contested Accuracy</a></p>
+
+<p>Contested queries are where agents disagree. This is where reliability inference matters most.</p>
+
+<p>!<a href="contested_line_plot.png">Contested Line Plot</a></p>
+
+<h3>Calibration (ECE)</h3>
+
+<p>!<a href="ece.png">ECE</a></p>
+
+<p>Lower ECE = better calibrated confidence scores.</p>
+
+<h3>Accuracy Heatmap</h3>
+
+<p>!<a href="accuracy_heatmap.png">Accuracy Heatmap</a></p>
+
+<h2>Key Findings</h2>
+
+<p>1. <strong>Sonnet achieves 90.8% with task info</strong> - nearly matching oracle_truth (92.9%)</p>
+<ul>
+<li>Can infer: "agent collecting red objects claiming something isn't red = probably lying"</li>
+</ul>
+
+<p>2. <strong>Task information is crucial for Sonnet</strong> but not for other models</p>
+<ul>
+<li>Haiku: 74.6% (worse than no_ids)</li>
+<li>Opus: 87.1% (same as no_ids)</li>
+</ul>
+
+<p>3. <strong>Opus is most robust</strong> across conditions without oracle info</p>
+
+<p>4. <strong>Oracle reliability provides diminishing returns</strong> over task inference for Sonnet</p>
+
+<h2>Interpretation</h2>
+
+<p>Sonnet demonstrates sophisticated task-based reasoning: understanding that an agent's task creates incentives that affect their reliability on different properties. This approaches the theoretical ceiling set by oracle conditions.</p>
+
+    </div>
+</body>
+</html>

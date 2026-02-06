@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICL Context Scaling Experiment - Truthification Experiments</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .header h1 { margin: 0 0 10px 0; }
+        .header a { color: #fff; opacity: 0.8; }
+        .header a:hover { opacity: 1; }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .card h2 { margin-top: 0; color: #444; }
+        .plots {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+        .plot {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .plot img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+        .plot-caption {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+        .readme {
+            line-height: 1.6;
+        }
+        .readme h1, .readme h2, .readme h3 {
+            color: #333;
+            margin-top: 1.5em;
+        }
+        .readme code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .readme pre {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+        .readme table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 15px 0;
+        }
+        .readme th, .readme td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        .readme th { background: #f5f5f5; }
+        .files {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .file-link {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #e3f2fd;
+            color: #1976d2;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .file-link:hover {
+            background: #bbdefb;
+        }
+        .metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .metric {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 120px;
+        }
+        .metric-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+        }
+        .metric-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="../../index.html">&larr; Back to Experiments</a>
+        <h1>ICL Context Scaling Experiment</h1>
+        <p>Last updated: 2026-01-21 11:00</p>
+    </div>
+    <div class="card readme">
+        <h2>Documentation</h2>
+        <h1>ICL Context Scaling Experiment</h1>
+
+<strong>Date</strong>: January 2026
+<strong>Config</strong>: <code>configs/experiment/icl_context_scaling.yaml</code>
+<strong>Script</strong>: <code>experiments/run_icl_context_scaling.py</code>
+<strong>Wandb</strong>: <a href="https://wandb.ai/thomasjiralerspong/truthification">truthification project</a>
+<strong>Status</strong>: In Progress
+
+<h2>Research Question</h2>
+
+<p>How does accuracy vary with the number of statements shown? Is there an optimal context size?</p>
+
+<h2>Experimental Setup</h2>
+
+<h3>Context Sizes Tested</h3>
+<ul>
+<li>30 statements (~12% of total)</li>
+<li>60 statements (25%)</li>
+<li>90 statements (37.5%)</li>
+<li>120 statements (50%)</li>
+<li>180 statements (75%)</li>
+<li>240 statements (100%)</li>
+</ul>
+
+<h3>Sampling Strategy</h3>
+<strong>Balanced</strong>: Equal number of statements sampled from each agent to preserve reliability signal.
+
+<h3>Conditions</h3>
+<ul>
+<li><code>full_context_no_ids</code></li>
+<li><code>full_context_ids</code></li>
+<li><code>full_context_ids_tasks</code></li>
+</ul>
+
+<h2>Preliminary Results (Seeds 42, 123)</h2>
+
+<h3>Accuracy vs Context Size</h3>
+
+<p>| Statements | Haiku | Sonnet | Opus |</p>
+<p>|------------|-------|--------|------|</p>
+<p>| 30 | 27-29% | 27-29% | 25-35% |</p>
+<p>| 60 | 42-46% | 43-47% | 42-48% |</p>
+<p>| 90 | 50-60% | 56-65% | 51-65% |</p>
+<p>| 120 | 54-70% | 68-72% | 59-69% |</p>
+<p>| 180 | 69-84% | 77-88% | 65-85% |</p>
+<p>| 240 | 76-85% | 81-85% | 75-84% |</p>
+
+<em>Ranges show variation across conditions and seeds</em>
+
+<h2>Key Findings (Preliminary)</h2>
+
+<h3>1. Strong Monotonic Scaling</h3>
+<p>Accuracy increases consistently with more context:</p>
+<ul>
+<li>30 statements: ~28% (near random guessing)</li>
+<li>240 statements: ~80%</li>
+</ul>
+
+<h3>2. Critical Threshold at 60-90 Statements</h3>
+<p>Major jump from ~28% to ~55%:</p>
+<ul>
+<li>This is likely where there's enough evidence for basic reliability inference</li>
+<li>Below this, insufficient data to detect patterns</li>
+</ul>
+
+<h3>3. Diminishing Returns Above 180</h3>
+<p>Improvement slows between 180-240 statements:</p>
+<ul>
+<li>Most reliability signal captured by 180 statements</li>
+<li>Additional context provides marginal benefit</li>
+</ul>
+
+<h3>4. Model Differences Emerge at Higher Context</h3>
+<ul>
+<li>At 30 statements: All models similar (~28%)</li>
+<li>At 240 statements: Sonnet consistently highest (81-88%)</li>
+</ul>
+
+<h2>Interpretation</h2>
+
+<p>The results suggest:</p>
+<p>1. <strong>Minimum viable context</strong>: ~60-90 statements needed</p>
+<p>2. <strong>No degradation observed</strong>: Unlike full-context experiment, Opus doesn't degrade</p>
+<p>3. <strong>Linear-ish scaling</strong>: Roughly linear improvement in log-context space</p>
+
+<h2>Plots</h2>
+
+<em>Plots will be generated when experiment completes</em>
+
+<!-- TODO: Add plots when available
+<p>!<a href="context_scaling_accuracy.png">Context Scaling</a></p>
+<p>!<a href="context_scaling_by_condition.png">Scaling by Condition</a></p>
+<p>--></p>
+
+    </div>
+</body>
+</html>
