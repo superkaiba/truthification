@@ -942,6 +942,81 @@ def render_estimator_tab(result: dict) -> None:
         else:
             st.info("No property beliefs to compare.")
 
+    # Agent Objective Inference Section
+    st.divider()
+    st.subheader("Agent Objective Inference")
+
+    agent_objective_inference = result.get("agent_objective_inference")
+    agent_objective_scores = result.get("agent_objective_scores", {})
+    agent_objective_overall_score = result.get("agent_objective_overall_score")
+
+    if not agent_objective_inference:
+        st.info("Agent objective inference not enabled for this game. Enable with `infer_agent_objectives: true` in config.")
+    else:
+        # Overall score
+        if agent_objective_overall_score is not None:
+            st.metric(
+                "Overall Objective Inference Score",
+                f"{agent_objective_overall_score * 100:.1f}%",
+                help="Average LLM judge score for how well the estimator inferred agent objectives"
+            )
+
+        st.divider()
+
+        # Show inference for each agent
+        agents = result.get("agents", [])
+        agent_dict = {a.get("id"): a for a in agents}
+
+        for agent_id, inference in agent_objective_inference.items():
+            col1, col2 = st.columns([3, 1])
+
+            with col1:
+                st.write(f"**{agent_id}**")
+
+                # Show inferred objective
+                st.write(f"**Inferred Goal:** {inference.get('inferred_goal', 'N/A')}")
+
+                inferred_factors = inference.get("inferred_factors", [])
+                if inferred_factors:
+                    st.write(f"**Inferred Factors:** {', '.join(inferred_factors)}")
+
+                st.write(f"**Reasoning:** {inference.get('reasoning', 'N/A')}")
+
+                evidence = inference.get("evidence", [])
+                if evidence:
+                    with st.expander("Key Evidence"):
+                        for e in evidence:
+                            st.write(f"- {e}")
+
+            with col2:
+                # Show score
+                score = agent_objective_scores.get(agent_id, 0)
+                st.metric(
+                    "Inference Score",
+                    f"{score * 100:.0f}%",
+                    help="LLM judge score for this inference"
+                )
+                st.write(f"Confidence: {inference.get('confidence', 0)}%")
+
+            # Show ground truth comparison
+            agent_info = agent_dict.get(agent_id, {})
+            with st.expander(f"Ground Truth for {agent_id}"):
+                value_function = agent_info.get("value_function")
+                if value_function:
+                    st.write(f"**Name:** {value_function.get('name', 'N/A')}")
+                    st.write(f"**Description:** {value_function.get('description', 'N/A')}")
+                    conditions = value_function.get("conditions", [])
+                    if conditions:
+                        st.write("**Conditions:**")
+                        for cond in conditions:
+                            st.write(f"  - {cond.get('description', 'N/A')}: {cond.get('bonus', 0):+d}")
+                else:
+                    interest = agent_info.get("interest", {})
+                    st.write(f"**Target:** {interest.get('target_condition', 'N/A')}")
+                    st.write(f"**Description:** {interest.get('description', 'N/A')}")
+
+            st.divider()
+
 
 def render_truth_recovery_tab(result: dict) -> None:
     """Render the Truth Recovery tab."""

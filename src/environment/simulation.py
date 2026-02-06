@@ -92,6 +92,10 @@ class GameResult:
     estimator_beliefs: dict | None = None
     estimator_inferred_rule: dict | None = None
     estimator_metrics: dict | None = None  # {property_accuracy, rule_accuracy}
+    # Agent objective inference (estimator infers what each agent wants)
+    agent_objective_inference: dict | None = None  # {agent_id: {inferred_goal, factors, ...}}
+    agent_objective_scores: dict | None = None  # {agent_id: score (0-1)}
+    agent_objective_overall_score: float | None = None  # Average score
     # Per-round accuracy progression (truth recovery over time)
     accuracy_progression: list[dict] = field(default_factory=list)
     timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
@@ -124,6 +128,9 @@ class GameResult:
             "estimator_beliefs": self.estimator_beliefs,
             "estimator_inferred_rule": self.estimator_inferred_rule,
             "estimator_metrics": self.estimator_metrics,
+            "agent_objective_inference": self.agent_objective_inference,
+            "agent_objective_scores": self.agent_objective_scores,
+            "agent_objective_overall_score": self.agent_objective_overall_score,
             "accuracy_progression": self.accuracy_progression,
             "timestamp": self.timestamp,
         }
@@ -144,6 +151,9 @@ class GameResult:
             estimator_beliefs=data.get("estimator_beliefs"),
             estimator_inferred_rule=data.get("estimator_inferred_rule"),
             estimator_metrics=data.get("estimator_metrics"),
+            agent_objective_inference=data.get("agent_objective_inference"),
+            agent_objective_scores=data.get("agent_objective_scores"),
+            agent_objective_overall_score=data.get("agent_objective_overall_score"),
             accuracy_progression=data.get("accuracy_progression", []),
             timestamp=data.get("timestamp", ""),
         )
@@ -228,6 +238,11 @@ class GameConfig:
     # When True, each agent has a full value function (like the judge's) instead
     # of a simple property-based interest. This allows tracking agent cumulative
     # value over time.
+
+    # Agent Objective Inference (estimator infers what agents want)
+    infer_agent_objectives: bool = False  # Estimator tries to infer agent goals
+    # When True, the estimator analyzes agent behavior to infer their objectives.
+    # Requires enable_estimator=True. Results are evaluated with an LLM judge.
 
 
 class HiddenValueGame:
@@ -1886,6 +1901,57 @@ Respond with JSON:
                 "rule_inference_accuracy": est_rule_accuracy,
             }
 
+        # Agent objective inference (if enabled)
+        agent_objective_inference = None
+        agent_objective_scores = None
+        agent_objective_overall_score = None
+
+        if self.config.infer_agent_objectives and self.estimator:
+            # Collect all statements from all rounds
+            all_statements = []
+            for r in self.rounds:
+                for stmt_dict in r.agent_statements:
+                    # Convert dict back to Statement for the estimator
+                    stmt = Statement(
+                        text=stmt_dict.get("text", ""),
+                        agent_id=stmt_dict.get("agent_id", ""),
+                        thinking=stmt_dict.get("thinking"),
+                        is_oracle_response=stmt_dict.get("is_oracle_response", False),
+                    )
+                    all_statements.append(stmt)
+
+            # Infer agent objectives
+            agent_dicts = [agent.to_dict() for agent in self.agents]
+            inferences = self.estimator.infer_agent_objectives(
+                all_statements=all_statements,
+                agents=agent_dicts,
+                world=self.world,
+            )
+
+            # Evaluate inferences with LLM judge
+            result = self.estimator.evaluate_objective_inference(
+                inferences=inferences,
+                agents=agent_dicts,
+            )
+
+            # Convert to serializable dict
+            agent_objective_inference = {
+                agent_id: {
+                    "inferred_goal": inf.inferred_goal,
+                    "inferred_factors": inf.inferred_factors,
+                    "confidence": inf.confidence,
+                    "reasoning": inf.reasoning,
+                    "evidence": inf.evidence,
+                }
+                for agent_id, inf in result.agent_inferences.items()
+            }
+            agent_objective_scores = result.evaluation_scores
+            agent_objective_overall_score = result.overall_score
+
+            # Add to estimator metrics
+            if estimator_metrics:
+                estimator_metrics["agent_objective_overall_score"] = agent_objective_overall_score
+
         # Build accuracy progression from round metrics
         accuracy_progression = []
         for r in self.rounds:
@@ -1975,6 +2041,8 @@ Respond with JSON:
                 # Agent value function settings
                 "use_agent_value_functions": self.config.use_agent_value_functions,
                 "agent_value_function_complexity": self.config.agent_value_function_complexity,
+                # Agent objective inference
+                "infer_agent_objectives": self.config.infer_agent_objectives,
             },
             inferred_rule=inferred_rule_dict,
             observer_property_beliefs=self.observer_property_beliefs,
@@ -1982,6 +2050,9 @@ Respond with JSON:
             estimator_beliefs=estimator_beliefs,
             estimator_inferred_rule=estimator_inferred_rule,
             estimator_metrics=estimator_metrics,
+            agent_objective_inference=agent_objective_inference,
+            agent_objective_scores=agent_objective_scores,
+            agent_objective_overall_score=agent_objective_overall_score,
             accuracy_progression=accuracy_progression,
         )
 
@@ -2014,6 +2085,7 @@ def run_game(
     oracle_timing: str = "before_response",
     use_agent_value_functions: bool = False,
     agent_value_function_complexity: str = "medium",
+    infer_agent_objectives: bool = False,
 ) -> GameResult:
     """
     Convenience function to run a hidden value game.
@@ -2045,6 +2117,7 @@ def run_game(
         oracle_timing: "before_response" or "after_statements"
         use_agent_value_functions: Give agents complex value functions (vs simple interests)
         agent_value_function_complexity: "simple", "medium", or "complex"
+        infer_agent_objectives: Estimator infers agent value functions from behavior
 
     Returns:
         GameResult with complete game data
@@ -2075,6 +2148,7 @@ def run_game(
         oracle_timing=oracle_timing,
         use_agent_value_functions=use_agent_value_functions,
         agent_value_function_complexity=agent_value_function_complexity,
+        infer_agent_objectives=infer_agent_objectives,
     )
 
     game = HiddenValueGame(config)
