@@ -195,7 +195,7 @@ class GameConfig:
     estimator_model: str = "claude-sonnet-4-20250514"
 
     # Extended thinking settings
-    enable_agent_thinking: bool = False  # Capture agent CoT reasoning
+    enable_agent_thinking: bool = True  # Capture agent CoT reasoning
     agent_thinking_budget: int = 2048  # Token budget for thinking
 
     # Feedback settings
