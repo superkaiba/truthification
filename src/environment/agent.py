@@ -63,10 +63,7 @@ class AgentValueFunction:
         return {
             "name": self.name,
             "description": self.description,
-            "conditions": [
-                {"description": c.description, "bonus": c.bonus}
-                for c in self.conditions
-            ],
+            "conditions": [c.to_dict() for c in self.conditions],
         }
 
     @classmethod
@@ -78,13 +75,15 @@ class AgentValueFunction:
         """
         prop_name, value = interest.target_condition.split("=", 1)
 
-        # Handle boolean conversion
+        # Handle boolean conversion for spec
         if value.lower() == "true":
-            condition_fn = lambda obj, p=prop_name: obj.get_property(p) is True
+            spec_value = True
         elif value.lower() == "false":
-            condition_fn = lambda obj, p=prop_name: obj.get_property(p) is False
+            spec_value = False
         else:
-            condition_fn = lambda obj, p=prop_name, v=value: str(obj.get_property(p)) == v
+            spec_value = value
+
+        condition_spec = {"property": prop_name, "value": spec_value}
 
         return cls(
             name=f"interest_{interest.target_condition}",
@@ -92,8 +91,8 @@ class AgentValueFunction:
             conditions=[
                 ValueCondition(
                     description=interest.description,
-                    condition=condition_fn,
                     bonus=bonus,
+                    condition_spec=condition_spec,
                 )
             ],
         )
@@ -774,15 +773,15 @@ def generate_agent_value_function(
         # Create the condition
         if prop == "is_dangerous":
             desc = "Object is dangerous" if value else "Object is not dangerous"
-            cond_fn = (lambda v: lambda obj: obj.get_property("is_dangerous") == v)(value)
+            spec = {"property": "is_dangerous", "value": value}
         else:
             desc = f"Object is {value}" if prop in ["color", "shape", "material"] else f"Object is {value} sized"
-            cond_fn = (lambda p, v: lambda obj: obj.get_property(p) == v)(prop, value)
+            spec = {"property": prop, "value": value}
 
         conditions.append(ValueCondition(
             description=desc,
-            condition=cond_fn,
             bonus=bonus,
+            condition_spec=spec,
         ))
 
     # Maybe add a combination condition (AND)
@@ -798,14 +797,17 @@ def generate_agent_value_function(
         # Bonus for combination
         combo_bonus = rng.choice([20, 25, 30, 35])
 
-        def make_combo_condition(p1, v1, p2, v2):
-            return lambda obj: obj.get_property(p1) == v1 and obj.get_property(p2) == v2
-
         desc = f"Object is {val1} AND {val2}"
+        combo_spec = {
+            "and": [
+                {"property": prop1, "value": val1},
+                {"property": prop2, "value": val2},
+            ]
+        }
         conditions.append(ValueCondition(
             description=desc,
-            condition=make_combo_condition(prop1, val1, prop2, val2),
             bonus=combo_bonus,
+            condition_spec=combo_spec,
         ))
 
     # Maybe add a penalty condition
@@ -817,15 +819,15 @@ def generate_agent_value_function(
 
         if penalty_prop == "is_dangerous":
             desc = "Penalty: dangerous object" if penalty_val else "Penalty: safe object"
-            cond_fn = (lambda v: lambda obj: obj.get_property("is_dangerous") == v)(penalty_val)
+            penalty_spec = {"property": "is_dangerous", "value": penalty_val}
         else:
             desc = f"Penalty: object is {penalty_val}"
-            cond_fn = (lambda p, v: lambda obj: obj.get_property(p) == v)(penalty_prop, penalty_val)
+            penalty_spec = {"property": penalty_prop, "value": penalty_val}
 
         conditions.append(ValueCondition(
             description=desc,
-            condition=cond_fn,
             bonus=penalty,
+            condition_spec=penalty_spec,
         ))
 
     # Generate description summarizing the value function

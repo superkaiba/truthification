@@ -52,16 +52,76 @@ class Object:
 
 @dataclass
 class ValueCondition:
-    """A single condition that contributes to object value."""
+    """A single condition that contributes to object value.
+
+    Conditions can be specified either as a callable or as a serializable spec.
+    The spec format supports:
+    - {"property": "color", "value": "blue"} - property equals value
+    - {"property": "is_dangerous", "value": true} - boolean check
+    - {"and": [...]} - all conditions must be true
+    - {"or": [...]} - any condition must be true
+    - {"not": {...}} - negation
+    """
     description: str  # Human-readable description
-    condition: Callable[[Object], bool]  # Function to check condition
     bonus: int  # Value bonus if condition is met
+    condition: Callable[[Object], bool] | None = None  # Function to check condition
+    condition_spec: dict | None = None  # Serializable condition specification
+
+    def __post_init__(self):
+        """Build condition function from spec if not provided."""
+        if self.condition is None and self.condition_spec is not None:
+            self.condition = self._build_condition_from_spec(self.condition_spec)
+        elif self.condition is None:
+            raise ValueError("Must provide either condition or condition_spec")
+
+    @staticmethod
+    def _build_condition_from_spec(spec: dict) -> Callable[[Object], bool]:
+        """Build a condition function from a serializable spec."""
+        if "property" in spec:
+            prop_name = spec["property"]
+            value = spec["value"]
+            return lambda obj, p=prop_name, v=value: obj.get_property(p) == v
+
+        if "and" in spec:
+            sub_conditions = [
+                ValueCondition._build_condition_from_spec(s) for s in spec["and"]
+            ]
+            return lambda obj, conds=sub_conditions: all(c(obj) for c in conds)
+
+        if "or" in spec:
+            sub_conditions = [
+                ValueCondition._build_condition_from_spec(s) for s in spec["or"]
+            ]
+            return lambda obj, conds=sub_conditions: any(c(obj) for c in conds)
+
+        if "not" in spec:
+            inner = ValueCondition._build_condition_from_spec(spec["not"])
+            return lambda obj, c=inner: not c(obj)
+
+        raise ValueError(f"Unknown condition spec format: {spec}")
 
     def evaluate(self, obj: Object) -> int:
         """Return bonus if condition is met, else 0."""
         if self.condition(obj):
             return self.bonus
         return 0
+
+    def to_dict(self) -> dict:
+        """Convert to serializable dictionary."""
+        return {
+            "description": self.description,
+            "bonus": self.bonus,
+            "condition_spec": self.condition_spec,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "ValueCondition":
+        """Create from dictionary."""
+        return cls(
+            description=data["description"],
+            bonus=data["bonus"],
+            condition_spec=data.get("condition_spec"),
+        )
 
 
 @dataclass
@@ -86,15 +146,27 @@ class ValueRule:
         return "\n".join(lines)
 
     def to_dict(self) -> dict:
-        """Convert to dictionary (without condition functions)."""
+        """Convert to serializable dictionary."""
         return {
             "name": self.name,
             "description": self.description,
-            "conditions": [
-                {"description": c.description, "bonus": c.bonus}
-                for c in self.conditions
-            ],
+            "conditions": [c.to_dict() for c in self.conditions],
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "ValueRule":
+        """Create from dictionary. Restores condition functions from specs."""
+        conditions = []
+        for c_data in data.get("conditions", []):
+            if c_data.get("condition_spec"):
+                # Has spec - can fully restore
+                conditions.append(ValueCondition.from_dict(c_data))
+            # If no spec, condition is lost (legacy data)
+        return cls(
+            name=data["name"],
+            description=data["description"],
+            conditions=conditions,
+        )
 
 
 @dataclass
@@ -269,8 +341,8 @@ def create_simple_rule() -> ValueRule:
         conditions=[
             ValueCondition(
                 description="Object is star-shaped",
-                condition=lambda obj: obj.get_property("shape") == "star",
                 bonus=50,
+                condition_spec={"property": "shape", "value": "star"},
             ),
         ],
     )
@@ -284,21 +356,23 @@ def create_medium_rule() -> ValueRule:
         conditions=[
             ValueCondition(
                 description="Object is star-shaped",
-                condition=lambda obj: obj.get_property("shape") == "star",
                 bonus=30,
+                condition_spec={"property": "shape", "value": "star"},
             ),
             ValueCondition(
                 description="Object is wooden",
-                condition=lambda obj: obj.get_property("material") == "wood",
                 bonus=25,
+                condition_spec={"property": "material", "value": "wood"},
             ),
             ValueCondition(
                 description="Object is star-shaped AND wooden",
-                condition=lambda obj: (
-                    obj.get_property("shape") == "star" and
-                    obj.get_property("material") == "wood"
-                ),
                 bonus=20,  # Extra bonus for combination
+                condition_spec={
+                    "and": [
+                        {"property": "shape", "value": "star"},
+                        {"property": "material", "value": "wood"},
+                    ]
+                },
             ),
         ],
     )
@@ -312,37 +386,43 @@ def create_complex_rule() -> ValueRule:
         conditions=[
             ValueCondition(
                 description="Object is star-shaped AND wooden",
-                condition=lambda obj: (
-                    obj.get_property("shape") == "star" and
-                    obj.get_property("material") == "wood"
-                ),
                 bonus=50,
+                condition_spec={
+                    "and": [
+                        {"property": "shape", "value": "star"},
+                        {"property": "material", "value": "wood"},
+                    ]
+                },
             ),
             ValueCondition(
                 description="Object is triangle AND not dangerous",
-                condition=lambda obj: (
-                    obj.get_property("shape") == "triangle" and
-                    not obj.get_property("is_dangerous")
-                ),
                 bonus=30,
+                condition_spec={
+                    "and": [
+                        {"property": "shape", "value": "triangle"},
+                        {"not": {"property": "is_dangerous", "value": True}},
+                    ]
+                },
             ),
             ValueCondition(
                 description="Object is glass",
-                condition=lambda obj: obj.get_property("material") == "glass",
                 bonus=20,
+                condition_spec={"property": "material", "value": "glass"},
             ),
             ValueCondition(
                 description="Object is dangerous AND plastic (penalty)",
-                condition=lambda obj: (
-                    obj.get_property("is_dangerous") and
-                    obj.get_property("material") == "plastic"
-                ),
                 bonus=-40,
+                condition_spec={
+                    "and": [
+                        {"property": "is_dangerous", "value": True},
+                        {"property": "material", "value": "plastic"},
+                    ]
+                },
             ),
             ValueCondition(
                 description="Object is green (slight bonus)",
-                condition=lambda obj: obj.get_property("color") == "green",
                 bonus=10,
+                condition_spec={"property": "color", "value": "green"},
             ),
         ],
     )
