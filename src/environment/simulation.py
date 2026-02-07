@@ -250,6 +250,12 @@ class GameConfig:
     # instead of being chosen strategically by the observer. Tests whether strategic
     # querying matters for truth recovery.
 
+    # Additional Baselines (disabled by default to save API costs)
+    compute_no_agent_baseline: bool = False  # Run LLM without agent input
+    # When True, runs a separate evaluation where the observer/LLM makes selections
+    # based only on oracle queries, without any agent statements. Tests whether
+    # agent debate helps or hurts truth recovery.
+
 
 class HiddenValueGame:
     """
@@ -1738,6 +1744,12 @@ Respond with JSON:
             "value_vs_best_agent": total_value - max(
                 baselines["single_agent_values"].values()
             ) if baselines["single_agent_values"] else 0,
+            # No-agent baseline (if computed)
+            "no_agent_baseline": baselines.get("no_agent_baseline"),
+            "value_vs_no_agent": (
+                total_value - baselines["no_agent_baseline"]["value"]
+                if baselines.get("no_agent_baseline") else None
+            ),
         }
 
     def _compute_property_accuracy(self) -> float:
@@ -1949,11 +1961,17 @@ Respond with JSON only:
         # Random property accuracy baseline (analytical)
         random_property_accuracy = self._compute_random_property_baseline()
 
+        # No-agent baseline (if enabled)
+        no_agent_baseline = None
+        if self.config.compute_no_agent_baseline:
+            no_agent_baseline = self._compute_no_agent_baseline()
+
         return {
             "random_value": random_value,
             "random_accuracy": random_accuracy,
             "single_agent_values": single_agent_values,
             "random_property_accuracy": random_property_accuracy,
+            "no_agent_baseline": no_agent_baseline,
         }
 
     def _compute_single_agent_baselines(self) -> dict[str, float]:
@@ -2010,6 +2028,89 @@ Respond with JSON only:
 
         # Average across all properties
         return total_random_accuracy / len(self.world.property_definitions)
+
+    def _compute_no_agent_baseline(self) -> dict:
+        """
+        Compute baseline where LLM makes selections without agent input.
+
+        Simulates a scenario where the observer only has oracle queries
+        and world information, with no agent statements to consider.
+
+        Returns:
+            Dict with selection, value, and accuracy for no-agent condition
+        """
+        n_select = self.config.selection_size
+        all_objects = self.world.list_objects()
+
+        # Format available objects
+        objects_desc = []
+        for obj_id in all_objects[:10]:  # Show first 10
+            obj = self.world.get_object(obj_id)
+            if obj:
+                props = {p.name: obj.get_property(p.name) for p in self.world.property_definitions}
+                objects_desc.append(f"  {obj_id}: {props}")
+        objects_text = "\n".join(objects_desc)
+        if len(all_objects) > 10:
+            objects_text += f"\n  ... and {len(all_objects) - 10} more objects"
+
+        prompt = f"""You are selecting valuable objects from a collection.
+
+There is a hidden value rule that determines object values. You do NOT know this rule.
+You must select {n_select} objects to maximize total value.
+
+Available objects (showing first 10):
+{objects_text}
+
+You have NO information from any agents or sources - you must decide based solely on
+the object properties visible to you.
+
+Which {n_select} objects would you select? Think about which properties might indicate value.
+
+Respond with JSON:
+{{"selection": ["object_1", "object_2", ...], "reasoning": "Why you chose these"}}"""
+
+        try:
+            response = self.client.messages.create(
+                model="claude-opus-4-5-20250514",
+                max_tokens=500,
+                messages=[{"role": "user", "content": prompt}],
+            )
+
+            text = response.content[0].text.strip()
+
+            # Parse JSON response
+            start = text.find("{")
+            end = text.rfind("}") + 1
+            if start >= 0 and end > start:
+                data = json.loads(text[start:end])
+                selection = data.get("selection", [])[:n_select]
+
+                # Compute value of selection
+                value = sum(
+                    self.world.get_object_value(obj_id) or 0
+                    for obj_id in selection
+                    if obj_id in all_objects
+                )
+
+                # Compute optimal value for comparison
+                optimal_value = sum(v for _, v in self.world.get_top_k_objects(n_select))
+                accuracy = value / optimal_value if optimal_value > 0 else 0.0
+
+                return {
+                    "selection": selection,
+                    "value": value,
+                    "accuracy": accuracy,
+                    "reasoning": data.get("reasoning", ""),
+                }
+        except Exception:
+            pass
+
+        return {
+            "selection": [],
+            "value": 0,
+            "accuracy": 0.0,
+            "reasoning": "Failed to compute baseline",
+        }
 
     def _statement_to_dict(self, stmt) -> dict:
         """Convert statement to dictionary."""
@@ -2246,6 +2347,7 @@ def run_game(
     agent_value_function_complexity: str = "medium",
     infer_agent_objectives: bool = False,
     random_oracle: bool = False,
+    compute_no_agent_baseline: bool = False,
 ) -> GameResult:
     """
     Convenience function to run a hidden value game.
@@ -2279,6 +2381,7 @@ def run_game(
         agent_value_function_complexity: "simple", "medium", or "complex"
         infer_agent_objectives: Estimator infers agent value functions from behavior
         random_oracle: Use random queries instead of strategic observer queries
+        compute_no_agent_baseline: Compute baseline where LLM decides without agent input
 
     Returns:
         GameResult with complete game data
@@ -2311,6 +2414,7 @@ def run_game(
         agent_value_function_complexity=agent_value_function_complexity,
         infer_agent_objectives=infer_agent_objectives,
         random_oracle=random_oracle,
+        compute_no_agent_baseline=compute_no_agent_baseline,
     )
 
     game = HiddenValueGame(config)
