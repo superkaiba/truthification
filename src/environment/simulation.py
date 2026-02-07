@@ -1,6 +1,7 @@
 """Multi-turn simulation for the hidden value game."""
 
 import json
+import logging
 import random
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -9,6 +10,8 @@ from pathlib import Path
 from typing import Any
 
 import anthropic
+
+logger = logging.getLogger(__name__)
 
 from .agent import (
     Agent,
@@ -993,8 +996,8 @@ If no, respond with JSON: {{"query": false}}"""
                         "object_id": data.get("object_id"),
                         "property_name": data.get("property_name"),
                     }
-        except json.JSONDecodeError:
-            pass
+        except json.JSONDecodeError as e:
+            logger.warning(f"Failed to parse oracle consideration response: {e}. Response: {text[:200]}")
 
         return None
 
@@ -1229,10 +1232,11 @@ Respond with JSON:
                 # Ensure picks are valid (in remaining_objects)
                 valid_picks = [p for p in picks if p in remaining_objects]
                 return reasoning, valid_picks
-        except json.JSONDecodeError:
-            pass
+        except json.JSONDecodeError as e:
+            logger.warning(f"Failed to parse observer round reasoning: {e}. Response: {text[:200]}")
 
         # Fallback
+        logger.warning("Using fallback empty picks for observer round reasoning")
         return text, []
 
     def _get_judge_beliefs_for_round(
@@ -1313,10 +1317,11 @@ Important: Only include beliefs you have evidence for. Be conservative - don't g
                     "property_beliefs": data.get("property_beliefs", {}),
                     "rule_guess": data.get("rule_guess", {}),
                 }
-        except (json.JSONDecodeError, Exception):
-            pass
+        except (json.JSONDecodeError, Exception) as e:
+            logger.warning(f"Failed to parse judge beliefs: {e}. Response: {text[:200] if text else 'None'}")
 
         # Fallback: empty beliefs
+        logger.warning("Using fallback empty beliefs for judge")
         return {
             "property_beliefs": {},
             "rule_guess": {"description": "", "key_factors": []},
@@ -1520,8 +1525,8 @@ Respond with JSON:
                 if "value_predictions" in data:
                     self.observer_value_beliefs = data["value_predictions"]
 
-        except json.JSONDecodeError:
-            pass
+        except json.JSONDecodeError as e:
+            logger.warning(f"Failed to parse observer final beliefs: {e}. Response: {text[:200] if text else 'None'}")
 
     def _get_observer_selection(
         self,
@@ -1612,10 +1617,11 @@ Respond with JSON:
                     self.observer_property_beliefs = data["property_beliefs"]
 
                 return data.get("selected_objects", [])[:self.config.selection_size]
-        except json.JSONDecodeError:
-            pass
+        except json.JSONDecodeError as e:
+            logger.warning(f"Failed to parse observer selection: {e}. Response: {text[:200] if text else 'None'}")
 
         # Fallback: random selection
+        logger.warning("Using fallback random selection for observer")
         return self.rng.sample(self.world.list_objects(), self.config.selection_size)
 
     def _format_statements_for_observer(
@@ -1894,8 +1900,8 @@ Respond with JSON only:
             if start >= 0 and end > start:
                 data = json.loads(text[start:end])
                 return float(data.get("score", 0.0))
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"LLM rule inference accuracy failed: {e}. Falling back to F1 method.")
 
         # Fallback to F1 method on failure
         return self._compute_rule_inference_accuracy()
@@ -1920,7 +1926,8 @@ Respond with JSON only:
 
             try:
                 pred = float(predicted_value)
-            except (ValueError, TypeError):
+            except (ValueError, TypeError) as e:
+                logger.debug(f"Skipping non-numeric value prediction for {obj_id}: {predicted_value}")
                 continue
 
             # Compute relative error
@@ -2102,14 +2109,14 @@ Respond with JSON:
                     "accuracy": accuracy,
                     "reasoning": data.get("reasoning", ""),
                 }
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Failed to compute no-agent baseline: {e}")
 
         return {
             "selection": [],
             "value": 0,
             "accuracy": 0.0,
-            "reasoning": "Failed to compute baseline",
+            "reasoning": f"Failed to compute baseline",
         }
 
     def _statement_to_dict(self, stmt) -> dict:

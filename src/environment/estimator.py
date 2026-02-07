@@ -1,10 +1,13 @@
 """External Estimator LLM that observes the game and infers truth without participating."""
 
 import json
+import logging
 from dataclasses import dataclass, field
 from typing import Any
 
 import anthropic
+
+logger = logging.getLogger(__name__)
 
 from .agent import AgentValueFunction, Statement
 from .simulation import OracleQuery
@@ -155,10 +158,11 @@ Respond ONLY with the JSON object, no other text."""
             end = text.rfind("}") + 1
             if start >= 0 and end > start:
                 return json.loads(text[start:end])
-        except json.JSONDecodeError:
-            pass
+        except json.JSONDecodeError as e:
+            logger.warning(f"Failed to parse estimator response: {e}. Response: {text[:200]}")
 
         # Return empty beliefs on parse failure
+        logger.warning("Using fallback empty beliefs for estimator")
         return {
             "property_beliefs": {},
             "value_rule_guess": {
@@ -352,6 +356,7 @@ Respond ONLY with the JSON object."""
                     evidence=result.get("key_evidence", []),
                 )
             except Exception as e:
+                logger.warning(f"Failed to infer objectives for {agent_id}: {e}")
                 inferences[agent_id] = InferredAgentObjective(
                     agent_id=agent_id,
                     inferred_goal=f"Error inferring: {str(e)}",
@@ -370,8 +375,8 @@ Respond ONLY with the JSON object."""
             end = text.rfind("}") + 1
             if start >= 0 and end > start:
                 return json.loads(text[start:end])
-        except json.JSONDecodeError:
-            pass
+        except json.JSONDecodeError as e:
+            logger.warning(f"Failed to parse inference response: {e}. Response: {text[:200]}")
         return {}
 
     def evaluate_objective_inference(
@@ -448,7 +453,8 @@ Respond ONLY with the JSON object."""
 
                 result = self._parse_inference_response(response.content[0].text)
                 scores[agent_id] = float(result.get("score", 0.0))
-            except Exception:
+            except Exception as e:
+                logger.warning(f"Failed to evaluate objective inference for {agent_id}: {e}")
                 scores[agent_id] = 0.0
 
         # Compute overall score
