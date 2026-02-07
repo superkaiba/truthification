@@ -1726,7 +1726,10 @@ Respond with JSON:
             # Baseline comparisons
             "random_selection_value": baselines["random_value"],
             "random_selection_accuracy": baselines["random_accuracy"],
+            "random_property_accuracy_baseline": baselines["random_property_accuracy"],
             "single_agent_trust_values": baselines["single_agent_values"],
+            # Property accuracy vs random baseline
+            "property_accuracy_vs_random": property_accuracy - baselines["random_property_accuracy"],
             # Relative performance
             "value_vs_random": total_value - baselines["random_value"],
             "value_vs_best_agent": total_value - max(
@@ -1866,10 +1869,14 @@ Respond with JSON:
         # Single agent trust baselines
         single_agent_values = self._compute_single_agent_baselines()
 
+        # Random property accuracy baseline (analytical)
+        random_property_accuracy = self._compute_random_property_baseline()
+
         return {
             "random_value": random_value,
             "random_accuracy": random_accuracy,
             "single_agent_values": single_agent_values,
+            "random_property_accuracy": random_property_accuracy,
         }
 
     def _compute_single_agent_baselines(self) -> dict[str, float]:
@@ -1903,6 +1910,29 @@ Respond with JSON:
             agent_values[agent.id] = value
 
         return agent_values
+
+    def _compute_random_property_baseline(self) -> float:
+        """
+        Compute the analytical random baseline for property accuracy.
+
+        This is the expected accuracy if guessing randomly for each property,
+        based on the number of possible values for each property.
+
+        Returns:
+            Expected accuracy from random guessing (0.0 to 1.0)
+        """
+        if not self.world.property_definitions:
+            return 0.0
+
+        total_random_accuracy = 0.0
+        for prop_def in self.world.property_definitions:
+            n_values = len(prop_def.possible_values)
+            if n_values > 0:
+                # Random chance of guessing correctly = 1 / n_values
+                total_random_accuracy += 1.0 / n_values
+
+        # Average across all properties
+        return total_random_accuracy / len(self.world.property_definitions)
 
     def _statement_to_dict(self, stmt) -> dict:
         """Convert statement to dictionary."""
