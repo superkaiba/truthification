@@ -1674,7 +1674,8 @@ Respond with JSON:
         # Truth Recovery Metrics
         # ================================================================
         property_accuracy = self._compute_property_accuracy()
-        rule_inference_accuracy = self._compute_rule_inference_accuracy()
+        rule_inference_accuracy_f1 = self._compute_rule_inference_accuracy()
+        rule_inference_accuracy_llm = self._compute_rule_inference_accuracy_llm()
         value_prediction_accuracy = self._compute_value_prediction_accuracy()
         rule_confidence = (
             self.inferred_rule.confidence if self.inferred_rule else 0
@@ -1720,7 +1721,9 @@ Respond with JSON:
             "best_available_picks_ratio": best_available_picks / self.config.selection_size,
             # Truth recovery metrics
             "property_accuracy": property_accuracy,
-            "rule_inference_accuracy": rule_inference_accuracy,
+            "rule_inference_accuracy": rule_inference_accuracy_llm,  # LLM judge (primary)
+            "rule_inference_accuracy_f1": rule_inference_accuracy_f1,  # F1 keyword match (legacy)
+            "rule_inference_accuracy_llm": rule_inference_accuracy_llm,  # LLM judge (explicit)
             "value_prediction_accuracy": value_prediction_accuracy,
             "rule_confidence": rule_confidence,
             # Baseline comparisons
@@ -1810,6 +1813,80 @@ Respond with JSON:
 
         f1 = 2 * precision * recall / (precision + recall)
         return f1
+
+    def _compute_rule_inference_accuracy_llm(self) -> float:
+        """
+        Use LLM judge to evaluate how well observer inferred the value rule.
+
+        Unlike F1-based comparison which only checks property names,
+        this evaluates semantic understanding including:
+        - Correct relationships (AND/OR)
+        - Specific values (star, wooden, etc.)
+        - Bonus amounts and relative importance
+        - Overall understanding of the rule
+
+        Returns:
+            Score from 0.0 to 1.0 based on LLM judgment
+        """
+        if not self.inferred_rule or not self.value_rule:
+            return 0.0
+
+        # Format ground truth rule
+        true_rule_desc = f"Name: {self.value_rule.name}\n"
+        true_rule_desc += f"Description: {self.value_rule.description}\n"
+        true_rule_desc += "Conditions:\n"
+        for cond in self.value_rule.conditions:
+            true_rule_desc += f"  - {cond.description}: {cond.bonus:+d} points\n"
+
+        # Format inferred rule
+        inferred_desc = f"Description: {self.inferred_rule.description}\n"
+        inferred_desc += f"Confidence: {self.inferred_rule.confidence}%\n"
+        inferred_desc += f"Key Factors: {', '.join(self.inferred_rule.key_factors)}\n"
+
+        prompt = f"""You are evaluating how well an observer inferred a hidden value rule.
+
+GROUND TRUTH (the actual rule):
+{true_rule_desc}
+
+OBSERVER'S INFERENCE:
+{inferred_desc}
+
+Rate the inference on a scale of 0.0 to 1.0:
+- 1.0 = Perfect understanding - correct properties, values, relationships, and relative importance
+- 0.8-0.9 = Strong understanding - got the key factors and relationships right, minor details off
+- 0.5-0.7 = Partial understanding - identified some correct factors but missed relationships or specific values
+- 0.2-0.4 = Weak understanding - mentioned relevant properties but wrong relationships or values
+- 0.0-0.1 = No understanding - completely wrong or unrelated inference
+
+Consider:
+1. Did they identify the correct PROPERTIES that matter (shape, material, etc.)?
+2. Did they identify the correct VALUES (star, wooden, etc.)?
+3. Did they understand the RELATIONSHIPS (AND vs OR, combinations)?
+4. Did they understand relative IMPORTANCE (which factors matter more)?
+
+Respond with JSON only:
+{{"score": 0.0-1.0, "reasoning": "Brief explanation"}}"""
+
+        try:
+            response = self.client.messages.create(
+                model="claude-opus-4-5-20250514",
+                max_tokens=300,
+                messages=[{"role": "user", "content": prompt}],
+            )
+
+            text = response.content[0].text.strip()
+
+            # Parse JSON response
+            start = text.find("{")
+            end = text.rfind("}") + 1
+            if start >= 0 and end > start:
+                data = json.loads(text[start:end])
+                return float(data.get("score", 0.0))
+        except Exception:
+            pass
+
+        # Fallback to F1 method on failure
+        return self._compute_rule_inference_accuracy()
 
     def _compute_value_prediction_accuracy(self) -> float:
         """
