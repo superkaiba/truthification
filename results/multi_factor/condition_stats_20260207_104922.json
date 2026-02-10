@@ -528,6 +528,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.63,
+      "std": 0.2752271788904577,
+      "se": 0.12308533625091171,
+      "n": 5,
+      "values": [
+        0.95,
+        0.44999999999999996,
+        0.35,
+        0.5,
+        0.9
+      ]
     }
   },
   "blind_oracle-strategic_vf-simple_medium": {
@@ -1059,6 +1072,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.555,
+      "std": 0.3084234102658227,
+      "se": 0.1379311422413372,
+      "n": 5,
+      "values": [
+        1.0,
+        0.65,
+        0.15000000000000002,
+        0.5,
+        0.475
+      ]
     }
   },
   "blind_oracle-strategic_vf-simple_complex": {
@@ -1590,6 +1616,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.81,
+      "std": 0.18506755523321747,
+      "se": 0.08276472678623424,
+      "n": 5,
+      "values": [
+        0.95,
+        0.5,
+        0.8,
+        0.95,
+        0.8500000000000001
+      ]
     }
   },
   "blind_oracle-strategic_vf-complex_simple": {
@@ -2121,6 +2160,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.32999999999999996,
+      "std": 0.08366600265340754,
+      "se": 0.0374165738677394,
+      "n": 5,
+      "values": [
+        0.35,
+        0.44999999999999996,
+        0.25,
+        0.25,
+        0.35
+      ]
     }
   },
   "blind_oracle-strategic_vf-complex_medium": {
@@ -2652,6 +2704,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.45,
+      "std": 0.29154759474226505,
+      "se": 0.130384048104053,
+      "n": 5,
+      "values": [
+        0.45,
+        0.05,
+        0.55,
+        0.35,
+        0.8500000000000001
+      ]
     }
   },
   "blind_oracle-strategic_vf-complex_complex": {
@@ -3183,6 +3248,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.32,
+      "std": 0.1823458252881047,
+      "se": 0.08154753215150046,
+      "n": 5,
+      "values": [
+        0.5,
+        0.45,
+        0.15,
+        0.1,
+        0.4
+      ]
     }
   },
   "blind_oracle-random_vf-simple_simple": {
@@ -3714,6 +3792,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.54,
+      "std": 0.28372521918222215,
+      "se": 0.1268857754044952,
+      "n": 5,
+      "values": [
+        0.7,
+        0.75,
+        0.05,
+        0.6499999999999999,
+        0.55
+      ]
     }
   },
   "blind_oracle-random_vf-simple_medium": {
@@ -4245,6 +4336,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.61,
+      "std": 0.2607680962081059,
+      "se": 0.11661903789690599,
+      "n": 5,
+      "values": [
+        0.95,
+        0.25,
+        0.75,
+        0.55,
+        0.55
+      ]
     }
   },
   "blind_oracle-random_vf-simple_complex": {
@@ -4776,6 +4880,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.7000000000000001,
+      "std": 0.19039432764659772,
+      "se": 0.08514693182963201,
+      "n": 5,
+      "values": [
+        0.8500000000000001,
+        0.5,
+        0.5,
+        0.9,
+        0.75
+      ]
     }
   },
   "blind_oracle-random_vf-complex_simple": {
@@ -5307,6 +5424,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.28,
+      "std": 0.11510864433221338,
+      "se": 0.051478150704935,
+      "n": 5,
+      "values": [
+        0.35,
+        0.3,
+        0.4,
+        0.1,
+        0.25
+      ]
     }
   },
   "blind_oracle-random_vf-complex_medium": {
@@ -5838,6 +5968,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.19,
+      "std": 0.2219234102117215,
+      "se": 0.09924716620639605,
+      "n": 5,
+      "values": [
+        0.05,
+        0.1,
+        0.0,
+        0.25,
+        0.55
+      ]
     }
   },
   "blind_oracle-random_vf-complex_complex": {
@@ -6369,6 +6512,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.33,
+      "std": 0.12549900398011132,
+      "se": 0.05612486080160911,
+      "n": 5,
+      "values": [
+        0.2,
+        0.45,
+        0.44999999999999996,
+        0.2,
+        0.35
+      ]
     }
   },
   "ids_oracle-strategic_vf-simple_simple": {
@@ -6900,6 +7056,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.78,
+      "std": 0.12549900398011132,
+      "se": 0.05612486080160911,
+      "n": 5,
+      "values": [
+        0.9,
+        0.7,
+        0.6000000000000001,
+        0.8500000000000001,
+        0.85
+      ]
     }
   },
   "ids_oracle-strategic_vf-simple_medium": {
@@ -7431,6 +7600,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.67,
+      "std": 0.3817721833764215,
+      "se": 0.17073371078963873,
+      "n": 5,
+      "values": [
+        0.9,
+        0.55,
+        0.05,
+        0.95,
+        0.9
+      ]
     }
   },
   "ids_oracle-strategic_vf-simple_complex": {
@@ -7962,6 +8144,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.7,
+      "std": 0.3758324094593227,
+      "se": 0.1680773631397161,
+      "n": 5,
+      "values": [
+        0.7,
+        0.05,
+        0.95,
+        0.9,
+        0.9
+      ]
     }
   },
   "ids_oracle-strategic_vf-complex_simple": {
@@ -8493,6 +8688,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.48,
+      "std": 0.24135036772294338,
+      "se": 0.1079351657246145,
+      "n": 5,
+      "values": [
+        0.35,
+        0.3,
+        0.30000000000000004,
+        0.6,
+        0.85
+      ]
     }
   },
   "ids_oracle-strategic_vf-complex_medium": {
@@ -9024,6 +9232,18 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.1,
+      "std": 0.04082482904638631,
+      "se": 0.020412414523193156,
+      "n": 4,
+      "values": [
+        0.1,
+        0.15000000000000002,
+        0.1,
+        0.05
+      ]
     }
   },
   "ids_oracle-strategic_vf-complex_complex": {
@@ -9555,6 +9775,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.42,
+      "std": 0.297069015550259,
+      "se": 0.13285330255586422,
+      "n": 5,
+      "values": [
+        0.35,
+        0.1,
+        0.3,
+        0.44999999999999996,
+        0.9
+      ]
     }
   },
   "ids_oracle-random_vf-simple_simple": {
@@ -10086,6 +10319,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.59,
+      "std": 0.3507135583350036,
+      "se": 0.1568438714135812,
+      "n": 5,
+      "values": [
+        0.85,
+        0.55,
+        0.05,
+        0.55,
+        0.95
+      ]
     }
   },
   "ids_oracle-random_vf-simple_medium": {
@@ -10617,6 +10863,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.72,
+      "std": 0.1788854381999832,
+      "se": 0.08000000000000002,
+      "n": 5,
+      "values": [
+        0.75,
+        0.9,
+        0.6499999999999999,
+        0.85,
+        0.44999999999999996
+      ]
     }
   },
   "ids_oracle-random_vf-simple_complex": {
@@ -11148,6 +11407,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.66,
+      "std": 0.29025850547399984,
+      "se": 0.12980754985747167,
+      "n": 5,
+      "values": [
+        0.8500000000000001,
+        0.7,
+        0.15000000000000002,
+        0.8,
+        0.8
+      ]
     }
   },
   "ids_oracle-random_vf-complex_simple": {
@@ -11679,6 +11951,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.41,
+      "std": 0.33800887562311144,
+      "se": 0.15116216457830975,
+      "n": 5,
+      "values": [
+        1.0,
+        0.15,
+        0.25,
+        0.3,
+        0.35
+      ]
     }
   },
   "ids_oracle-random_vf-complex_medium": {
@@ -12210,6 +12495,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.3,
+      "std": 0.24748737341529162,
+      "se": 0.11067971810589326,
+      "n": 5,
+      "values": [
+        0.3,
+        0.0,
+        0.4,
+        0.6499999999999999,
+        0.15
+      ]
     }
   },
   "ids_oracle-random_vf-complex_complex": {
@@ -12741,6 +13039,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.32,
+      "std": 0.0758287544405155,
+      "se": 0.033911649915626334,
+      "n": 5,
+      "values": [
+        0.35,
+        0.2,
+        0.30000000000000004,
+        0.4,
+        0.35
+      ]
     }
   },
   "interests_oracle-strategic_vf-simple_simple": {
@@ -13272,6 +13583,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.62,
+      "std": 0.21389249636207436,
+      "se": 0.09565563234854495,
+      "n": 5,
+      "values": [
+        0.6,
+        0.6,
+        0.35,
+        0.95,
+        0.6
+      ]
     }
   },
   "interests_oracle-strategic_vf-simple_medium": {
@@ -13803,6 +14127,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.63,
+      "std": 0.37682887362833545,
+      "se": 0.16852299546352717,
+      "n": 5,
+      "values": [
+        0.9,
+        0.5,
+        0.05,
+        1.0,
+        0.7
+      ]
     }
   },
   "interests_oracle-strategic_vf-simple_complex": {
@@ -14334,6 +14671,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.61,
+      "std": 0.34713109915419565,
+      "se": 0.15524174696260024,
+      "n": 5,
+      "values": [
+        0.39999999999999997,
+        0.8500000000000001,
+        0.1,
+        0.8,
+        0.9
+      ]
     }
   },
   "interests_oracle-strategic_vf-complex_simple": {
@@ -14865,6 +15215,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.47,
+      "std": 0.4147288270665544,
+      "se": 0.18547236990991406,
+      "n": 5,
+      "values": [
+        1.0,
+        0.0,
+        0.6,
+        0.1,
+        0.65
+      ]
     }
   },
   "interests_oracle-strategic_vf-complex_medium": {
@@ -15396,6 +15759,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.47,
+      "std": 0.3053686296920494,
+      "se": 0.13656500283747663,
+      "n": 5,
+      "values": [
+        0.2,
+        0.15,
+        0.44999999999999996,
+        0.7,
+        0.85
+      ]
     }
   },
   "interests_oracle-strategic_vf-complex_complex": {
@@ -15927,6 +16303,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.29,
+      "std": 0.2815137652051849,
+      "se": 0.1258967831201417,
+      "n": 5,
+      "values": [
+        0.05,
+        0.0,
+        0.25,
+        0.6499999999999999,
+        0.5
+      ]
     }
   },
   "interests_oracle-random_vf-simple_simple": {
@@ -16458,6 +16847,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.68,
+      "std": 0.21679483388678802,
+      "se": 0.09695359714832659,
+      "n": 5,
+      "values": [
+        0.8,
+        0.5,
+        0.39999999999999997,
+        0.8,
+        0.9
+      ]
     }
   },
   "interests_oracle-random_vf-simple_medium": {
@@ -16989,6 +17391,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.56,
+      "std": 0.33800887562311144,
+      "se": 0.15116216457830975,
+      "n": 5,
+      "values": [
+        0.8500000000000001,
+        0.55,
+        0.0,
+        0.6000000000000001,
+        0.8
+      ]
     }
   },
   "interests_oracle-random_vf-simple_complex": {
@@ -17520,6 +17935,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.785,
+      "std": 0.24596747752497686,
+      "se": 0.10999999999999999,
+      "n": 5,
+      "values": [
+        0.975,
+        1.0,
+        0.45,
+        0.6,
+        0.9
+      ]
     }
   },
   "interests_oracle-random_vf-complex_simple": {
@@ -18051,6 +18479,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.45,
+      "std": 0.1118033988749895,
+      "se": 0.05,
+      "n": 5,
+      "values": [
+        0.4,
+        0.45,
+        0.5,
+        0.30000000000000004,
+        0.6000000000000001
+      ]
     }
   },
   "interests_oracle-random_vf-complex_medium": {
@@ -18582,6 +19023,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.38,
+      "std": 0.24392621835300934,
+      "se": 0.10908712114635713,
+      "n": 5,
+      "values": [
+        0.15,
+        0.15,
+        0.55,
+        0.35,
+        0.7
+      ]
     }
   },
   "interests_oracle-random_vf-complex_complex": {
@@ -19113,6 +19567,19 @@
         "std": 0,
         "n": 0
       }
+    },
+    "objective_inference_score": {
+      "mean": 0.37,
+      "std": 0.1823458252881047,
+      "se": 0.08154753215150046,
+      "n": 5,
+      "values": [
+        0.45,
+        0.15,
+        0.2,
+        0.5,
+        0.55
+      ]
     }
   }
 }

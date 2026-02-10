@@ -242,9 +242,9 @@ def compute_condition_stats(results: list[dict]) -> dict:
     for r in results:
         est_metrics = r.get("estimator_metrics", {})
         if est_metrics:
-            obj_inf = est_metrics.get("objective_inference_result", {})
-            if obj_inf:
-                obj_scores.append(obj_inf.get("overall_score", 0))
+            score = est_metrics.get("agent_objective_overall_score")
+            if score is not None:
+                obj_scores.append(score)
     stats["objective_inference_score"] = safe_stats(obj_scores)
 
     return stats

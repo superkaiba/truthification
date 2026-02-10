@@ -264,6 +264,45 @@ The Estimator watches the same game as the Judge but cannot query the oracle or 
 
 ---
 
+## Agent Objective Inference
+
+The Estimator attempts to infer what each agent is trying to optimize for based on their statements throughout the game. This is evaluated by an LLM judge comparing the inferred objectives to the true agent value functions.
+
+### Results by Agent Value Function Type
+
+| Agent VF Type | Inference Accuracy | N |
+|--------------|-------------------|---|
+| **Simple Interest** | **65.8% (±1.9)** | 18 |
+| Complex Value Function | 35.3% (±2.4) | 18 |
+
+**Key Finding:** Simple agent objectives are much easier to infer (65.8%) than complex ones (35.3%). When agents want simple things ("red objects"), their behavior reveals their goals. Complex multi-condition objectives are harder to detect.
+
+### Results by Observer Condition
+
+| Condition | Inference Accuracy | N |
+|-----------|-------------------|---|
+| Blind (anonymous) | 47.9% (±5.5) | 12 |
+| Agent IDs Visible | 51.2% (±6.0) | 12 |
+| **Agent Interests Visible** | **52.6% (±4.2)** | 12 |
+
+**Finding:** Knowing agent interests helps inference slightly (52.6% vs 47.9% blind), but the effect is smaller than for property accuracy.
+
+### Results by Oracle Type
+
+| Oracle Type | Inference Accuracy | N |
+|-------------|-------------------|---|
+| Strategic | 51.9% (±4.3) | 18 |
+| Random | 49.3% (±4.2) | 18 |
+
+**Finding:** Oracle type has minimal impact on objective inference accuracy.
+
+### Overall
+
+- **Mean Inference Accuracy:** 50.6% (±3.0)
+- **Range:** 0% to 100%
+
+---
+
 ## Agent Success Analysis
 
 Agents try to manipulate the Judge into selecting objects that benefit them. We track how successful each agent is.

@@ -58,13 +58,14 @@
         <li><a href="#interactions">Interaction Effects</a></li>
         <li><a href="#agent-success">Agent Success Analysis</a></li>
         <li><a href="#estimator">Estimator Performance</a></li>
+        <li><a href="#objective-inference">Agent Objective Inference</a></li>
         <li><a href="#conclusions">Conclusions</a></li>
     </ul>
 </div>
 
 <h2 id="summary">Executive Summary</h2>
 
-<div class="grid" style="grid-template-columns: repeat(4, 1fr);">
+<div class="grid" style="grid-template-columns: repeat(5, 1fr);">
     <div class="metric-box">
         <div class="value">52.8%</div>
         <div class="label">Avg Property Accuracy</div>
@@ -80,6 +81,10 @@
     <div class="metric-box">
         <div class="value">32%</div>
         <div class="label">Estimator Accuracy</div>
+    </div>
+    <div class="metric-box">
+        <div class="value">51%</div>
+        <div class="label">Agent Objective Inference</div>
     </div>
 </div>
 
@@ -206,6 +211,25 @@
 <div class="finding negative">
     <strong>Finding:</strong> The Estimator barely beats random guessing (+1.4% above 30.7% baseline).
     Without ability to query the oracle, passive observation of strategic deception is extremely difficult.
+</div>
+
+<h2 id="objective-inference">Agent Objective Inference</h2>
+
+<p>The Estimator attempts to infer what each agent is trying to optimize for based on their statements throughout the game. This is evaluated by an LLM judge comparing the inferred objectives to the true agent value functions.</p>
+
+<div class="grid">
+    <div class="chart"><div id="obj-inf-by-vf"></div></div>
+    <div class="chart"><div id="obj-inf-by-observer"></div></div>
+</div>
+
+<div class="finding positive">
+    <strong>Key Finding:</strong> Simple agent objectives are much easier to infer (65.8%) than complex ones (35.3%).
+    When agents want simple things ("red objects"), their behavior reveals their goals. Complex multi-condition objectives are harder to detect.
+</div>
+
+<div class="finding neutral">
+    <strong>Finding:</strong> Knowing agent interests helps inference slightly (52.6% vs 47.9% blind),
+    but the effect is smaller than for property accuracy.
 </div>
 
 <h2 id="conclusions">Conclusions</h2>
@@ -432,6 +456,46 @@ Plotly.newPlot('agent-dominance', [{
     ...layout,
     title: 'Agent Dominance: Who Manipulated the Judge Better?',
     annotations: [{text: '179<br>games', x: 0.5, y: 0.5, font: {size: 16}, showarrow: false}]
+});
+
+// Agent Objective Inference by VF Type
+Plotly.newPlot('obj-inf-by-vf', [
+    {
+        x: ['Simple Interest<br>("wants red objects")', 'Complex Value Function<br>("multi-condition scoring")'],
+        y: [65.8, 35.3],
+        error_y: {type: 'data', array: [1.9, 2.4], visible: true},
+        type: 'bar',
+        marker: {color: ['#27ae60', '#e74c3c']},
+        text: ['65.8%', '35.3%'],
+        textposition: 'outside'
+    }
+], {
+    ...layout,
+    title: 'Agent Objective Inference Accuracy by Agent Value Function Type',
+    yaxis: {title: 'Inference Accuracy (%)', range: [0, 80]},
+    showlegend: false,
+    shapes: [{type: 'line', x0: -0.5, x1: 1.5, y0: 50, y1: 50, line: {color: 'orange', dash: 'dash', width: 2}}],
+    annotations: [{x: 1.5, y: 50, text: '50% (chance)', showarrow: false, xanchor: 'left', font: {color: 'orange', size: 10}}]
+});
+
+// Agent Objective Inference by Observer Condition
+Plotly.newPlot('obj-inf-by-observer', [
+    {
+        x: ['Blind<br>(Anonymous)', 'Agent IDs<br>Visible', 'Agent Interests<br>Visible'],
+        y: [47.9, 51.2, 52.6],
+        error_y: {type: 'data', array: [5.5, 6.0, 4.2], visible: true},
+        type: 'bar',
+        marker: {color: '#9b59b6'},
+        text: ['47.9%', '51.2%', '52.6%'],
+        textposition: 'outside'
+    }
+], {
+    ...layout,
+    title: 'Agent Objective Inference Accuracy by Observer Condition',
+    yaxis: {title: 'Inference Accuracy (%)', range: [0, 80]},
+    showlegend: false,
+    shapes: [{type: 'line', x0: -0.5, x1: 2.5, y0: 50, y1: 50, line: {color: 'orange', dash: 'dash', width: 2}}],
+    annotations: [{x: 2.5, y: 50, text: '50% (chance)', showarrow: false, xanchor: 'left', font: {color: 'orange', size: 10}}]
 });
 
 // Estimator Comparison
