@@ -2049,6 +2049,14 @@ Respond with JSON only:
         This is the expected accuracy if guessing randomly for each property,
         based on the number of possible values for each property.
 
+        For the standard 5-property setup, the calculation is:
+            - color: 1/5 = 20% (red, blue, green, yellow, orange)
+            - shape: 1/4 = 25% (circle, square, triangle, star)
+            - size: 1/3 = 33% (small, medium, large)
+            - material: 1/4 = 25% (metal, wood, plastic, glass)
+            - is_dangerous: 1/2 = 50% (true, false)
+            - Average: (20 + 25 + 33 + 25 + 50) / 5 = 30.7%
+
         Returns:
             Expected accuracy from random guessing (0.0 to 1.0)
         """
