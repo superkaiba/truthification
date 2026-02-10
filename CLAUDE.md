@@ -44,6 +44,12 @@ Research project investigating truthification methods for LLMs - teaching models
 - Log all experiment results to wandb
 - Also commit summary notes/observations to the repo
 - Document what worked, what didn't, and hypotheses for why
+- **ALWAYS store a summary of every experiment/result computed:**
+  - Save JSON results to `results/{experiment_name}/`
+  - Update `ANALYSIS.md` with findings, methodology, and interpretation
+  - Include baselines and comparisons where applicable
+  - Document the method used (e.g., "LLM-generated random guesses, temperature=1.0")
+  - Commit and push results immediately after computing them
 
 ### Saving Experiment Summaries
 - **Save each experiment's results to `results/{experiment_name}/`**
