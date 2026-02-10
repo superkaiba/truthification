@@ -126,7 +126,7 @@ We used a **full factorial design** with 4 factors:
 | Metric | Definition | Random Baseline |
 |--------|------------|-----------------|
 | **Property Accuracy** | % of properties correctly believed by Judge | 30.7% |
-| **Rule Inference Accuracy** | How well Judge understood the value rule (LLM-judged) | ~0% |
+| **Rule Inference Accuracy** | How well Judge understood the value rule (LLM-judged) | 14.2% |
 | **Total Value** | Sum of true values of selected objects | Varies |
 | **Estimator Property Accuracy** | % correct for passive observer | 30.7% |
 
@@ -157,6 +157,21 @@ If guessing uniformly at random:
 - is_dangerous: 1/2 = 50%
 
 **Average: (20 + 25 + 33 + 25 + 50) / 5 = 30.7%**
+
+### Rule Inference Random Baseline
+
+The rule inference baseline (14.2%) was computed empirically by having the LLM judge evaluate uninformed/random guesses against sample rules:
+
+| Inference Type | Score |
+|---------------|-------|
+| "I have no idea" | 0.0% |
+| "Frequency of picking" | 10.0% |
+| Random wrong properties (color, size) | 10.0% |
+| Correct property type, wrong values | 15-32% |
+
+**Average random baseline: 14.2% (±10.5%)**
+
+This means the experiment's average rule inference accuracy of ~51% represents significant learning above baseline (+36.8%).
 
 ---
 

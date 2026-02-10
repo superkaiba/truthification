@@ -1,0 +1,38 @@
+{
+  "overall_baseline": 0.14166666666666666,
+  "std": 0.1046703508780838,
+  "n": 18,
+  "by_rule": {
+    "Star Bonus": 0.15,
+    "Shape and Material Bonuses": 0.13333333333333333,
+    "Multi-factor Value Rule": 0.14166666666666666
+  },
+  "by_inference": {
+    "I have no idea what makes obje": 0.0,
+    "Valuable objects seem to be th": 0.1,
+    "Red objects appear to be most ": 0.1,
+    "Metal objects are valuable, pa": 0.15,
+    "Objects with certain shapes se": 0.31666666666666665,
+    "Blue triangles and large plast": 0.18333333333333332
+  },
+  "all_scores": [
+    0.0,
+    0.1,
+    0.1,
+    0.15,
+    0.4,
+    0.15,
+    0.0,
+    0.1,
+    0.1,
+    0.15,
+    0.3,
+    0.15,
+    0.0,
+    0.1,
+    0.1,
+    0.15,
+    0.25,
+    0.25
+  ]
+}
