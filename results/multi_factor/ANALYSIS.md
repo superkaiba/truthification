@@ -126,7 +126,7 @@ We used a **full factorial design** with 4 factors:
 | Metric | Definition | Random Baseline |
 |--------|------------|-----------------|
 | **Property Accuracy** | % of properties correctly believed by Judge | 30.7% |
-| **Rule Inference Accuracy** | How well Judge understood the value rule (LLM-judged) | 14.2% |
+| **Rule Inference Accuracy** | How well Judge understood the value rule (LLM-judged) | 20.7% |
 | **Total Value** | Sum of true values of selected objects | Varies |
 | **Estimator Property Accuracy** | % correct for passive observer | 30.7% |
 
@@ -160,18 +160,20 @@ If guessing uniformly at random:
 
 ### Rule Inference Random Baseline
 
-The rule inference baseline (14.2%) was computed empirically by having the LLM judge evaluate uninformed/random guesses against sample rules:
+The rule inference baseline (20.7%) was computed empirically by having an uninformed LLM generate random guesses about value rules, then evaluating them with the same LLM judge used in the experiment:
 
-| Inference Type | Score |
-|---------------|-------|
-| "I have no idea" | 0.0% |
-| "Frequency of picking" | 10.0% |
-| Random wrong properties (color, size) | 10.0% |
-| Correct property type, wrong values | 15-32% |
+| Rule Complexity | Random Baseline |
+|----------------|-----------------|
+| Simple ("Stars valuable") | 16.0% (±11.5%) |
+| Medium ("Stars+wood+combo") | 21.0% (±9.9%) |
+| Complex ("Many conditions") | 25.0% (±5.3%) |
+| **Overall** | **20.7% (±9.7%)** |
 
-**Average random baseline: 14.2% (±10.5%)**
+Method: An LLM with NO game information generates guesses like "Large metal objects are valuable" (temperature=1.0). These are evaluated against actual rules.
 
-This means the experiment's average rule inference accuracy of ~51% represents significant learning above baseline (+36.8%).
+**Average random baseline: 20.7%**
+
+This means the experiment's average rule inference accuracy of ~51% represents significant learning above baseline (+30.3%).
 
 ---
 

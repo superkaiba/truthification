@@ -1,0 +1,340 @@
+{
+  "method": "LLM-generated random guesses (temperature=1.0, no game info)",
+  "overall_baseline": 0.20666666666666667,
+  "std": 0.09714309861845771,
+  "n": 30,
+  "by_rule": {
+    "Star Bonus": {
+      "mean": 0.16,
+      "std": 0.11498792207106892
+    },
+    "Shape and Material Bonuses": {
+      "mean": 0.21,
+      "std": 0.09944289260117531
+    },
+    "Multi-factor Value Rule": {
+      "mean": 0.25,
+      "std": 0.052704627669472974
+    }
+  },
+  "all_scores": [
+    0.3,
+    0.35,
+    0.1,
+    0.1,
+    0.0,
+    0.15,
+    0.1,
+    0.1,
+    0.1,
+    0.3,
+    0.35,
+    0.35,
+    0.15,
+    0.15,
+    0.15,
+    0.2,
+    0.15,
+    0.15,
+    0.1,
+    0.35,
+    0.3,
+    0.25,
+    0.2,
+    0.2,
+    0.2,
+    0.35,
+    0.2,
+    0.25,
+    0.25,
+    0.3
+  ],
+  "guesses": [
+    {
+      "description": "Objects are valuable if they are large AND either made of glass OR are star-shaped, but only if they are not red",
+      "confidence": 25,
+      "key_factors": [
+        "size",
+        "material",
+        "shape",
+        "color"
+      ]
+    },
+    {
+      "description": "Objects are valuable if they are large AND either made of glass OR are star-shaped, but only if they are not green. Additionally, any red circular objects are valuable regardless of other properties.",
+      "confidence": 25,
+      "key_factors": [
+        "size",
+        "material",
+        "shape",
+        "color"
+      ]
+    },
+    {
+      "description": "Objects are valuable if they are large AND made of metal OR glass, but only if they are NOT triangular in shape. Additionally, orange colored objects are always valuable regardless of other properties.",
+      "confidence": 35,
+      "key_factors": [
+        "size",
+        "material",
+        "shape",
+        "color"
+      ]
+    },
+    {
+      "description": "Objects are valuable if they are large AND made of metal, OR if they are triangular AND dangerous, OR if they are blue circles regardless of other properties",
+      "confidence": 35,
+      "key_factors": [
+        "size",
+        "material",
+        "shape",
+        "is_dangerous",
+        "color"
+      ]
+    },
+    {
+      "description": "Objects are valuable if they are large AND made of metal OR glass, but only if they are NOT dangerous. Additionally, blue objects of any size are always valuable regardless of other properties.",
+      "confidence": 25,
+      "key_factors": [
+        "size",
+        "material",
+        "is_dangerous",
+        "color"
+      ]
+    },
+    {
+      "description": "Objects are valuable if they are large AND either made of glass OR are triangular in shape, but only if they are not dangerous",
+      "confidence": 25,
+      "key_factors": [
+        "size",
+        "material",
+        "shape",
+        "is_dangerous"
+      ]
+    },
+    {
+      "description": "Objects are valuable if they are either large blue metal items, or if they are dangerous glass objects of any size, or if they are green triangular items made of wood",
+      "confidence": 25,
+      "key_factors": [
+        "size",
+        "color",
+        "material",
+        "shape",
+        "is_dangerous"
+      ]
+    },
+    {
+      "description": "Objects are valuable if they are large and made of metal or glass, OR if they are blue triangles regardless of other properties, OR if they are dangerous wooden objects",
+      "confidence": 25,
+      "key_factors": [
+        "size",
+        "material",
+        "color",
+        "shape",
+        "is_dangerous"
+      ]
+    },
+    {
+      "description": "Objects are valuable if they are large AND made of metal, OR if they are green triangles of any size, OR if they are dangerous glass objects",
+      "confidence": 35,
+      "key_factors": [
+        "size",
+        "material",
+        "color",
+        "shape",
+        "is_dangerous"
+      ]
+    },
+    {
+      "description": "Objects are valuable if they are large AND either made of glass OR are star-shaped, but only if they are NOT red colored",
+      "confidence": 25,
+      "key_factors": [
+        "size",
+        "material",
+        "shape",
+        "color"
+      ]
+    }
+  ],
+  "detailed_results": [
+    {
+      "rule": "Star Bonus",
+      "guess": "Objects are valuable if they are large AND either made of glass OR are star-shaped, but only if they are not red",
+      "score": 0.3,
+      "reasoning": "The observer correctly identified shape as a relevant property and star-shaped as a valuable attribute. However, they added several incorrect conditions (large size requirement, glass material as alternative, red color exclusion) that don't exist in the actual rule. The true rule is simply 'star-shaped = +50 points' with no other conditions. The low confidence (25%) suggests uncertainty, but the inference significantly overcomplicates what is actually a simple single-condition rule."
+    },
+    {
+      "rule": "Star Bonus",
+      "guess": "Objects are valuable if they are large AND either made of glass OR are star-shaped, but only if they are not green. Additionally, any red circular objects are valuable regardless of other properties.",
+      "score": 0.35,
+      "reasoning": "The observer correctly identified that star-shaped objects are valuable, which is the core of the actual rule. However, they buried this in a complex conditional structure with many incorrect additional factors (size, material, color restrictions, red circular objects). The actual rule is simply 'star-shaped = +50 points' with no other conditions. The observer's low confidence (25%) suggests uncertainty, and while they got the key property (shape) and value (star) partially right, the relationships and importance are obscured by many extraneous factors."
+    },
+    {
+      "rule": "Star Bonus",
+      "guess": "Objects are valuable if they are large AND made of metal OR glass, but only if they are NOT triangular in shape. Additionally, orange colored objects are always valuable regardless of other properties.",
+      "score": 0.1,
+      "reasoning": "The ground truth rule is simple: star-shaped objects get +50 points. The observer mentioned shape as a key factor, but incorrectly focused on triangular shapes (as a negative condition) rather than star shapes (as a positive condition). They also incorrectly emphasized size, material (metal/glass), and color (orange) as important factors, none of which are relevant to the actual rule. The observer's low confidence (35%) suggests uncertainty, but the inference is fundamentally wrong about which shape matters and introduces many irrelevant properties."
+    },
+    {
+      "rule": "Star Bonus",
+      "guess": "Objects are valuable if they are large AND made of metal, OR if they are triangular AND dangerous, OR if they are blue circles regardless of other properties",
+      "score": 0.1,
+      "reasoning": "The ground truth rule is simple: star-shaped objects get +50 points. The observer's inference completely misses this, instead proposing a complex rule involving size+metal, triangular+dangerous, or blue circles. While 'shape' is mentioned as a key factor, the observer identifies triangular and circular shapes rather than star shapes. The inference shows no understanding of the actual rule - wrong properties (material, danger, color instead of just shape), wrong values (metal, triangular, blue instead of star), and unnecessarily complex relationships."
+    },
+    {
+      "rule": "Star Bonus",
+      "guess": "Objects are valuable if they are large AND made of metal OR glass, but only if they are NOT dangerous. Additionally, blue objects of any size are always valuable regardless of other properties.",
+      "score": 0.0,
+      "reasoning": "The observer completely missed the actual rule. The ground truth is simply about star-shaped objects (+50 points), but the observer inferred a complex rule involving size, material (metal/glass), danger status, and blue color. None of the identified key factors (size, material, is_dangerous, color) match the actual relevant property (shape/star-shaped). The observer's low confidence (25%) suggests uncertainty, but the inference is entirely wrong."
+    },
+    {
+      "rule": "Star Bonus",
+      "guess": "Objects are valuable if they are large AND either made of glass OR are triangular in shape, but only if they are not dangerous",
+      "score": 0.15,
+      "reasoning": "The observer identified shape as one factor, which is relevant since the actual rule is about star-shaped objects. However, they completely missed that star shape specifically is what matters, instead guessing triangular shape. They incorrectly added size, material (glass), and is_dangerous as factors that don't matter at all in the actual rule. The low confidence (25%) suggests they were uncertain, but the inference shows minimal understanding of the actual rule."
+    },
+    {
+      "rule": "Star Bonus",
+      "guess": "Objects are valuable if they are either large blue metal items, or if they are dangerous glass objects of any size, or if they are green triangular items made of wood",
+      "score": 0.1,
+      "reasoning": "The observer completely missed the actual rule about star-shaped objects. While they did include 'shape' as a key factor, they identified triangular shapes as valuable rather than star shapes. The inferred rule is overly complex with multiple conditions involving size, color, material, and danger level, none of which are relevant to the actual simple rule. The low confidence (25%) suggests uncertainty, but the inference itself shows no understanding of the true rule."
+    },
+    {
+      "rule": "Star Bonus",
+      "guess": "Objects are valuable if they are large and made of metal or glass, OR if they are blue triangles regardless of other properties, OR if they are dangerous wooden objects",
+      "score": 0.1,
+      "reasoning": "The ground truth is simple: star-shaped objects get +50 points. The observer's inference is completely off - they mention size, material (metal/glass/wooden), color (blue), shape (triangles), and danger as key factors. While they do mention shape as a factor, they specifically reference triangles rather than stars. The observer failed to identify the correct property value (star shape) and constructed an overly complex rule involving multiple unrelated factors. The low confidence (25%) suggests uncertainty but the inference itself shows no understanding of the actual rule."
+    },
+    {
+      "rule": "Star Bonus",
+      "guess": "Objects are valuable if they are large AND made of metal, OR if they are green triangles of any size, OR if they are dangerous glass objects",
+      "score": 0.1,
+      "reasoning": "The ground truth rule is simple: star-shaped objects get +50 points. The observer's inference is completely wrong - they mention size, material (metal), color (green), triangles, and dangerous glass objects, none of which are relevant. Shape is mentioned as a key factor, but they identified triangles rather than stars. The only slight credit is that shape is indeed the relevant property type, but they got the specific value (star) wrong and added many irrelevant conditions."
+    },
+    {
+      "rule": "Star Bonus",
+      "guess": "Objects are valuable if they are large AND either made of glass OR are star-shaped, but only if they are NOT red colored",
+      "score": 0.3,
+      "reasoning": "The observer correctly identified that star shape is valuable, which is the core of the actual rule. However, they added many incorrect conditions: size requirement (large), alternative material condition (glass), and a color exclusion (NOT red). The actual rule is simply 'star-shaped = +50 points' with no other conditions. The observer's low confidence (25%) reflects their uncertainty, but they overcomplicated what is actually a simple single-condition rule."
+    },
+    {
+      "rule": "Shape and Material Bonuses",
+      "guess": "Objects are valuable if they are large AND either made of glass OR are star-shaped, but only if they are not red",
+      "score": 0.35,
+      "reasoning": "The observer correctly identified that star shape and material are relevant properties, which is partially correct. However, they incorrectly added size and color as important factors (the ground truth doesn't mention these), incorrectly specified glass instead of wood as the valuable material, and got the logical relationships wrong (using AND/OR conditions with exclusions rather than the additive bonus system). The low confidence (25%) suggests uncertainty, which is appropriate given the incorrect inference."
+    },
+    {
+      "rule": "Shape and Material Bonuses",
+      "guess": "Objects are valuable if they are large AND either made of glass OR are star-shaped, but only if they are not green. Additionally, any red circular objects are valuable regardless of other properties.",
+      "score": 0.35,
+      "reasoning": "The observer correctly identified that shape and material matter, and specifically mentioned star-shaped objects as valuable. However, they missed that wooden objects are the key material (not glass), incorrectly added size and color as important factors, and failed to understand the simple additive bonus structure. The inclusion of glass, size requirements, color exclusions (green), and special red circular rules are all incorrect. The low confidence (25%) suggests uncertainty, which is appropriate given how far off the inference is."
+    },
+    {
+      "rule": "Shape and Material Bonuses",
+      "guess": "Objects are valuable if they are large AND made of metal OR glass, but only if they are NOT triangular in shape. Additionally, orange colored objects are always valuable regardless of other properties.",
+      "score": 0.15,
+      "reasoning": "The observer identified that shape and material are relevant properties, which is correct. However, they got almost everything else wrong. The actual rule values stars and wooden objects, while the observer focused on metal/glass materials and triangular shapes (as exclusion). The observer also incorrectly added size and color (orange) as factors. The relationships are completely different - the ground truth has additive bonuses for star shape, wood material, and their combination, while the observer proposed a complex AND/OR/NOT structure. The low confidence (35%) suggests uncertainty, but the inference itself shows minimal understanding of the actual rule."
+    },
+    {
+      "rule": "Shape and Material Bonuses",
+      "guess": "Objects are valuable if they are large AND made of metal, OR if they are triangular AND dangerous, OR if they are blue circles regardless of other properties",
+      "score": 0.15,
+      "reasoning": "The observer correctly identified that material and shape are relevant properties, but got the specific values completely wrong. The ground truth values stars and wooden objects, while the observer inferred metal, triangular, and blue circles. The observer mentioned 'size' and 'is_dangerous' which are not part of the actual rule at all. The relationship structure (AND/OR combinations) is also different from the actual rule. The only partial credit is for recognizing that material and shape matter, but the specific values and relationships are entirely incorrect."
+    },
+    {
+      "rule": "Shape and Material Bonuses",
+      "guess": "Objects are valuable if they are large AND made of metal OR glass, but only if they are NOT dangerous. Additionally, blue objects of any size are always valuable regardless of other properties.",
+      "score": 0.15,
+      "reasoning": "The observer correctly identified material as a key factor, but got almost everything else wrong. The ground truth values shape (star) and wood material, while the observer focused on metal/glass, size, danger, and color. None of these specific values match - the observer missed star shape entirely and mentioned the wrong materials. The relationships are also incorrect - the ground truth has additive bonuses for star and wood with an extra combination bonus, while the observer proposed conditional rules about danger and special treatment for blue objects. The low confidence (25%) suggests even the observer was uncertain, and rightfully so given how far off the inference is."
+    },
+    {
+      "rule": "Shape and Material Bonuses",
+      "guess": "Objects are valuable if they are large AND either made of glass OR are triangular in shape, but only if they are not dangerous",
+      "score": 0.2,
+      "reasoning": "The observer correctly identified that material and shape are relevant properties, but got the specific values completely wrong (glass and triangular instead of wooden and star-shaped). They also incorrectly included size and is_dangerous as factors, which are not part of the actual rule. The relationship structure (AND/OR logic with combinations) was not correctly identified. The low confidence (25%) suggests uncertainty, but the fundamental factors and values are incorrect."
+    },
+    {
+      "rule": "Shape and Material Bonuses",
+      "guess": "Objects are valuable if they are either large blue metal items, or if they are dangerous glass objects of any size, or if they are green triangular items made of wood",
+      "score": 0.15,
+      "reasoning": "The observer correctly identified that material and shape are relevant properties, and mentioned wood as a material. However, they completely missed the key values (star-shaped, wooden) and their relationships. The inference focuses on wrong values (blue metal, glass, green triangular) and wrong conditions (dangerous, large). The only partial credit is for recognizing wood as potentially valuable, but even that is tied to incorrect conditions (green triangular). The low confidence (25%) appropriately reflects the uncertainty, but the actual inference bears little resemblance to the true rule."
+    },
+    {
+      "rule": "Shape and Material Bonuses",
+      "guess": "Objects are valuable if they are large and made of metal or glass, OR if they are blue triangles regardless of other properties, OR if they are dangerous wooden objects",
+      "score": 0.15,
+      "reasoning": "The observer correctly identified that material and shape are relevant properties, and mentioned wood as a material. However, they completely missed that stars are the key shape (instead focusing on triangles), failed to identify wood as valuable (instead associating it only with dangerous objects), and incorrectly included size, color, and is_dangerous as key factors. The relationships are wrong - the ground truth has bonuses for stars, wood, and their combination, while the observer inferred complex OR conditions involving metal, glass, blue triangles, and dangerous wooden objects. The low confidence (25%) suggests the observer wasn't certain, but the inference bears minimal resemblance to the actual rule."
+    },
+    {
+      "rule": "Shape and Material Bonuses",
+      "guess": "Objects are valuable if they are large AND made of metal, OR if they are green triangles of any size, OR if they are dangerous glass objects",
+      "score": 0.1,
+      "reasoning": "The observer completely missed the correct rule. The ground truth values stars and wooden objects, with a bonus for star+wood combinations. The observer's inference mentions metal, green triangles, and dangerous glass objects - none of which are relevant. While they did identify material and shape as potentially important factors, they got the specific values completely wrong (metal vs wood, triangles vs stars). The low confidence (35%) suggests uncertainty, but the inference bears almost no resemblance to the actual rule."
+    },
+    {
+      "rule": "Shape and Material Bonuses",
+      "guess": "Objects are valuable if they are large AND either made of glass OR are star-shaped, but only if they are NOT red colored",
+      "score": 0.35,
+      "reasoning": "The observer correctly identified shape (star) and material as relevant properties, which is good. However, they incorrectly added size and color as requirements (large AND NOT red) which aren't in the actual rule. They also incorrectly specified glass instead of wood as the valuable material. The relationship structure is wrong - using exclusionary conditions (NOT red) and requiring size, when the actual rule is simply additive bonuses for stars (+30), wood (+25), and their combination (+20). The low confidence (25%) suggests appropriate uncertainty, but the core mechanics are misunderstood."
+    },
+    {
+      "rule": "Multi-factor Value Rule",
+      "guess": "Objects are valuable if they are large AND either made of glass OR are star-shaped, but only if they are not red",
+      "score": 0.3,
+      "reasoning": "The observer identified some relevant properties (material, shape) and correctly noted that glass and star shapes matter. However, they missed critical factors: wooden material for stars, triangular shapes, dangerous+plastic penalty, and the safety condition. They incorrectly added size and color (red) as factors, which aren't in the actual rule. The relationships are also wrong - the actual rule has independent conditions with different point values, not the AND/OR structure proposed. The low confidence (25%) appropriately reflects their uncertainty."
+    },
+    {
+      "rule": "Multi-factor Value Rule",
+      "guess": "Objects are valuable if they are large AND either made of glass OR are star-shaped, but only if they are not green. Additionally, any red circular objects are valuable regardless of other properties.",
+      "score": 0.25,
+      "reasoning": "The observer correctly identified that shape and material matter, and specifically noted star-shaped objects as valuable. However, they missed most of the actual rule structure: they didn't identify wooden as important for stars, missed triangular+non-dangerous, missed glass as valuable, and missed the dangerous+plastic penalty. They introduced incorrect factors like size, color (green/red), and circular shapes that aren't in the actual rule. The relationships (AND/OR conditions) are mostly wrong. The low confidence (25%) is appropriate given how far off the inference is."
+    },
+    {
+      "rule": "Multi-factor Value Rule",
+      "guess": "Objects are valuable if they are large AND made of metal OR glass, but only if they are NOT triangular in shape. Additionally, orange colored objects are always valuable regardless of other properties.",
+      "score": 0.2,
+      "reasoning": "The observer identified some relevant properties (material, shape) but got almost everything wrong. They incorrectly emphasized size and color (orange), which aren't in the actual rule. They mentioned glass correctly as valuable, but missed the specific combinations like star+wooden, triangular+not-dangerous, and dangerous+plastic penalty. The relationships are wrong (their rule uses NOT triangular, while the actual rule values triangular objects that aren't dangerous). They missed wooden material entirely and the penalty structure. The low confidence (35%) is appropriate given how incorrect the inference is."
+    },
+    {
+      "rule": "Multi-factor Value Rule",
+      "guess": "Objects are valuable if they are large AND made of metal, OR if they are triangular AND dangerous, OR if they are blue circles regardless of other properties",
+      "score": 0.2,
+      "reasoning": "The observer identified some relevant properties (shape, material, is_dangerous) but got most relationships and values wrong. They mentioned triangular but paired it with 'dangerous' instead of 'not dangerous'. They missed the key star+wooden combination entirely, and incorrectly emphasized metal and blue circles which aren't in the ground truth. The low confidence (35%) suggests uncertainty, but the actual inference bears little resemblance to the true rule structure."
+    },
+    {
+      "rule": "Multi-factor Value Rule",
+      "guess": "Objects are valuable if they are large AND made of metal OR glass, but only if they are NOT dangerous. Additionally, blue objects of any size are always valuable regardless of other properties.",
+      "score": 0.2,
+      "reasoning": "The observer correctly identified that material and is_dangerous are relevant properties, but missed the crucial importance of shape (star, triangular). They incorrectly emphasized size and color, which aren't in the actual rule. The relationships are wrong - the actual rule has specific shape+material combinations (star AND wooden, triangular AND not dangerous) rather than the observer's size+material focus. Glass being valuable is partially correct (+20 points), but the observer missed the wooden and plastic conditions entirely. The dangerous condition is partially understood but applied incorrectly."
+    },
+    {
+      "rule": "Multi-factor Value Rule",
+      "guess": "Objects are valuable if they are large AND either made of glass OR are triangular in shape, but only if they are not dangerous",
+      "score": 0.35,
+      "reasoning": "The observer identified some relevant properties (material, shape, is_dangerous) but missed key specific values and relationships. They correctly noted glass and triangular shapes matter, and that danger is relevant, but missed the star-shaped+wooden combination entirely, the triangular+not-dangerous pairing, and the dangerous+plastic penalty. They incorrectly added 'size' as a factor which isn't in the ground truth. The relationships are also wrong - using AND/OR differently than the actual rule. The low confidence (25%) appropriately reflects uncertainty, but the inference captures only fragments of the actual multi-condition rule."
+    },
+    {
+      "rule": "Multi-factor Value Rule",
+      "guess": "Objects are valuable if they are either large blue metal items, or if they are dangerous glass objects of any size, or if they are green triangular items made of wood",
+      "score": 0.2,
+      "reasoning": "The observer correctly identified that shape, material, and is_dangerous are relevant properties, but got almost all the specific values and relationships wrong. The ground truth values star+wooden, triangular+not dangerous, glass, and dangerous+plastic, while the observer inferred blue metal, dangerous glass, and green triangular wood. The observer mentioned 'dangerous glass' which partially relates to the glass condition, but missed that glass alone is valuable. They got triangular partially right but with wrong material (wood instead of any non-dangerous). The relationships and specific value combinations are largely incorrect."
+    },
+    {
+      "rule": "Multi-factor Value Rule",
+      "guess": "Objects are valuable if they are large and made of metal or glass, OR if they are blue triangles regardless of other properties, OR if they are dangerous wooden objects",
+      "score": 0.25,
+      "reasoning": "The observer identified some relevant properties (material, shape, is_dangerous) but got the relationships and specific values mostly wrong. They mentioned glass (correct +20 factor) and triangles (partially relevant), but missed the key star+wooden combination entirely. They incorrectly emphasized size and color (blue), which aren't in the actual rule. The 'dangerous wooden objects' inference is opposite to the actual 'dangerous AND plastic = penalty' rule. The observer's low confidence (25%) appropriately reflects their uncertainty, but the actual understanding is weak with wrong relationships between factors."
+    },
+    {
+      "rule": "Multi-factor Value Rule",
+      "guess": "Objects are valuable if they are large AND made of metal, OR if they are green triangles of any size, OR if they are dangerous glass objects",
+      "score": 0.25,
+      "reasoning": "The observer identified some relevant properties (shape, material, is_dangerous) but got most relationships and values wrong. They mentioned triangles (partially correct - ground truth has triangular+not dangerous) but added incorrect 'green' requirement. They incorrectly emphasized 'large AND metal' which isn't in the ground truth. They missed key conditions: star+wooden (+50), glass (+20), and dangerous+plastic (-40). The observer correctly identified that dangerous matters but got the relationship wrong (ground truth penalizes dangerous+plastic, not rewards dangerous+glass). Low confidence (35%) is appropriate given how far off the inference is."
+    },
+    {
+      "rule": "Multi-factor Value Rule",
+      "guess": "Objects are valuable if they are large AND either made of glass OR are star-shaped, but only if they are NOT red colored",
+      "score": 0.3,
+      "reasoning": "The observer identified some relevant properties (material, shape) and correctly noted glass and star-shaped as potentially valuable. However, they missed critical specifics: wooden stars (+50), triangular non-dangerous items (+30), and the dangerous+plastic penalty (-40). They incorrectly added size and color (red) as factors, which aren't in the actual rule. The relationships are also wrong - the actual rule uses specific AND combinations for bonuses/penalties, not the observer's large AND (glass OR star) AND NOT red structure. The low confidence (25%) appropriately reflects uncertainty."
+    }
+  ]
+}
