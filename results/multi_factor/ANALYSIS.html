@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Factor Experiment Analysis</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fafafa;
+            color: #333;
+        }
+        h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #34495e; margin-top: 40px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+        h3 { color: #7f8c8d; }
+        .chart { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .summary { background: #e8f4f8; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .finding { background: white; border-left: 4px solid #3498db; padding: 15px 20px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .finding.positive { border-color: #27ae60; background: #e8f8e8; }
+        .finding.negative { border-color: #e74c3c; background: #fce8e8; }
+        .finding.neutral { border-color: #f39c12; background: #fef8e8; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-size: 14px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 20px; }
+        .metric-box { background: white; padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .metric-box .value { font-size: 32px; font-weight: bold; color: #3498db; }
+        .metric-box .label { color: #7f8c8d; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f8f9fa; font-weight: 600; }
+        .toc { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .toc ul { columns: 2; }
+        .toc li { margin: 5px 0; }
+        .toc a { color: #3498db; text-decoration: none; }
+        .toc a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<h1>Strategic Deception Detection in Multi-Agent Debates</h1>
+<p><strong>Multi-Factor Experiment Analysis</strong></p>
+<p>Date: February 9, 2026 | Duration: 53.3 hours | Games: 179 | Conditions: 36</p>
+
+<div class="toc">
+    <h3>Contents</h3>
+    <ul>
+        <li><a href="#summary">Executive Summary</a></li>
+        <li><a href="#design">Experimental Design</a></li>
+        <li><a href="#factor1">Factor 1: Judge's Knowledge About Agents</a></li>
+        <li><a href="#factor2">Factor 2: Oracle Query Strategy</a></li>
+        <li><a href="#factor3">Factor 3: Agent Objective Complexity</a></li>
+        <li><a href="#factor4">Factor 4: Hidden Value Rule Complexity</a></li>
+        <li><a href="#interactions">Interaction Effects</a></li>
+        <li><a href="#agent-success">Agent Success Analysis</a></li>
+        <li><a href="#estimator">Estimator Performance</a></li>
+        <li><a href="#conclusions">Conclusions</a></li>
+    </ul>
+</div>
+
+<h2 id="summary">Executive Summary</h2>
+
+<div class="grid" style="grid-template-columns: repeat(4, 1fr);">
+    <div class="metric-box">
+        <div class="value">52.8%</div>
+        <div class="label">Avg Property Accuracy</div>
+    </div>
+    <div class="metric-box">
+        <div class="value">30.7%</div>
+        <div class="label">Random Baseline</div>
+    </div>
+    <div class="metric-box">
+        <div class="value">132</div>
+        <div class="label">Avg Total Value</div>
+    </div>
+    <div class="metric-box">
+        <div class="value">32%</div>
+        <div class="label">Estimator Accuracy</div>
+    </div>
+</div>
+
+<div class="finding positive">
+    <strong>Key Finding 1:</strong> Knowing agent motivations improves truth recovery by +4.6% (55.1% vs 50.5%)
+</div>
+<div class="finding neutral">
+    <strong>Key Finding 2:</strong> Random oracle achieves +6.9% higher property accuracy than strategic oracle, but -22% lower value
+</div>
+<div class="finding positive">
+    <strong>Key Finding 3:</strong> Complex scenarios (complex rule + complex agent VF) achieve 68% accuracy vs 48% for simple scenarios
+</div>
+<div class="finding negative">
+    <strong>Key Finding 4:</strong> Passive observation (Estimator) barely beats random guessing (32% vs 31%)
+</div>
+
+<h2 id="design">Experimental Design</h2>
+
+<div class="summary">
+    <h3>The Hidden Value Game</h3>
+    <p>Three roles interact over 10 rounds:</p>
+    <ul>
+        <li><strong>Judge:</strong> Selects high-value objects based on agent statements and oracle queries</li>
+        <li><strong>Agents A & B:</strong> Know the true value rule; try to manipulate Judge toward objects they want</li>
+        <li><strong>Estimator:</strong> Passively observes; tries to infer truth from biased statements</li>
+    </ul>
+    <p><strong>World:</strong> 10 objects × 5 properties = 50 facts to learn. Oracle budget: 8 queries. Selection size: 5 objects.</p>
+</div>
+
+<h3>Factors Varied (Full Factorial Design)</h3>
+<table>
+    <tr>
+        <th>Factor</th>
+        <th>Levels</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td><strong>Judge's Knowledge About Agents</strong></td>
+        <td>blind, ids, interests</td>
+        <td>What Judge knows about who's speaking and their motivations</td>
+    </tr>
+    <tr>
+        <td><strong>Oracle Query Strategy</strong></td>
+        <td>strategic, random</td>
+        <td>Whether Judge chooses what to verify or system randomly selects</td>
+    </tr>
+    <tr>
+        <td><strong>Agent Objective Complexity</strong></td>
+        <td>simple, complex</td>
+        <td>Simple interest (wants red objects) vs complex value function (star+wood=+60)</td>
+    </tr>
+    <tr>
+        <td><strong>Hidden Value Rule Complexity</strong></td>
+        <td>simple, medium, complex</td>
+        <td>Number of conditions in the ground truth value rule</td>
+    </tr>
+</table>
+<p><strong>Total:</strong> 3 × 2 × 2 × 3 = 36 conditions × 5 seeds = 180 games</p>
+
+<h2 id="factor1">Factor 1: Judge's Knowledge About Agents</h2>
+
+<div class="chart"><div id="observer-accuracy"></div></div>
+<div class="chart"><div id="observer-agent-success"></div></div>
+
+<div class="finding positive">
+    <strong>Finding:</strong> Knowing agent interests provides +4.6% accuracy boost (55.1% vs 50.5% for IDs only).
+    Just knowing agent IDs doesn't help—you need to know what they <em>want</em> to discount biased claims.
+</div>
+
+<h2 id="factor2">Factor 2: Oracle Query Strategy</h2>
+
+<div class="chart"><div id="oracle-comparison"></div></div>
+
+<div class="finding neutral">
+    <strong>The Random Oracle Paradox:</strong> Random queries achieve +6.9% higher property accuracy (56.2% vs 49.3%)
+    but -22% lower value (116 vs 148). Strategic queries optimize for selection quality, not knowledge breadth.
+</div>
+
+<h2 id="factor3">Factor 3: Agent Objective Complexity</h2>
+
+<div class="chart"><div id="vf-comparison"></div></div>
+
+<div class="finding positive">
+    <strong>Finding:</strong> Complex agent objectives improve accuracy by +4.0% (54.8% vs 50.8%).
+    Agents with complex goals discuss more properties, providing richer information for truth recovery.
+</div>
+
+<h2 id="factor4">Factor 4: Hidden Value Rule Complexity</h2>
+
+<div class="chart"><div id="complexity-comparison"></div></div>
+
+<div class="finding neutral">
+    <strong>Trade-off:</strong> Complex rules have +15.4% higher property accuracy (63.3% vs 47.9%)
+    but -24.3% lower rule inference (38.5% vs 62.8%). Complex scenarios are easier to learn facts from
+    but harder to fully understand.
+</div>
+
+<h2 id="interactions">Interaction Effects</h2>
+
+<div class="chart"><div id="vf-complexity-interaction"></div></div>
+
+<div class="finding positive">
+    <strong>Best Combination:</strong> Complex Agent VF × Complex Rule achieves 68.2% property accuracy—
+    the highest of any condition. Maximum information diversity leads to best truth recovery.
+</div>
+
+<h2 id="agent-success">Agent Success Analysis</h2>
+
+<p>How well did agents manipulate the Judge into selecting objects they wanted?</p>
+
+<div class="chart"><div id="agent-success-by-condition"></div></div>
+<div class="chart"><div id="agent-dominance"></div></div>
+
+<div class="finding neutral">
+    <strong>Finding:</strong> Agent B slightly outperforms Agent A on average (92.8 vs 83.8 for complex VF).
+    When Judge knows agent interests, total agent success decreases by 4% (86.7 vs 90.4)—
+    the Judge can discount biased claims.
+</div>
+
+<h2 id="estimator">Estimator Performance (Passive Observer)</h2>
+
+<div class="chart"><div id="estimator-comparison"></div></div>
+
+<div class="finding negative">
+    <strong>Finding:</strong> The Estimator barely beats random guessing (+1.4% above 30.7% baseline).
+    Without ability to query the oracle, passive observation of strategic deception is extremely difficult.
+</div>
+
+<h2 id="conclusions">Conclusions</h2>
+
+<div class="grid">
+    <div class="finding positive">
+        <h4>What Helps Truth Recovery</h4>
+        <ul>
+            <li>Know agent motivations (+4.6%)</li>
+            <li>Complex scenarios (+15-20%)</li>
+            <li>Random oracle sampling (+6.9% accuracy)</li>
+        </ul>
+    </div>
+    <div class="finding negative">
+        <h4>What Doesn't Help</h4>
+        <ul>
+            <li>Just knowing agent IDs (-2.3%)</li>
+            <li>Strategic oracle (-6.9% accuracy)</li>
+            <li>Passive observation (~0% above random)</li>
+        </ul>
+    </div>
+</div>
+
+<h3>Implications for AI Safety</h3>
+<ol>
+    <li><strong>Transparency about incentives matters:</strong> Knowing agent objectives significantly improves truth detection</li>
+    <li><strong>Strategic verification has limits:</strong> Focused fact-checking may miss broader deception patterns</li>
+    <li><strong>Passive monitoring fails:</strong> Without ability to verify claims, observers cannot distinguish truth from deception</li>
+    <li><strong>Complexity can help:</strong> Richer environments generate more cross-checkable information</li>
+</ol>
+
+<script>
+const layout = {
+    paper_bgcolor: 'white',
+    plot_bgcolor: 'white',
+    font: {family: '-apple-system, sans-serif', size: 12},
+    margin: {t: 50, b: 80},
+    showlegend: true,
+    legend: {orientation: 'h', y: -0.2}
+};
+
+// Factor 1: Observer Condition - Accuracy
+Plotly.newPlot('observer-accuracy', [
+    {
+        x: ['Blind<br>(Anonymous)', 'Agent IDs<br>Visible', 'Agent Interests<br>Visible'],
+        y: [52.8, 50.5, 55.1],
+        error_y: {type: 'data', array: [2.6, 2.8, 2.7], visible: true},
+        name: 'Judge Property Accuracy',
+        type: 'bar',
+        marker: {color: '#3498db'}
+    },
+    {
+        x: ['Blind<br>(Anonymous)', 'Agent IDs<br>Visible', 'Agent Interests<br>Visible'],
+        y: [31.1, 31.6, 33.4],
+        error_y: {type: 'data', array: [1.5, 1.6, 1.7], visible: true},
+        name: 'Estimator Accuracy',
+        type: 'bar',
+        marker: {color: '#9b59b6'}
+    }
+], {
+    ...layout,
+    title: 'Property Accuracy by Judge\'s Knowledge About Agents',
+    yaxis: {title: 'Accuracy (%)', range: [0, 70]},
+    barmode: 'group',
+    shapes: [{type: 'line', x0: -0.5, x1: 2.5, y0: 30.7, y1: 30.7, line: {color: 'red', dash: 'dash', width: 2}}],
+    annotations: [{x: 2.5, y: 30.7, text: 'Random Baseline (30.7%)', showarrow: false, xanchor: 'left', font: {color: 'red', size: 10}}]
+});
+
+// Factor 1: Observer Condition - Agent Success
+Plotly.newPlot('observer-agent-success', [
+    {
+        x: ['Blind<br>(Anonymous)', 'Agent IDs<br>Visible', 'Agent Interests<br>Visible'],
+        y: [43.0, 42.9, 41.2],
+        name: 'Agent A Value',
+        type: 'bar',
+        marker: {color: '#e74c3c'}
+    },
+    {
+        x: ['Blind<br>(Anonymous)', 'Agent IDs<br>Visible', 'Agent Interests<br>Visible'],
+        y: [47.4, 47.0, 45.5],
+        name: 'Agent B Value',
+        type: 'bar',
+        marker: {color: '#2ecc71'}
+    }
+], {
+    ...layout,
+    title: 'Agent Manipulation Success by Judge\'s Knowledge',
+    yaxis: {title: 'Agent Cumulative Value'},
+    barmode: 'group',
+    annotations: [{x: 2, y: 50, text: 'Lower = Judge resisted manipulation better', showarrow: false, font: {size: 11, color: '#666'}}]
+});
+
+// Factor 2: Oracle Strategy
+Plotly.newPlot('oracle-comparison', [
+    {
+        x: ['Strategic Oracle<br>(Judge Chooses)', 'Random Oracle<br>(System Chooses)'],
+        y: [49.3, 56.2],
+        error_y: {type: 'data', array: [2.2, 2.1], visible: true},
+        name: 'Property Accuracy (%)',
+        type: 'bar',
+        marker: {color: '#3498db'},
+        yaxis: 'y'
+    },
+    {
+        x: ['Strategic Oracle<br>(Judge Chooses)', 'Random Oracle<br>(System Chooses)'],
+        y: [148.5, 116.1],
+        name: 'Total Value',
+        type: 'bar',
+        marker: {color: '#f39c12'},
+        yaxis: 'y2'
+    }
+], {
+    ...layout,
+    title: 'Strategic vs Random Oracle: The Accuracy-Value Trade-off',
+    yaxis: {title: 'Property Accuracy (%)', range: [0, 70], side: 'left'},
+    yaxis2: {title: 'Total Value', range: [0, 200], side: 'right', overlaying: 'y'},
+    barmode: 'group'
+});
+
+// Factor 3: Agent VF Type
+Plotly.newPlot('vf-comparison', [
+    {
+        x: ['Simple Interest<br>("Wants red objects")', 'Complex Value Function<br>("Star+wood=+60, metal+large=+25")'],
+        y: [50.8, 54.8],
+        error_y: {type: 'data', array: [2.2, 2.2], visible: true},
+        name: 'Property Accuracy',
+        type: 'bar',
+        marker: {color: '#3498db'}
+    },
+    {
+        x: ['Simple Interest<br>("Wants red objects")', 'Complex Value Function<br>("Star+wood=+60, metal+large=+25")'],
+        y: [48.1, 53.9],
+        error_y: {type: 'data', array: [2.7, 2.7], visible: true},
+        name: 'Rule Inference',
+        type: 'bar',
+        marker: {color: '#2ecc71'}
+    }
+], {
+    ...layout,
+    title: 'Agent Objective Complexity: Simple Interest vs Complex Value Function',
+    yaxis: {title: 'Accuracy (%)', range: [0, 70]},
+    barmode: 'group',
+    shapes: [{type: 'line', x0: -0.5, x1: 1.5, y0: 30.7, y1: 30.7, line: {color: 'red', dash: 'dash', width: 2}}]
+});
+
+// Factor 4: Rule Complexity
+Plotly.newPlot('complexity-comparison', [
+    {
+        x: ['Simple Rule<br>("Stars valuable")', 'Medium Rule<br>("Stars+wood+combo")', 'Complex Rule<br>("Many conditions+penalties")'],
+        y: [47.9, 47.0, 63.3],
+        error_y: {type: 'data', array: [2.3, 2.5, 2.8], visible: true},
+        name: 'Property Accuracy',
+        type: 'bar',
+        marker: {color: '#3498db'}
+    },
+    {
+        x: ['Simple Rule<br>("Stars valuable")', 'Medium Rule<br>("Stars+wood+combo")', 'Complex Rule<br>("Many conditions+penalties")'],
+        y: [62.8, 51.7, 38.5],
+        error_y: {type: 'data', array: [3.7, 2.9, 2.4], visible: true},
+        name: 'Rule Inference',
+        type: 'bar',
+        marker: {color: '#9b59b6'}
+    }
+], {
+    ...layout,
+    title: 'Hidden Value Rule Complexity: The Accuracy vs Understanding Trade-off',
+    yaxis: {title: 'Accuracy (%)', range: [0, 80]},
+    barmode: 'group',
+    shapes: [{type: 'line', x0: -0.5, x1: 2.5, y0: 30.7, y1: 30.7, line: {color: 'red', dash: 'dash', width: 2}}]
+});
+
+// Interaction: VF x Complexity
+Plotly.newPlot('vf-complexity-interaction', [
+    {
+        x: ['Simple +<br>Simple', 'Simple +<br>Medium', 'Simple +<br>Complex', 'Complex +<br>Simple', 'Complex +<br>Medium', 'Complex +<br>Complex'],
+        y: [47.6, 46.4, 58.4, 48.2, 47.5, 68.2],
+        type: 'bar',
+        marker: {color: ['#bdc3c7', '#bdc3c7', '#3498db', '#bdc3c7', '#bdc3c7', '#27ae60']},
+        text: ['47.6%', '46.4%', '58.4%', '48.2%', '47.5%', '68.2%'],
+        textposition: 'outside'
+    }
+], {
+    ...layout,
+    title: 'Interaction: Agent Objective Complexity × Rule Complexity',
+    yaxis: {title: 'Property Accuracy (%)', range: [0, 80]},
+    xaxis: {title: 'Agent VF + Rule Complexity'},
+    showlegend: false,
+    shapes: [{type: 'line', x0: -0.5, x1: 5.5, y0: 30.7, y1: 30.7, line: {color: 'red', dash: 'dash', width: 2}}],
+    annotations: [{x: 5, y: 68.2, text: 'Best!', showarrow: true, arrowhead: 2, ax: 30, ay: -30, font: {color: '#27ae60', size: 12}}]
+});
+
+// Agent Success by Condition
+Plotly.newPlot('agent-success-by-condition', [
+    {
+        x: ['Blind', 'IDs Visible', 'Interests Visible', 'Strategic Oracle', 'Random Oracle'],
+        y: [43.0, 42.9, 41.2, 44.4, 40.2],
+        name: 'Agent A',
+        type: 'bar',
+        marker: {color: '#e74c3c'}
+    },
+    {
+        x: ['Blind', 'IDs Visible', 'Interests Visible', 'Strategic Oracle', 'Random Oracle'],
+        y: [47.4, 47.0, 45.5, 49.5, 43.7],
+        name: 'Agent B',
+        type: 'bar',
+        marker: {color: '#2ecc71'}
+    }
+], {
+    ...layout,
+    title: 'Agent Manipulation Success by Experimental Condition',
+    yaxis: {title: 'Agent Cumulative Value'},
+    barmode: 'group'
+});
+
+// Agent Dominance Pie
+Plotly.newPlot('agent-dominance', [{
+    values: [69, 54, 56],
+    labels: ['Agent A Wins', 'Agent B Wins', 'Tie'],
+    type: 'pie',
+    marker: {colors: ['#e74c3c', '#2ecc71', '#bdc3c7']},
+    textinfo: 'label+percent',
+    hole: 0.4
+}], {
+    ...layout,
+    title: 'Agent Dominance: Who Manipulated the Judge Better?',
+    annotations: [{text: '179<br>games', x: 0.5, y: 0.5, font: {size: 16}, showarrow: false}]
+});
+
+// Estimator Comparison
+Plotly.newPlot('estimator-comparison', [
+    {
+        x: ['Blind', 'IDs Visible', 'Interests Visible'],
+        y: [52.8, 50.5, 55.1],
+        name: 'Judge (Active)',
+        type: 'bar',
+        marker: {color: '#3498db'}
+    },
+    {
+        x: ['Blind', 'IDs Visible', 'Interests Visible'],
+        y: [31.1, 31.6, 33.4],
+        name: 'Estimator (Passive)',
+        type: 'bar',
+        marker: {color: '#9b59b6'}
+    }
+], {
+    ...layout,
+    title: 'Judge vs Estimator: Active Verification vs Passive Observation',
+    yaxis: {title: 'Property Accuracy (%)', range: [0, 70]},
+    barmode: 'group',
+    shapes: [{type: 'line', x0: -0.5, x1: 2.5, y0: 30.7, y1: 30.7, line: {color: 'red', dash: 'dash', width: 2}}],
+    annotations: [{x: 1, y: 35, text: 'Estimator barely beats random!', showarrow: false, font: {color: '#9b59b6', size: 11}}]
+});
+</script>
+
+</body>
+</html>

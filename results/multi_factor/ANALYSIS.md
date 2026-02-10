@@ -264,6 +264,77 @@ The Estimator watches the same game as the Judge but cannot query the oracle or 
 
 ---
 
+## Agent Success Analysis
+
+Agents try to manipulate the Judge into selecting objects that benefit them. We track how successful each agent is.
+
+### Metrics
+
+| Metric | Description |
+|--------|-------------|
+| **Agent Cumulative Value** | Total value agent accumulated from Judge's selections |
+| **Agent Win Rate** | % of selected objects matching agent's simple interest |
+
+### Results by Agent Value Function Type
+
+| Agent Type | Agent A Value | Agent B Value | A Win Rate | B Win Rate |
+|------------|---------------|---------------|------------|------------|
+| **Simple Interest** | 1.4 (range: 0-3) | 1.0 (range: 0-3) | 29.7% | 20.3% |
+| **Complex VF** | 83.8 (range: 0-200) | 92.8 (range: 20-165) | 22.2% | 22.2% |
+
+**Note:** Simple interest agents get 0-1 points per matching object (max 5 selections = max 5 points). Complex VF agents can get 20-60+ points per object meeting their conditions.
+
+### Agent Dominance: Who Manipulated the Judge Better?
+
+| Outcome | Games | Percentage |
+|---------|-------|------------|
+| Agent A > Agent B | 69 | 38.5% |
+| Agent B > Agent A | 54 | 30.2% |
+| Tie | 56 | 31.3% |
+
+**Finding:** Agent A slightly outperforms Agent B (38.5% vs 30.2% wins), but there's high variance and many ties.
+
+### Agent Success by Observer Condition
+
+| Condition | Agent A Value | Agent B Value | Total Agent Value |
+|-----------|---------------|---------------|-------------------|
+| Blind | 43.0 | 47.4 | 90.4 |
+| IDs Visible | 42.9 | 47.0 | 89.9 |
+| **Interests Visible** | **41.2** | **45.5** | **86.7** |
+
+**Finding:** When the Judge knows agent interests, total agent success decreases by 4% (86.7 vs 90.4). The Judge can discount claims that align with known agent motivations.
+
+### Agent Success by Oracle Type
+
+| Oracle Type | Agent A Value | Agent B Value | Total |
+|-------------|---------------|---------------|-------|
+| Strategic | 44.4 | 49.5 | 93.9 |
+| **Random** | **40.2** | **43.7** | **83.9** |
+
+**Finding:** Random oracle reduces agent success by 11% (83.9 vs 93.9). When the Judge can't strategically verify claims, they may be more conservative in following agent recommendations.
+
+### Agent Success by Rule Complexity
+
+| Rule Complexity | Agent A Value | Agent B Value |
+|-----------------|---------------|---------------|
+| Simple | 40.7 | 48.1 |
+| Medium | 45.7 | 47.5 |
+| Complex | 40.8 | 43.7 |
+
+**Finding:** Agent success is relatively stable across rule complexity levels. Agents adapt their manipulation strategies to the complexity of the environment.
+
+### Per-Round Agent Value Accumulation
+
+```
+Round:           1     2     3     4     5     6-10
+Agent A Value:   9.8  18.9  28.6  36.1  44.5  (plateau)
+Agent B Value:  10.9  19.9  29.8  37.4  46.6  (plateau)
+```
+
+Both agents accumulate value roughly linearly during the selection phase (rounds 1-5), then plateau when no more selections occur.
+
+---
+
 ## Trajectory Analysis (Learning Over Rounds)
 
 ### Judge Value Accumulation

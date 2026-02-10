@@ -57,26 +57,44 @@ def extract_metrics_by_factor(results):
         est_prop_acc = est_metrics.get("property_accuracy", 0) * 100 if est_metrics else 0
         total_value = metrics.get("total_value", 0)
 
+        # Agent success metrics
+        agent_cum_vals = metrics.get("agent_cumulative_values", {})
+        agent_a_value = agent_cum_vals.get("Agent_A", 0)
+        agent_b_value = agent_cum_vals.get("Agent_B", 0)
+        total_agent_value = agent_a_value + agent_b_value
+
         # Group by single factors
         by_observer[observer]["prop_acc"].append(prop_acc)
         by_observer[observer]["rule_acc"].append(rule_acc)
         by_observer[observer]["est_prop_acc"].append(est_prop_acc)
         by_observer[observer]["value"].append(total_value)
+        by_observer[observer]["agent_a_value"].append(agent_a_value)
+        by_observer[observer]["agent_b_value"].append(agent_b_value)
+        by_observer[observer]["total_agent_value"].append(total_agent_value)
 
         by_oracle[oracle]["prop_acc"].append(prop_acc)
         by_oracle[oracle]["rule_acc"].append(rule_acc)
         by_oracle[oracle]["est_prop_acc"].append(est_prop_acc)
         by_oracle[oracle]["value"].append(total_value)
+        by_oracle[oracle]["agent_a_value"].append(agent_a_value)
+        by_oracle[oracle]["agent_b_value"].append(agent_b_value)
+        by_oracle[oracle]["total_agent_value"].append(total_agent_value)
 
         by_vf[vf]["prop_acc"].append(prop_acc)
         by_vf[vf]["rule_acc"].append(rule_acc)
         by_vf[vf]["est_prop_acc"].append(est_prop_acc)
         by_vf[vf]["value"].append(total_value)
+        by_vf[vf]["agent_a_value"].append(agent_a_value)
+        by_vf[vf]["agent_b_value"].append(agent_b_value)
+        by_vf[vf]["total_agent_value"].append(total_agent_value)
 
         by_complexity[complexity]["prop_acc"].append(prop_acc)
         by_complexity[complexity]["rule_acc"].append(rule_acc)
         by_complexity[complexity]["est_prop_acc"].append(est_prop_acc)
         by_complexity[complexity]["value"].append(total_value)
+        by_complexity[complexity]["agent_a_value"].append(agent_a_value)
+        by_complexity[complexity]["agent_b_value"].append(agent_b_value)
+        by_complexity[complexity]["total_agent_value"].append(total_agent_value)
 
         # Group by factor interactions
         by_observer_oracle[f"{observer}_{oracle}"]["prop_acc"].append(prop_acc)
