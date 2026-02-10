@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Factor Analysis Plots</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { font-family: -apple-system, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #2c3e50; }
+        h2 { color: #34495e; margin-top: 40px; }
+        .chart { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Multi-Factor Experiment: Accuracy by Factor</h1>
+    <p>179 games across 36 conditions. Red dashed line = 30.7% random baseline.</p>
+
+    <h2>1. Single Factor Effects</h2>
+    <div class="grid">
+        <div class="chart"><div id="observer-prop"></div></div>
+        <div class="chart"><div id="observer-rule"></div></div>
+        <div class="chart"><div id="oracle-prop"></div></div>
+        <div class="chart"><div id="oracle-value"></div></div>
+        <div class="chart"><div id="vf-prop"></div></div>
+        <div class="chart"><div id="vf-rule"></div></div>
+        <div class="chart"><div id="complexity-prop"></div></div>
+        <div class="chart"><div id="complexity-rule"></div></div>
+    </div>
+
+    <h2>2. Factor Interactions</h2>
+    <div class="chart"><div id="observer-oracle"></div></div>
+    <div class="chart"><div id="oracle-complexity"></div></div>
+    <div class="chart"><div id="vf-complexity"></div></div>
+
+    <h2>3. Estimator Accuracy</h2>
+    <div class="grid">
+        <div class="chart"><div id="est-observer"></div></div>
+        <div class="chart"><div id="est-oracle"></div></div>
+    </div>
+</div>
+
+<script>
+const stats = {"by_observer": {"blind": {"prop_acc": {"mean": 52.8, "std": 20.496217096192098, "se": 2.646050249126791, "n": 60}, "rule_acc": {"mean": 52.333333333333336, "std": 23.586599662007647, "se": 3.04501692282057, "n": 60}, "est_prop_acc": {"mean": 31.133333333333333, "std": 16.940040488482087, "se": 2.186949823199016, "n": 60}, "value": {"mean": 135.51666666666668, "std": 69.3056339986498, "se": 8.94731887583724, "n": 60}}, "ids": {"prop_acc": {"mean": 50.47457627118644, "std": 21.368165115910315, "se": 2.781898146098794, "n": 59}, "rule_acc": {"mean": 50.50847457627118, "std": 26.517640765552546, "se": 3.4523027730479865, "n": 59}, "est_prop_acc": {"mean": 31.661016949152543, "std": 14.210984301238692, "se": 1.8501125701438497, "n": 59}, "value": {"mean": 129.94915254237287, "std": 64.26465316035835, "se": 8.366545209507414, "n": 59}}, "interests": {"prop_acc": {"mean": 55.06666666666667, "std": 20.556550085372532, "se": 2.6538392045375487, "n": 60}, "rule_acc": {"mean": 50.11666666666667, "std": 26.84171536276732, "se": 3.46525055278792, "n": 60}, "est_prop_acc": {"mean": 33.36666666666667, "std": 13.829429031765294, "se": 1.7853716109194782, "n": 60}, "value": {"mean": 131, "std": 67.81555243852529, "se": 8.754950173608806, "n": 60}}}, "by_oracle": {"strategic": {"prop_acc": {"mean": 49.348314606741575, "std": 20.768803705424233, "se": 2.2014887898017923, "n": 89}, "rule_acc": {"mean": 53.449438202247194, "std": 25.969830063834323, "se": 2.7527964811789816, "n": 89}, "est_prop_acc": {"mean": 28.247191011235955, "std": 14.779655011101951, "se": 1.5666402978993443, "n": 89}, "value": {"mean": 148.38202247191012, "std": 65.44836716102965, "se": 6.937513044056931, "n": 89}}, "random": {"prop_acc": {"mean": 56.2, "std": 20.325552634249345, "se": 2.142501367528775, "n": 90}, "rule_acc": {"mean": 48.55555555555556, "std": 25.053251649780233, "se": 2.6408446002225543, "n": 90}, "est_prop_acc": {"mean": 35.82222222222222, "std": 14.33983825914285, "se": 1.5115516725771752, "n": 90}, "value": {"mean": 116.13333333333334, "std": 64.63626838711558, "se": 6.813260918574108, "n": 90}}}, "by_vf": {"simple": {"prop_acc": {"mean": 50.8, "std": 20.919965196439136, "se": 2.205157953073316, "n": 90}, "rule_acc": {"mean": 48.111111111111114, "std": 25.16884307378686, "se": 2.653029006150661, "n": 90}, "est_prop_acc": {"mean": 29.266666666666666, "std": 13.446356174890745, "se": 1.4173703914174716, "n": 90}, "value": {"mean": 133.12222222222223, "std": 72.23492071212608, "se": 7.614229201733016, "n": 90}}, "complex": {"prop_acc": {"mean": 54.80898876404494, "std": 20.54865423844676, "se": 2.1781529929737267, "n": 89}, "rule_acc": {"mean": 53.89887640449438, "std": 25.762483709941577, "se": 2.7308178116236457, "n": 89}, "est_prop_acc": {"mean": 34.87640449438202, "std": 16.02258365325125, "se": 1.6983904704670885, "n": 89}, "value": {"mean": 131.20224719101122, "std": 61.30738124314843, "se": 6.498569414647902, "n": 89}}}, "by_complexity": {"simple": {"prop_acc": {"mean": 47.93333333333333, "std": 17.536273947301414, "se": 2.2639232317476456, "n": 60}, "rule_acc": {"mean": 62.75, "std": 29.000657502774317, "se": 3.743968784577003, "n": 60}, "est_prop_acc": {"mean": 28.766666666666666, "std": 11.829819642258355, "se": 1.527223148770133, "n": 60}, "value": {"mean": 152.51666666666668, "std": 66.33696509377789, "se": 8.564065368204817, "n": 60}}, "medium": {"prop_acc": {"mean": 47.016949152542374, "std": 19.22058121535326, "se": 2.502306536845321, "n": 59}, "rule_acc": {"mean": 51.69491525423729, "std": 22.256540485647047, "se": 2.897554768027006, "n": 59}, "est_prop_acc": {"mean": 28.71186440677966, "std": 12.906895841260964, "se": 1.6803347137166895, "n": 59}, "value": {"mean": 140.59322033898306, "std": 63.976859675459, "se": 8.329077689120993, "n": 59}}, "complex": {"prop_acc": {"mean": 63.333333333333336, "std": 21.473410177071745, "se": 2.7722053334026575, "n": 60}, "rule_acc": {"mean": 38.53333333333333, "std": 18.546749604821724, "se": 2.3943750781917843, "n": 60}, "est_prop_acc": {"mean": 38.63333333333333, "std": 17.596192448952273, "se": 2.2716586770484284, "n": 60}, "value": {"mean": 103.53333333333333, "std": 61.071357725723416, "se": 7.884278380066748, "n": 60}}}, "by_observer_oracle": {"blind_strategic": {"prop_acc": {"mean": 50.53333333333333, "std": 20.74431094979077, "se": 3.7873756823672737, "n": 30}, "rule_acc": {"mean": 55.5, "std": 24.752220381070938, "se": 4.519116483683891, "n": 30}}, "blind_random": {"prop_acc": {"mean": 55.06666666666667, "std": 20.340096858911096, "se": 3.7135766238218606, "n": 30}, "rule_acc": {"mean": 49.166666666666664, "std": 22.325311649109963, "se": 4.076025597850129, "n": 30}}, "ids_strategic": {"prop_acc": {"mean": 44.758620689655174, "std": 21.195779856939502, "se": 3.9359575084607252, "n": 29}, "rule_acc": {"mean": 50.51724137931035, "std": 27.94589247821477, "se": 5.189421954401622, "n": 29}}, "ids_random": {"prop_acc": {"mean": 56.0, "std": 20.37578007814924, "se": 3.7200914585222384, "n": 30}, "rule_acc": {"mean": 50.5, "std": 25.540704497074792, "se": 4.663073329207167, "n": 30}}, "interests_strategic": {"prop_acc": {"mean": 52.6, "std": 20.28180771375991, "se": 3.702934530602861, "n": 30}, "rule_acc": {"mean": 54.233333333333334, "std": 25.81189692735708, "se": 4.712586066370586, "n": 30}}, "interests_random": {"prop_acc": {"mean": 57.53333333333333, "std": 20.87521766697723, "se": 3.8112758696779316, "n": 30}, "rule_acc": {"mean": 46.0, "std": 27.6492813400401, "se": 5.048045029582211, "n": 30}}}, "by_oracle_complexity": {"strategic_simple": {"prop_acc": {"mean": 45.266666666666666, "std": 17.31241000640538, "se": 3.1607991617621276, "n": 30}, "rule_acc": {"mean": 64.83333333333333, "std": 29.228096229405743, "se": 5.336295872592405, "n": 30}}, "strategic_medium": {"prop_acc": {"mean": 40.48275862068966, "std": 19.1360181886992, "se": 3.5534693689127135, "n": 29}, "rule_acc": {"mean": 54.6551724137931, "std": 21.9142417196622, "se": 4.0693725270263315, "n": 29}}, "strategic_complex": {"prop_acc": {"mean": 62.0, "std": 19.85464420612276, "se": 3.6249455009775624, "n": 30}, "rule_acc": {"mean": 40.9, "std": 20.740348814943236, "se": 3.786652298823317, "n": 30}}, "random_simple": {"prop_acc": {"mean": 50.6, "std": 17.64125259451404, "se": 3.2208373295539587, "n": 30}, "rule_acc": {"mean": 60.666666666666664, "std": 29.117281671784248, "se": 5.316063994955989, "n": 30}}, "random_medium": {"prop_acc": {"mean": 53.333333333333336, "std": 17.358955421722047, "se": 3.169297153067923, "n": 30}, "rule_acc": {"mean": 48.833333333333336, "std": 22.578725618925276, "se": 4.122292447068389, "n": 30}}, "random_complex": {"prop_acc": {"mean": 64.66666666666667, "std": 23.242845889810294, "se": 4.243543664821777, "n": 30}, "rule_acc": {"mean": 36.166666666666664, "std": 16.064703938874136, "se": 2.9330002423211523, "n": 30}}}, "by_vf_complexity": {"simple_simple": {"prop_acc": {"mean": 51.666666666666664, "std": 16.971240040307812, "se": 3.0985103329704913, "n": 30}, "rule_acc": {"mean": 63.5, "std": 26.559951703321275, "se": 4.849161558052274, "n": 30}}, "simple_medium": {"prop_acc": {"mean": 47.46666666666667, "std": 19.916607752521916, "se": 3.6362584450128406, "n": 30}, "rule_acc": {"mean": 50.666666666666664, "std": 21.882654654146595, "se": 3.9952078573904997, "n": 30}}, "simple_complex": {"prop_acc": {"mean": 53.266666666666666, "std": 25.295404153014985, "se": 4.618287818605389, "n": 30}, "rule_acc": {"mean": 30.166666666666668, "std": 13.227670405926212, "se": 2.4150311548564343, "n": 30}}, "complex_simple": {"prop_acc": {"mean": 44.2, "std": 17.572313646658817, "se": 3.2082508572769664, "n": 30}, "rule_acc": {"mean": 62.0, "std": 31.693575983481097, "se": 5.786428831385526, "n": 30}}, "complex_medium": {"prop_acc": {"mean": 46.55172413793103, "std": 18.814102246712537, "se": 3.493691079200916, "n": 29}, "rule_acc": {"mean": 52.758620689655174, "std": 22.974605814143384, "se": 4.266277196141818, "n": 29}}, "complex_complex": {"prop_acc": {"mean": 73.4, "std": 9.412390952795993, "se": 1.7184596149679696, "n": 30}, "rule_acc": {"mean": 46.9, "std": 19.49420780465404, "se": 3.5591391184340933, "n": 30}}}};
+
+const layout = {
+    paper_bgcolor: 'white',
+    plot_bgcolor: 'white',
+    font: {size: 12},
+    showlegend: false,
+    margin: {t: 50, b: 50}
+};
+
+function makeBarChart(divId, data, title, yLabel, showBaseline=true) {
+    const labels = Object.keys(data);
+    const means = labels.map(l => data[l].prop_acc ? data[l].prop_acc.mean : (data[l].rule_acc ? data[l].rule_acc.mean : data[l].value.mean));
+    const stds = labels.map(l => data[l].prop_acc ? data[l].prop_acc.se : (data[l].rule_acc ? data[l].rule_acc.se : data[l].value.se));
+
+    const traces = [{
+        x: labels,
+        y: means,
+        error_y: {type: 'data', array: stds, visible: true},
+        type: 'bar',
+        marker: {color: ['#3498db', '#e74c3c', '#2ecc71', '#9b59b6', '#f39c12', '#1abc9c'].slice(0, labels.length)},
+        text: means.map(m => m.toFixed(1)),
+        textposition: 'outside'
+    }];
+
+    const shapes = showBaseline ? [{
+        type: 'line', x0: -0.5, x1: labels.length - 0.5, y0: 30.7, y1: 30.7,
+        line: {color: 'red', width: 2, dash: 'dash'}
+    }] : [];
+
+    Plotly.newPlot(divId, traces, {...layout, title: title, yaxis: {title: yLabel, range: [0, Math.max(...means) * 1.3]}, shapes: shapes});
+}
+
+function makeBarChartMetric(divId, data, metric, title, yLabel, showBaseline=true) {
+    const labels = Object.keys(data);
+    const means = labels.map(l => data[l][metric] ? data[l][metric].mean : 0);
+    const stds = labels.map(l => data[l][metric] ? data[l][metric].se : 0);
+
+    const traces = [{
+        x: labels,
+        y: means,
+        error_y: {type: 'data', array: stds, visible: true},
+        type: 'bar',
+        marker: {color: ['#3498db', '#e74c3c', '#2ecc71', '#9b59b6', '#f39c12', '#1abc9c'].slice(0, labels.length)},
+        text: means.map(m => m.toFixed(1)),
+        textposition: 'outside'
+    }];
+
+    const shapes = showBaseline ? [{
+        type: 'line', x0: -0.5, x1: labels.length - 0.5, y0: 30.7, y1: 30.7,
+        line: {color: 'red', width: 2, dash: 'dash'}
+    }] : [];
+
+    Plotly.newPlot(divId, traces, {...layout, title: title, yaxis: {title: yLabel, range: [0, Math.max(...means) * 1.3]}, shapes: shapes});
+}
+
+// Single factors
+makeBarChartMetric('observer-prop', stats.by_observer, 'prop_acc', 'Property Accuracy by Observer Condition', 'Accuracy (%)');
+makeBarChartMetric('observer-rule', stats.by_observer, 'rule_acc', 'Rule Inference by Observer Condition', 'Accuracy (%)');
+makeBarChartMetric('oracle-prop', stats.by_oracle, 'prop_acc', 'Property Accuracy by Oracle Type', 'Accuracy (%)');
+makeBarChartMetric('oracle-value', stats.by_oracle, 'value', 'Total Value by Oracle Type', 'Value', false);
+makeBarChartMetric('vf-prop', stats.by_vf, 'prop_acc', 'Property Accuracy by Agent VF Type', 'Accuracy (%)');
+makeBarChartMetric('vf-rule', stats.by_vf, 'rule_acc', 'Rule Inference by Agent VF Type', 'Accuracy (%)');
+makeBarChartMetric('complexity-prop', stats.by_complexity, 'prop_acc', 'Property Accuracy by Rule Complexity', 'Accuracy (%)');
+makeBarChartMetric('complexity-rule', stats.by_complexity, 'rule_acc', 'Rule Inference by Rule Complexity', 'Accuracy (%)');
+
+// Interactions
+makeBarChartMetric('observer-oracle', stats.by_observer_oracle, 'prop_acc', 'Property Accuracy: Observer × Oracle', 'Accuracy (%)');
+makeBarChartMetric('oracle-complexity', stats.by_oracle_complexity, 'prop_acc', 'Property Accuracy: Oracle × Complexity', 'Accuracy (%)');
+makeBarChartMetric('vf-complexity', stats.by_vf_complexity, 'prop_acc', 'Property Accuracy: VF × Complexity', 'Accuracy (%)');
+
+// Estimator
+makeBarChartMetric('est-observer', stats.by_observer, 'est_prop_acc', 'Estimator Accuracy by Observer Condition', 'Accuracy (%)');
+makeBarChartMetric('est-oracle', stats.by_oracle, 'est_prop_acc', 'Estimator Accuracy by Oracle Type', 'Accuracy (%)');
+</script>
+</body>
+</html>

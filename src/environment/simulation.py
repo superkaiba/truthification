@@ -1727,6 +1727,35 @@ Respond with JSON:
             "oracle_budget": self.config.oracle_budget,
             "oracle_efficiency": oracle_efficiency,
             "agent_win_rates": agent_wins,
+            # Agent value metrics (final cumulative values)
+            "agent_cumulative_values": dict(self.agent_cumulative_values),
+            # Per-round value progression (for plotting)
+            "value_per_round": [
+                r.round_metrics.picks_value
+                for r in self.rounds
+                if r.round_metrics is not None
+            ],
+            "cumulative_value_per_round": [
+                r.round_metrics.cumulative_value
+                for r in self.rounds
+                if r.round_metrics is not None
+            ],
+            "agent_value_per_round": {
+                agent_id: [
+                    r.round_metrics.agent_round_value.get(agent_id, 0)
+                    for r in self.rounds
+                    if r.round_metrics is not None
+                ]
+                for agent_id in self.agent_cumulative_values.keys()
+            },
+            "agent_cumulative_value_per_round": {
+                agent_id: [
+                    r.round_metrics.agent_cumulative_value.get(agent_id, 0)
+                    for r in self.rounds
+                    if r.round_metrics is not None
+                ]
+                for agent_id in self.agent_cumulative_values.keys()
+            },
             # Per-round decision quality
             "avg_decision_quality": avg_decision_quality,
             "best_available_picks": best_available_picks,
@@ -1887,7 +1916,7 @@ Respond with JSON only:
 
         try:
             response = self.client.messages.create(
-                model="claude-opus-4-5-20250514",
+                model="claude-opus-4-5-20251101",
                 max_tokens=300,
                 messages=[{"role": "user", "content": prompt}],
             )
@@ -2078,7 +2107,7 @@ Respond with JSON:
 
         try:
             response = self.client.messages.create(
-                model="claude-opus-4-5-20250514",
+                model="claude-opus-4-5-20251101",
                 max_tokens=500,
                 messages=[{"role": "user", "content": prompt}],
             )

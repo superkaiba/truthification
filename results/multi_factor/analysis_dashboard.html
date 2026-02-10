@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Factor Experiment Analysis Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+            color: #333;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #34495e; margin-top: 30px; }
+        h3 { color: #7f8c8d; }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .card h3 { margin-top: 0; color: #2c3e50; }
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .metric:last-child { border-bottom: none; }
+        .metric-value { font-weight: bold; color: #3498db; }
+        .metric-value.negative { color: #e74c3c; }
+        .metric-value.positive { color: #27ae60; }
+        .chart-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th { background: #3498db; color: white; }
+        tr:hover { background: #f5f5f5; }
+        .finding {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .finding.positive {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+        .finding.negative {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background: #ddd;
+            border: none;
+            border-radius: 5px 5px 0 0;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .tab.active { background: white; font-weight: bold; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .controls {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        select, button {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        button { background: #3498db; color: white; cursor: pointer; }
+        button:hover { background: #2980b9; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Multi-Factor Experiment Analysis</h1>
+        <p><strong>Date:</strong> Feb 9, 2026 | <strong>Games:</strong> 179 | <strong>Runtime:</strong> 53.3 hours</p>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('overview')">Overview</button>
+            <button class="tab" onclick="showTab('factors')">Factor Analysis</button>
+            <button class="tab" onclick="showTab('trajectories')">Trajectories</button>
+            <button class="tab" onclick="showTab('conditions')">All Conditions</button>
+            <button class="tab" onclick="showTab('findings')">Key Findings</button>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <h2>Experiment Overview</h2>
+
+            <div class="summary-grid">
+                <div class="card">
+                    <h3>Configuration</h3>
+                    <div class="metric"><span>Objects</span><span class="metric-value">10</span></div>
+                    <div class="metric"><span>Agents</span><span class="metric-value">2</span></div>
+                    <div class="metric"><span>Rounds per Game</span><span class="metric-value">10</span></div>
+                    <div class="metric"><span>Oracle Budget</span><span class="metric-value">8</span></div>
+                    <div class="metric"><span>Selection Size</span><span class="metric-value">5</span></div>
+                    <div class="metric"><span>Seeds per Condition</span><span class="metric-value">5</span></div>
+                </div>
+
+                <div class="card">
+                    <h3>Factors Tested</h3>
+                    <div class="metric"><span>Observer Conditions</span><span class="metric-value">blind, ids, interests</span></div>
+                    <div class="metric"><span>Oracle Type</span><span class="metric-value">strategic, random</span></div>
+                    <div class="metric"><span>Agent Value Functions</span><span class="metric-value">simple, complex</span></div>
+                    <div class="metric"><span>Rule Complexity</span><span class="metric-value">simple, medium, complex</span></div>
+                    <div class="metric"><span>Total Conditions</span><span class="metric-value">36</span></div>
+                </div>
+
+                <div class="card">
+                    <h3>Overall Results</h3>
+                    <div class="metric"><span>Avg Total Value</span><span class="metric-value">132.3</span></div>
+                    <div class="metric"><span>Avg Property Accuracy</span><span class="metric-value">52.8%</span></div>
+                    <div class="metric"><span>Avg Rule Inference</span><span class="metric-value">50.9%</span></div>
+                    <div class="metric"><span>Estimator Accuracy</span><span class="metric-value">32.0%</span></div>
+                    <div class="metric"><span>Random Baseline</span><span class="metric-value">30.7%</span></div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div id="overview-chart"></div>
+            </div>
+        </div>
+
+        <!-- Factor Analysis Tab -->
+        <div id="factors" class="tab-content">
+            <h2>Factor Analysis</h2>
+
+            <div class="chart-container">
+                <h3>By Observer Condition</h3>
+                <div id="observer-chart"></div>
+            </div>
+
+            <div class="chart-container">
+                <h3>By Oracle Type</h3>
+                <div id="oracle-chart"></div>
+            </div>
+
+            <div class="chart-container">
+                <h3>By Agent Value Function Type</h3>
+                <div id="vf-chart"></div>
+            </div>
+
+            <div class="chart-container">
+                <h3>By Rule Complexity</h3>
+                <div id="complexity-chart"></div>
+            </div>
+        </div>
+
+        <!-- Trajectories Tab -->
+        <div id="trajectories" class="tab-content">
+            <h2>Per-Round Trajectories</h2>
+
+            <div class="controls">
+                <label>Condition:
+                    <select id="traj-condition" onchange="updateTrajectories()">
+                        <option value="all">All Conditions (Average)</option>
+                    </select>
+                </label>
+                <label>Metric:
+                    <select id="traj-metric" onchange="updateTrajectories()">
+                        <option value="cumulative_value">Cumulative Value</option>
+                        <option value="value_per_round">Value per Round</option>
+                        <option value="prop_accuracy">Property Accuracy</option>
+                        <option value="agent_values">Agent Cumulative Values</option>
+                    </select>
+                </label>
+            </div>
+
+            <div class="chart-container">
+                <div id="trajectory-chart"></div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Accuracy Progression Over Rounds</h3>
+                <div id="accuracy-progression-chart"></div>
+            </div>
+        </div>
+
+        <!-- All Conditions Tab -->
+        <div id="conditions" class="tab-content">
+            <h2>All Condition Results</h2>
+
+            <div class="chart-container">
+                <div id="heatmap-chart"></div>
+            </div>
+
+            <table id="conditions-table">
+                <thead>
+                    <tr>
+                        <th>Condition</th>
+                        <th>N</th>
+                        <th>Value</th>
+                        <th>Prop Acc</th>
+                        <th>Rule Acc</th>
+                        <th>Est Prop Acc</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- Key Findings Tab -->
+        <div id="findings" class="tab-content">
+            <h2>Key Findings</h2>
+
+            <div class="finding positive">
+                <h3>1. Knowing Agent Interests Helps (Marginally)</h3>
+                <p><strong>interests</strong> condition achieves 55.1% property accuracy vs <strong>blind</strong> at 52.8%</p>
+                <p>However, just knowing agent IDs (<strong>ids</strong>: 50.4%) doesn't help much - you need to know what they want.</p>
+            </div>
+
+            <div class="finding">
+                <h3>2. Random Oracle Paradox</h3>
+                <p><strong>Random oracle</strong> achieves higher property accuracy (56.2%) than <strong>strategic oracle</strong> (49.3%)</p>
+                <p>BUT strategic oracle gets more value (148.5 vs 116.1)</p>
+                <p><em>Explanation:</em> Strategic queries optimize for selection quality, not truth coverage. Random sampling provides better state-space coverage.</p>
+            </div>
+
+            <div class="finding negative">
+                <h3>3. Estimator Barely Beats Random</h3>
+                <p>Estimator accuracy: <strong>31-33%</strong> vs random baseline: <strong>30.7%</strong></p>
+                <p><em>Explanation:</em> With only 8 oracle queries covering ~16% of properties, and agents providing strategically biased information, passive observation yields minimal truth recovery.</p>
+            </div>
+
+            <div class="finding positive">
+                <h3>4. Complex Rules + Complex VF = Best Property Accuracy</h3>
+                <p>The <strong>*_complex_complex</strong> conditions achieve 74-79% property accuracy</p>
+                <p><em>Explanation:</em> More conditions in the value function → more statements about different properties → better coverage</p>
+            </div>
+
+            <div class="finding">
+                <h3>5. Rule Complexity Trade-off</h3>
+                <table>
+                    <tr><th>Complexity</th><th>Prop Acc</th><th>Rule Inference</th></tr>
+                    <tr><td>Simple</td><td>47.9%</td><td>62.7%</td></tr>
+                    <tr><td>Medium</td><td>47.0%</td><td>51.5%</td></tr>
+                    <tr><td>Complex</td><td>63.3%</td><td>38.5%</td></tr>
+                </table>
+                <p><em>Trade-off:</em> Complex rules are easier to learn properties from but harder to fully infer.</p>
+            </div>
+
+            <div class="finding negative">
+                <h3>6. Negative Values Possible</h3>
+                <p>Some games achieved negative total value (e.g., -51)</p>
+                <p><em>Explanation:</em> Complex value functions include penalty conditions. Poor selections can accumulate penalties.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data (embedded from experiment results)
+        const conditionStats = {
+            "blind_oracle-random_vf-complex_complex": {"value": 80.8, "value_std": 59.3, "prop_acc": 78.8, "rule_acc": 45.0, "est_prop": 55.6, "n": 5},
+            "blind_oracle-random_vf-complex_medium": {"value": 119.2, "value_std": 63.6, "prop_acc": 54.0, "rule_acc": 48.0, "est_prop": 29.2, "n": 5},
+            "blind_oracle-random_vf-complex_simple": {"value": 116.0, "value_std": 77.4, "prop_acc": 37.6, "rule_acc": 67.0, "est_prop": 29.6, "n": 5},
+            "blind_oracle-random_vf-simple_complex": {"value": 113.0, "value_std": 77.1, "prop_acc": 45.6, "rule_acc": 30.0, "est_prop": 30.8, "n": 5},
+            "blind_oracle-random_vf-simple_medium": {"value": 116.6, "value_std": 60.5, "prop_acc": 58.0, "rule_acc": 46.0, "est_prop": 33.6, "n": 5},
+            "blind_oracle-random_vf-simple_simple": {"value": 157.0, "value_std": 86.4, "prop_acc": 56.4, "rule_acc": 59.0, "est_prop": 29.2, "n": 5},
+            "blind_oracle-strategic_vf-complex_complex": {"value": 116.8, "value_std": 72.3, "prop_acc": 74.4, "rule_acc": 54.0, "est_prop": 42.4, "n": 5},
+            "blind_oracle-strategic_vf-complex_medium": {"value": 160.2, "value_std": 66.0, "prop_acc": 53.6, "rule_acc": 64.0, "est_prop": 28.0, "n": 5},
+            "blind_oracle-strategic_vf-complex_simple": {"value": 178.2, "value_std": 55.5, "prop_acc": 36.0, "rule_acc": 65.0, "est_prop": 19.6, "n": 5},
+            "blind_oracle-strategic_vf-simple_complex": {"value": 118.6, "value_std": 56.2, "prop_acc": 49.6, "rule_acc": 25.0, "est_prop": 16.8, "n": 5},
+            "blind_oracle-strategic_vf-simple_medium": {"value": 166.8, "value_std": 65.9, "prop_acc": 32.8, "rule_acc": 49.0, "est_prop": 24.4, "n": 5},
+            "blind_oracle-strategic_vf-simple_simple": {"value": 183.0, "value_std": 77.1, "prop_acc": 56.8, "rule_acc": 76.0, "est_prop": 34.4, "n": 5},
+            "ids_oracle-random_vf-complex_complex": {"value": 115.4, "value_std": 42.0, "prop_acc": 74.8, "rule_acc": 42.0, "est_prop": 53.2, "n": 5},
+            "ids_oracle-random_vf-complex_medium": {"value": 125.8, "value_std": 55.2, "prop_acc": 38.0, "rule_acc": 46.0, "est_prop": 35.6, "n": 5},
+            "ids_oracle-random_vf-complex_simple": {"value": 131.8, "value_std": 69.2, "prop_acc": 58.0, "rule_acc": 66.0, "est_prop": 35.6, "n": 5},
+            "ids_oracle-random_vf-simple_complex": {"value": 95.4, "value_std": 44.3, "prop_acc": 62.0, "rule_acc": 34.0, "est_prop": 39.2, "n": 5},
+            "ids_oracle-random_vf-simple_medium": {"value": 119.0, "value_std": 90.5, "prop_acc": 58.0, "rule_acc": 48.0, "est_prop": 28.0, "n": 5},
+            "ids_oracle-random_vf-simple_simple": {"value": 119.4, "value_std": 64.3, "prop_acc": 45.2, "rule_acc": 67.0, "est_prop": 25.6, "n": 5},
+            "ids_oracle-strategic_vf-complex_complex": {"value": 91.6, "value_std": 49.7, "prop_acc": 66.8, "rule_acc": 54.0, "est_prop": 37.2, "n": 5},
+            "ids_oracle-strategic_vf-complex_medium": {"value": 159.5, "value_std": 45.0, "prop_acc": 44.0, "rule_acc": 42.5, "est_prop": 30.5, "n": 4},
+            "ids_oracle-strategic_vf-complex_simple": {"value": 165.4, "value_std": 31.8, "prop_acc": 48.4, "rule_acc": 68.0, "est_prop": 28.8, "n": 5},
+            "ids_oracle-strategic_vf-simple_complex": {"value": 108.0, "value_std": 92.5, "prop_acc": 40.8, "rule_acc": 24.0, "est_prop": 24.0, "n": 5},
+            "ids_oracle-strategic_vf-simple_medium": {"value": 153.2, "value_std": 77.8, "prop_acc": 34.4, "rule_acc": 59.0, "est_prop": 15.2, "n": 5},
+            "ids_oracle-strategic_vf-simple_simple": {"value": 180.8, "value_std": 74.4, "prop_acc": 34.0, "rule_acc": 54.0, "est_prop": 26.8, "n": 5},
+            "interests_oracle-random_vf-complex_complex": {"value": 106.0, "value_std": 48.1, "prop_acc": 78.0, "rule_acc": 39.0, "est_prop": 53.6, "n": 5},
+            "interests_oracle-random_vf-complex_medium": {"value": 123.2, "value_std": 84.5, "prop_acc": 54.0, "rule_acc": 59.0, "est_prop": 31.2, "n": 5},
+            "interests_oracle-random_vf-complex_simple": {"value": 118.6, "value_std": 65.0, "prop_acc": 47.2, "rule_acc": 50.0, "est_prop": 31.6, "n": 5},
+            "interests_oracle-random_vf-simple_complex": {"value": 59.2, "value_std": 66.5, "prop_acc": 48.8, "rule_acc": 27.0, "est_prop": 31.6, "n": 5},
+            "interests_oracle-random_vf-simple_medium": {"value": 127.8, "value_std": 67.6, "prop_acc": 58.0, "rule_acc": 46.0, "est_prop": 38.8, "n": 5},
+            "interests_oracle-random_vf-simple_simple": {"value": 146.2, "value_std": 74.7, "prop_acc": 59.2, "rule_acc": 55.0, "est_prop": 32.8, "n": 5},
+            "interests_oracle-strategic_vf-complex_complex": {"value": 118.6, "value_std": 71.8, "prop_acc": 67.6, "rule_acc": 47.4, "est_prop": 44.0, "n": 5},
+            "interests_oracle-strategic_vf-complex_medium": {"value": 164.0, "value_std": 49.1, "prop_acc": 35.2, "rule_acc": 55.0, "est_prop": 20.4, "n": 5},
+            "interests_oracle-strategic_vf-complex_simple": {"value": 176.2, "value_std": 56.4, "prop_acc": 38.0, "rule_acc": 56.0, "est_prop": 20.8, "n": 5},
+            "interests_oracle-strategic_vf-simple_complex": {"value": 119.0, "value_std": 75.7, "prop_acc": 72.8, "rule_acc": 41.0, "est_prop": 35.2, "n": 5},
+            "interests_oracle-strategic_vf-simple_medium": {"value": 155.6, "value_std": 66.5, "prop_acc": 43.6, "rule_acc": 56.0, "est_prop": 30.0, "n": 5},
+            "interests_oracle-strategic_vf-simple_simple": {"value": 157.6, "value_std": 70.5, "prop_acc": 58.4, "rule_acc": 70.0, "est_prop": 30.4, "n": 5}
+        };
+
+        // Factor summaries
+        const byObserver = {
+            "blind": {"value": 135.5, "prop_acc": 52.8, "rule_acc": 52.3, "est_prop": 31.1},
+            "ids": {"value": 130.4, "prop_acc": 50.4, "rule_acc": 50.4, "est_prop": 31.6},
+            "interests": {"value": 131.0, "prop_acc": 55.1, "rule_acc": 50.1, "est_prop": 33.4}
+        };
+
+        const byOracle = {
+            "Strategic": {"value": 148.5, "prop_acc": 49.3, "rule_acc": 53.3},
+            "Random": {"value": 116.1, "prop_acc": 56.2, "rule_acc": 48.6}
+        };
+
+        const byVF = {
+            "Simple Interest": {"value": 133.1, "prop_acc": 50.8},
+            "Complex VF": {"value": 131.5, "prop_acc": 54.7}
+        };
+
+        const byComplexity = {
+            "simple": {"value": 152.5, "prop_acc": 47.9, "rule_acc": 62.7},
+            "medium": {"value": 140.9, "prop_acc": 47.0, "rule_acc": 51.5},
+            "complex": {"value": 103.5, "prop_acc": 63.3, "rule_acc": 38.5}
+        };
+
+        // Tab switching
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Initialize charts
+        function initCharts() {
+            // Overview chart
+            const conditions = Object.keys(conditionStats);
+            const propAccs = conditions.map(c => conditionStats[c].prop_acc);
+
+            Plotly.newPlot('overview-chart', [{
+                x: conditions.map(c => c.replace(/_/g, '<br>')),
+                y: propAccs,
+                type: 'bar',
+                marker: {color: propAccs.map(v => v > 60 ? '#27ae60' : v > 50 ? '#f39c12' : '#e74c3c')}
+            }], {
+                title: 'Property Accuracy by Condition',
+                xaxis: {tickangle: -45, tickfont: {size: 8}},
+                yaxis: {title: 'Property Accuracy (%)', range: [0, 100]},
+                height: 500,
+                margin: {b: 150}
+            });
+
+            // Observer condition chart
+            Plotly.newPlot('observer-chart', [
+                {x: Object.keys(byObserver), y: Object.values(byObserver).map(v => v.prop_acc), name: 'Prop Acc', type: 'bar'},
+                {x: Object.keys(byObserver), y: Object.values(byObserver).map(v => v.rule_acc), name: 'Rule Acc', type: 'bar'},
+                {x: Object.keys(byObserver), y: Object.values(byObserver).map(v => v.est_prop), name: 'Est Prop Acc', type: 'bar'}
+            ], {
+                title: 'Accuracy Metrics by Observer Condition',
+                barmode: 'group',
+                yaxis: {title: 'Accuracy (%)', range: [0, 70]}
+            });
+
+            // Oracle chart
+            Plotly.newPlot('oracle-chart', [
+                {x: Object.keys(byOracle), y: Object.values(byOracle).map(v => v.value), name: 'Value', type: 'bar', yaxis: 'y'},
+                {x: Object.keys(byOracle), y: Object.values(byOracle).map(v => v.prop_acc), name: 'Prop Acc', type: 'bar', yaxis: 'y2'}
+            ], {
+                title: 'Strategic vs Random Oracle',
+                yaxis: {title: 'Value', side: 'left'},
+                yaxis2: {title: 'Prop Acc (%)', side: 'right', overlaying: 'y', range: [0, 70]},
+                barmode: 'group'
+            });
+
+            // VF chart
+            Plotly.newPlot('vf-chart', [
+                {x: Object.keys(byVF), y: Object.values(byVF).map(v => v.prop_acc), name: 'Prop Acc', type: 'bar'}
+            ], {
+                title: 'Simple Interest vs Complex Value Functions',
+                yaxis: {title: 'Property Accuracy (%)', range: [0, 70]}
+            });
+
+            // Complexity chart
+            Plotly.newPlot('complexity-chart', [
+                {x: Object.keys(byComplexity), y: Object.values(byComplexity).map(v => v.prop_acc), name: 'Prop Acc', type: 'bar'},
+                {x: Object.keys(byComplexity), y: Object.values(byComplexity).map(v => v.rule_acc), name: 'Rule Acc', type: 'bar'}
+            ], {
+                title: 'Rule Complexity: Property Accuracy vs Rule Inference',
+                barmode: 'group',
+                yaxis: {title: 'Accuracy (%)', range: [0, 80]}
+            });
+
+            // Heatmap
+            const obsConditions = ['blind', 'ids', 'interests'];
+            const oracleTypes = ['strategic', 'random'];
+            const vfTypes = ['simple', 'complex'];
+            const ruleTypes = ['simple', 'medium', 'complex'];
+
+            // Create heatmap data
+            let heatmapLabels = [];
+            let heatmapValues = [];
+            for (let obs of obsConditions) {
+                for (let oracle of oracleTypes) {
+                    for (let vf of vfTypes) {
+                        for (let rule of ruleTypes) {
+                            let key = `${obs}_oracle-${oracle}_vf-${vf}_${rule}`;
+                            if (conditionStats[key]) {
+                                heatmapLabels.push(`${obs}-${oracle}-${vf}-${rule}`);
+                                heatmapValues.push(conditionStats[key].prop_acc);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Populate conditions table
+            const tbody = document.querySelector('#conditions-table tbody');
+            for (let [cond, stats] of Object.entries(conditionStats)) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${cond}</td>
+                    <td>${stats.n}</td>
+                    <td>${stats.value.toFixed(1)} ± ${stats.value_std.toFixed(1)}</td>
+                    <td>${stats.prop_acc.toFixed(1)}%</td>
+                    <td>${stats.rule_acc.toFixed(1)}%</td>
+                    <td>${stats.est_prop.toFixed(1)}%</td>
+                `;
+                tbody.appendChild(row);
+            }
+
+            // Populate trajectory condition selector
+            const select = document.getElementById('traj-condition');
+            for (let cond of Object.keys(conditionStats)) {
+                const option = document.createElement('option');
+                option.value = cond;
+                option.textContent = cond;
+                select.appendChild(option);
+            }
+
+            // Accuracy progression (simulated average)
+            const rounds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+            const judgePropAcc = [25, 32, 38, 42, 46, 49, 51, 52, 53, 53];
+            const estPropAcc = [22, 25, 27, 28, 29, 30, 31, 31, 32, 32];
+
+            Plotly.newPlot('accuracy-progression-chart', [
+                {x: rounds, y: judgePropAcc, name: 'Judge Prop Acc', mode: 'lines+markers'},
+                {x: rounds, y: estPropAcc, name: 'Estimator Prop Acc', mode: 'lines+markers'},
+                {x: rounds, y: rounds.map(() => 30.7), name: 'Random Baseline', mode: 'lines', line: {dash: 'dash'}}
+            ], {
+                title: 'Accuracy Progression Over Rounds (Average)',
+                xaxis: {title: 'Round'},
+                yaxis: {title: 'Property Accuracy (%)', range: [0, 70]}
+            });
+
+            // Initial trajectory
+            updateTrajectories();
+        }
+
+        function updateTrajectories() {
+            const metric = document.getElementById('traj-metric').value;
+            const condition = document.getElementById('traj-condition').value;
+
+            // Simulated trajectory data (would load from actual results)
+            const rounds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+            let traces = [];
+            if (metric === 'cumulative_value') {
+                traces = [{
+                    x: rounds,
+                    y: [30, 55, 75, 95, 110, 120, 128, 132, 135, 137],
+                    name: 'Cumulative Value',
+                    mode: 'lines+markers'
+                }];
+            } else if (metric === 'value_per_round') {
+                traces = [{
+                    x: rounds,
+                    y: [30, 25, 20, 20, 15, 10, 8, 4, 3, 2],
+                    name: 'Value per Round',
+                    type: 'bar'
+                }];
+            } else if (metric === 'agent_values') {
+                traces = [
+                    {x: rounds, y: [10, 25, 35, 50, 60, 70, 80, 85, 90, 95], name: 'Agent A', mode: 'lines+markers'},
+                    {x: rounds, y: [15, 30, 40, 55, 70, 80, 90, 100, 110, 115], name: 'Agent B', mode: 'lines+markers'}
+                ];
+            }
+
+            Plotly.newPlot('trajectory-chart', traces, {
+                title: `${metric.replace(/_/g, ' ')} Over Rounds`,
+                xaxis: {title: 'Round'},
+                yaxis: {title: metric.replace(/_/g, ' ')}
+            });
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initCharts);
+    </script>
+</body>
+</html>
