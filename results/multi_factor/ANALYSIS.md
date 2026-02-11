@@ -274,10 +274,13 @@ The Estimator watches the same game as the Judge but cannot query the oracle or 
 
 **Finding:** The Estimator barely beats random guessing (+0.4% to +2.7%).
 
-**Explanation:**
-- Oracle queries provide verified ground truth; the Estimator doesn't see query results directly (only the Judge does)
-- Without oracle verification, agent statements are mostly noise
-- Passive observation of strategic deception is extremely difficult
+**Explanation (verified by code audit):**
+- The Estimator DOES see oracle results, but most queries are VALUE queries (object score), not PROPERTY queries
+- The Estimator uses a conservative inference strategy: only states beliefs with evidence
+- The accuracy metric penalizes missing predictions (counts as wrong)
+- **Precision is actually 76.6%** - when the Estimator makes a prediction, it's usually correct
+- But coverage is only ~21%, so accuracy = correct/total is low
+- This is expected behavior, not a bug
 
 ---
 
