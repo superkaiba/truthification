@@ -1,0 +1,1290 @@
+{
+  "summary": {
+    "0": {
+      "property_accuracy": {
+        "mean": 0.3,
+        "std": 0.1783255450012701,
+        "se": 0.07974960814950754
+      },
+      "total_value": {
+        "mean": 154.6,
+        "std": 68.34690922053461
+      },
+      "rule_inference": {
+        "mean": 0.77,
+        "std": 0.07582875444051551
+      },
+      "estimator_accuracy": {
+        "mean": 0.14,
+        "std": 0.08
+      },
+      "n": 5
+    },
+    "8": {
+      "property_accuracy": {
+        "mean": 0.444,
+        "std": 0.17572706109191039,
+        "se": 0.078587530817554
+      },
+      "total_value": {
+        "mean": 165.2,
+        "std": 79.8104003247697
+      },
+      "rule_inference": {
+        "mean": 0.7899999999999999,
+        "std": 0.1341640786499874
+      },
+      "estimator_accuracy": {
+        "mean": 0.252,
+        "std": 0.11798304963002101
+      },
+      "n": 5
+    }
+  },
+  "all_results": [
+    {
+      "oracle_budget": 0,
+      "seed": 42,
+      "metrics": {
+        "total_value": 76,
+        "optimal_value": 135,
+        "selection_accuracy": 0.562962962962963,
+        "optimal_overlap": 2,
+        "optimal_overlap_ratio": 0.4,
+        "oracle_queries_used": 0,
+        "oracle_budget": 0,
+        "oracle_efficiency": 76,
+        "agent_win_rates": {
+          "Agent_A": 0.2,
+          "Agent_B": 0.2
+        },
+        "agent_cumulative_values": {
+          "Agent_A": 60,
+          "Agent_B": 175
+        },
+        "value_per_round": [
+          26,
+          30,
+          3,
+          11,
+          6,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "cumulative_value_per_round": [
+          26,
+          56,
+          59,
+          70,
+          76,
+          76,
+          76,
+          76,
+          76,
+          76
+        ],
+        "agent_value_per_round": {
+          "Agent_A": [
+            20,
+            0,
+            0,
+            20,
+            20,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "Agent_B": [
+            35,
+            35,
+            35,
+            35,
+            35,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "agent_cumulative_value_per_round": {
+          "Agent_A": [
+            20,
+            20,
+            20,
+            40,
+            60,
+            60,
+            60,
+            60,
+            60,
+            60
+          ],
+          "Agent_B": [
+            35,
+            70,
+            105,
+            140,
+            175,
+            175,
+            175,
+            175,
+            175,
+            175
+          ]
+        },
+        "avg_decision_quality": 0.6617021276595745,
+        "best_available_picks": 0,
+        "best_available_picks_ratio": 0.0,
+        "property_accuracy": 0.46,
+        "rule_inference_accuracy": 0.7,
+        "rule_inference_accuracy_f1": 0.6666666666666666,
+        "rule_inference_accuracy_llm": 0.7,
+        "value_prediction_accuracy": 0.0,
+        "rule_confidence": 75,
+        "random_selection_value": 82.0,
+        "random_selection_accuracy": 0.6074074074074074,
+        "random_property_accuracy_baseline": 0.30666666666666664,
+        "single_agent_trust_values": {
+          "Agent_A": 130,
+          "Agent_B": 130
+        },
+        "property_accuracy_vs_random": 0.15333333333333338,
+        "value_vs_random": -6.0,
+        "value_vs_best_agent": -54,
+        "no_agent_baseline": null,
+        "value_vs_no_agent": null
+      },
+      "estimator_metrics": {
+        "property_accuracy": 0.12,
+        "rule_inference_accuracy": 0.0
+      }
+    },
+    {
+      "oracle_budget": 0,
+      "seed": 123,
+      "metrics": {
+        "total_value": 115,
+        "optimal_value": 130,
+        "selection_accuracy": 0.8846153846153846,
+        "optimal_overlap": 4,
+        "optimal_overlap_ratio": 0.8,
+        "oracle_queries_used": 0,
+        "oracle_budget": 0,
+        "oracle_efficiency": 115,
+        "agent_win_rates": {
+          "Agent_A": 0.0,
+          "Agent_B": 0.0
+        },
+        "agent_cumulative_values": {
+          "Agent_A": 25,
+          "Agent_B": 50
+        },
+        "value_per_round": [
+          29,
+          30,
+          47,
+          8,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "cumulative_value_per_round": [
+          29,
+          59,
+          106,
+          114,
+          115,
+          115,
+          115,
+          115,
+          115,
+          115
+        ],
+        "agent_value_per_round": {
+          "Agent_A": [
+            0,
+            0,
+            0,
+            25,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "Agent_B": [
+            0,
+            0,
+            0,
+            25,
+            25,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "agent_cumulative_value_per_round": {
+          "Agent_A": [
+            0,
+            0,
+            0,
+            25,
+            25,
+            25,
+            25,
+            25,
+            25,
+            25
+          ],
+          "Agent_B": [
+            0,
+            0,
+            0,
+            25,
+            50,
+            50,
+            50,
+            50,
+            50,
+            50
+          ]
+        },
+        "avg_decision_quality": 0.781781914893617,
+        "best_available_picks": 1,
+        "best_available_picks_ratio": 0.2,
+        "property_accuracy": 0.22,
+        "rule_inference_accuracy": 0.7,
+        "rule_inference_accuracy_f1": 0.6666666666666666,
+        "rule_inference_accuracy_llm": 0.7,
+        "value_prediction_accuracy": 0.33279530447542194,
+        "rule_confidence": 75,
+        "random_selection_value": 71.0,
+        "random_selection_accuracy": 0.5461538461538461,
+        "random_property_accuracy_baseline": 0.30666666666666664,
+        "single_agent_trust_values": {
+          "Agent_A": 35,
+          "Agent_B": 35
+        },
+        "property_accuracy_vs_random": -0.08666666666666664,
+        "value_vs_random": 44.0,
+        "value_vs_best_agent": 80,
+        "no_agent_baseline": null,
+        "value_vs_no_agent": null
+      },
+      "estimator_metrics": {
+        "property_accuracy": 0.2,
+        "rule_inference_accuracy": 0.0
+      }
+    },
+    {
+      "oracle_budget": 0,
+      "seed": 456,
+      "metrics": {
+        "total_value": 185,
+        "optimal_value": 201,
+        "selection_accuracy": 0.9203980099502488,
+        "optimal_overlap": 4,
+        "optimal_overlap_ratio": 0.8,
+        "oracle_queries_used": 0,
+        "oracle_budget": 0,
+        "oracle_efficiency": 185,
+        "agent_win_rates": {
+          "Agent_A": 0.0,
+          "Agent_B": 0.0
+        },
+        "agent_cumulative_values": {
+          "Agent_A": 0,
+          "Agent_B": 140
+        },
+        "value_per_round": [
+          26,
+          44,
+          42,
+          32,
+          41,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "cumulative_value_per_round": [
+          26,
+          70,
+          112,
+          144,
+          185,
+          185,
+          185,
+          185,
+          185,
+          185
+        ],
+        "agent_value_per_round": {
+          "Agent_A": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "Agent_B": [
+            60,
+            0,
+            0,
+            20,
+            60,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "agent_cumulative_value_per_round": {
+          "Agent_A": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "Agent_B": [
+            60,
+            60,
+            60,
+            80,
+            140,
+            140,
+            140,
+            140,
+            140,
+            140
+          ]
+        },
+        "avg_decision_quality": 0.9329004329004329,
+        "best_available_picks": 1,
+        "best_available_picks_ratio": 0.2,
+        "property_accuracy": 0.52,
+        "rule_inference_accuracy": 0.85,
+        "rule_inference_accuracy_f1": 0.6666666666666666,
+        "rule_inference_accuracy_llm": 0.85,
+        "value_prediction_accuracy": 0.5584885389001243,
+        "rule_confidence": 75,
+        "random_selection_value": 125.0,
+        "random_selection_accuracy": 0.6218905472636815,
+        "random_property_accuracy_baseline": 0.30666666666666664,
+        "single_agent_trust_values": {
+          "Agent_A": 163,
+          "Agent_B": 163
+        },
+        "property_accuracy_vs_random": 0.21333333333333337,
+        "value_vs_random": 60.0,
+        "value_vs_best_agent": 22,
+        "no_agent_baseline": null,
+        "value_vs_no_agent": null
+      },
+      "estimator_metrics": {
+        "property_accuracy": 0.24,
+        "rule_inference_accuracy": 0.0
+      }
+    },
+    {
+      "oracle_budget": 0,
+      "seed": 789,
+      "metrics": {
+        "total_value": 254,
+        "optimal_value": 300,
+        "selection_accuracy": 0.8466666666666667,
+        "optimal_overlap": 4,
+        "optimal_overlap_ratio": 0.8,
+        "oracle_queries_used": 0,
+        "oracle_budget": 0,
+        "oracle_efficiency": 254,
+        "agent_win_rates": {
+          "Agent_A": 0.25,
+          "Agent_B": 0.25
+        },
+        "agent_cumulative_values": {
+          "Agent_A": 90,
+          "Agent_B": 85
+        },
+        "value_per_round": [
+          92,
+          81,
+          0,
+          36,
+          45,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "cumulative_value_per_round": [
+          92,
+          173,
+          173,
+          209,
+          254,
+          254,
+          254,
+          254,
+          254,
+          254
+        ],
+        "agent_value_per_round": {
+          "Agent_A": [
+            30,
+            30,
+            0,
+            30,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "Agent_B": [
+            25,
+            35,
+            0,
+            25,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "agent_cumulative_value_per_round": {
+          "Agent_A": [
+            30,
+            60,
+            60,
+            90,
+            90,
+            90,
+            90,
+            90,
+            90,
+            90
+          ],
+          "Agent_B": [
+            25,
+            60,
+            60,
+            85,
+            85,
+            85,
+            85,
+            85,
+            85,
+            85
+          ]
+        },
+        "avg_decision_quality": 0.8760869565217391,
+        "best_available_picks": 2,
+        "best_available_picks_ratio": 0.4,
+        "property_accuracy": 0.18,
+        "rule_inference_accuracy": 0.85,
+        "rule_inference_accuracy_f1": 0.6666666666666666,
+        "rule_inference_accuracy_llm": 0.85,
+        "value_prediction_accuracy": 0.303515834675255,
+        "rule_confidence": 75,
+        "random_selection_value": 175.0,
+        "random_selection_accuracy": 0.5833333333333334,
+        "random_property_accuracy_baseline": 0.30666666666666664,
+        "single_agent_trust_values": {
+          "Agent_A": 209,
+          "Agent_B": 209
+        },
+        "property_accuracy_vs_random": -0.12666666666666665,
+        "value_vs_random": 79.0,
+        "value_vs_best_agent": 45,
+        "no_agent_baseline": null,
+        "value_vs_no_agent": null
+      },
+      "estimator_metrics": {
+        "property_accuracy": 0.1,
+        "rule_inference_accuracy": 0.0
+      }
+    },
+    {
+      "oracle_budget": 0,
+      "seed": 101,
+      "metrics": {
+        "total_value": 143,
+        "optimal_value": 181,
+        "selection_accuracy": 0.7900552486187845,
+        "optimal_overlap": 4,
+        "optimal_overlap_ratio": 0.8,
+        "oracle_queries_used": 0,
+        "oracle_budget": 0,
+        "oracle_efficiency": 143,
+        "agent_win_rates": {
+          "Agent_A": 0.4,
+          "Agent_B": 0.4
+        },
+        "agent_cumulative_values": {
+          "Agent_A": 160,
+          "Agent_B": 120
+        },
+        "value_per_round": [
+          44,
+          37,
+          43,
+          1,
+          18,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "cumulative_value_per_round": [
+          44,
+          81,
+          124,
+          125,
+          143,
+          143,
+          143,
+          143,
+          143,
+          143
+        ],
+        "agent_value_per_round": {
+          "Agent_A": [
+            0,
+            40,
+            40,
+            40,
+            40,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "Agent_B": [
+            40,
+            0,
+            0,
+            40,
+            40,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "agent_cumulative_value_per_round": {
+          "Agent_A": [
+            0,
+            40,
+            80,
+            120,
+            160,
+            160,
+            160,
+            160,
+            160,
+            160
+          ],
+          "Agent_B": [
+            40,
+            40,
+            40,
+            80,
+            120,
+            120,
+            120,
+            120,
+            120,
+            120
+          ]
+        },
+        "avg_decision_quality": 0.8347644603458557,
+        "best_available_picks": 2,
+        "best_available_picks_ratio": 0.4,
+        "property_accuracy": 0.12,
+        "rule_inference_accuracy": 0.75,
+        "rule_inference_accuracy_f1": 0.6666666666666666,
+        "rule_inference_accuracy_llm": 0.75,
+        "value_prediction_accuracy": 0.0,
+        "rule_confidence": 75,
+        "random_selection_value": 111.0,
+        "random_selection_accuracy": 0.6132596685082873,
+        "random_property_accuracy_baseline": 0.30666666666666664,
+        "single_agent_trust_values": {
+          "Agent_A": 152,
+          "Agent_B": 152
+        },
+        "property_accuracy_vs_random": -0.18666666666666665,
+        "value_vs_random": 32.0,
+        "value_vs_best_agent": -9,
+        "no_agent_baseline": null,
+        "value_vs_no_agent": null
+      },
+      "estimator_metrics": {
+        "property_accuracy": 0.04,
+        "rule_inference_accuracy": 0.0
+      }
+    },
+    {
+      "oracle_budget": 8,
+      "seed": 42,
+      "metrics": {
+        "total_value": 116,
+        "optimal_value": 135,
+        "selection_accuracy": 0.8592592592592593,
+        "optimal_overlap": 3,
+        "optimal_overlap_ratio": 0.6,
+        "oracle_queries_used": 0,
+        "oracle_budget": 8,
+        "oracle_efficiency": 116,
+        "agent_win_rates": {
+          "Agent_A": 0.6,
+          "Agent_B": 0.6
+        },
+        "agent_cumulative_values": {
+          "Agent_A": 60,
+          "Agent_B": 105
+        },
+        "value_per_round": [
+          26,
+          30,
+          47,
+          7,
+          6,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "cumulative_value_per_round": [
+          26,
+          56,
+          103,
+          110,
+          116,
+          116,
+          116,
+          116,
+          116,
+          116
+        ],
+        "agent_value_per_round": {
+          "Agent_A": [
+            20,
+            0,
+            20,
+            0,
+            20,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "Agent_B": [
+            35,
+            35,
+            0,
+            0,
+            35,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "agent_cumulative_value_per_round": {
+          "Agent_A": [
+            20,
+            20,
+            40,
+            40,
+            60,
+            60,
+            60,
+            60,
+            60,
+            60
+          ],
+          "Agent_B": [
+            35,
+            70,
+            70,
+            70,
+            105,
+            105,
+            105,
+            105,
+            105,
+            105
+          ]
+        },
+        "avg_decision_quality": 0.7841489361702128,
+        "best_available_picks": 1,
+        "best_available_picks_ratio": 0.2,
+        "property_accuracy": 0.4,
+        "rule_inference_accuracy": 0.7,
+        "rule_inference_accuracy_f1": 0.6666666666666666,
+        "rule_inference_accuracy_llm": 0.7,
+        "value_prediction_accuracy": 0.10284077624503163,
+        "rule_confidence": 85,
+        "random_selection_value": 82.0,
+        "random_selection_accuracy": 0.6074074074074074,
+        "random_property_accuracy_baseline": 0.30666666666666664,
+        "single_agent_trust_values": {
+          "Agent_A": 130,
+          "Agent_B": 130
+        },
+        "property_accuracy_vs_random": 0.09333333333333338,
+        "value_vs_random": 34.0,
+        "value_vs_best_agent": -14,
+        "no_agent_baseline": null,
+        "value_vs_no_agent": null
+      },
+      "estimator_metrics": {
+        "property_accuracy": 0.24,
+        "rule_inference_accuracy": 0.0
+      }
+    },
+    {
+      "oracle_budget": 8,
+      "seed": 123,
+      "metrics": {
+        "total_value": 115,
+        "optimal_value": 130,
+        "selection_accuracy": 0.8846153846153846,
+        "optimal_overlap": 4,
+        "optimal_overlap_ratio": 0.8,
+        "oracle_queries_used": 0,
+        "oracle_budget": 8,
+        "oracle_efficiency": 115,
+        "agent_win_rates": {
+          "Agent_A": 0.0,
+          "Agent_B": 0.0
+        },
+        "agent_cumulative_values": {
+          "Agent_A": 25,
+          "Agent_B": 50
+        },
+        "value_per_round": [
+          30,
+          47,
+          29,
+          8,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "cumulative_value_per_round": [
+          30,
+          77,
+          106,
+          114,
+          115,
+          115,
+          115,
+          115,
+          115,
+          115
+        ],
+        "agent_value_per_round": {
+          "Agent_A": [
+            0,
+            0,
+            0,
+            25,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "Agent_B": [
+            0,
+            0,
+            0,
+            25,
+            25,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "agent_cumulative_value_per_round": {
+          "Agent_A": [
+            0,
+            0,
+            0,
+            25,
+            25,
+            25,
+            25,
+            25,
+            25,
+            25
+          ],
+          "Agent_B": [
+            0,
+            0,
+            0,
+            25,
+            50,
+            50,
+            50,
+            50,
+            50,
+            50
+          ]
+        },
+        "avg_decision_quality": 0.8200797872340425,
+        "best_available_picks": 2,
+        "best_available_picks_ratio": 0.4,
+        "property_accuracy": 0.24,
+        "rule_inference_accuracy": 0.85,
+        "rule_inference_accuracy_f1": 0.6666666666666666,
+        "rule_inference_accuracy_llm": 0.85,
+        "value_prediction_accuracy": 0.3500366837857667,
+        "rule_confidence": 85,
+        "random_selection_value": 71.0,
+        "random_selection_accuracy": 0.5461538461538461,
+        "random_property_accuracy_baseline": 0.30666666666666664,
+        "single_agent_trust_values": {
+          "Agent_A": 35,
+          "Agent_B": 35
+        },
+        "property_accuracy_vs_random": -0.06666666666666665,
+        "value_vs_random": 44.0,
+        "value_vs_best_agent": 80,
+        "no_agent_baseline": null,
+        "value_vs_no_agent": null
+      },
+      "estimator_metrics": {
+        "property_accuracy": 0.12,
+        "rule_inference_accuracy": 0.0
+      }
+    },
+    {
+      "oracle_budget": 8,
+      "seed": 456,
+      "metrics": {
+        "total_value": 118,
+        "optimal_value": 201,
+        "selection_accuracy": 0.5870646766169154,
+        "optimal_overlap": 3,
+        "optimal_overlap_ratio": 0.6,
+        "oracle_queries_used": 0,
+        "oracle_budget": 8,
+        "oracle_efficiency": 118,
+        "agent_win_rates": {
+          "Agent_A": 0.0,
+          "Agent_B": 0.0
+        },
+        "agent_cumulative_values": {
+          "Agent_A": 0,
+          "Agent_B": 20
+        },
+        "value_per_round": [
+          44,
+          42,
+          32,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "cumulative_value_per_round": [
+          44,
+          86,
+          118,
+          118,
+          118,
+          118,
+          118,
+          118,
+          118,
+          118
+        ],
+        "agent_value_per_round": {
+          "Agent_A": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "Agent_B": [
+            0,
+            0,
+            20,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "agent_cumulative_value_per_round": {
+          "Agent_A": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "Agent_B": [
+            0,
+            0,
+            20,
+            20,
+            20,
+            20,
+            20,
+            20,
+            20,
+            20
+          ]
+        },
+        "avg_decision_quality": 0.7761904761904762,
+        "best_available_picks": 1,
+        "best_available_picks_ratio": 0.2,
+        "property_accuracy": 0.34,
+        "rule_inference_accuracy": 0.7,
+        "rule_inference_accuracy_f1": 0.6666666666666666,
+        "rule_inference_accuracy_llm": 0.7,
+        "value_prediction_accuracy": 0.43618888733218,
+        "rule_confidence": 75,
+        "random_selection_value": 125.0,
+        "random_selection_accuracy": 0.6218905472636815,
+        "random_property_accuracy_baseline": 0.30666666666666664,
+        "single_agent_trust_values": {
+          "Agent_A": 163,
+          "Agent_B": 163
+        },
+        "property_accuracy_vs_random": 0.03333333333333338,
+        "value_vs_random": -7.0,
+        "value_vs_best_agent": -45,
+        "no_agent_baseline": null,
+        "value_vs_no_agent": null
+      },
+      "estimator_metrics": {
+        "property_accuracy": 0.16,
+        "rule_inference_accuracy": 0.0
+      }
+    },
+    {
+      "oracle_budget": 8,
+      "seed": 789,
+      "metrics": {
+        "total_value": 300,
+        "optimal_value": 300,
+        "selection_accuracy": 1.0,
+        "optimal_overlap": 5,
+        "optimal_overlap_ratio": 1.0,
+        "oracle_queries_used": 0,
+        "oracle_budget": 8,
+        "oracle_efficiency": 300,
+        "agent_win_rates": {
+          "Agent_A": 0.4,
+          "Agent_B": 0.4
+        },
+        "agent_cumulative_values": {
+          "Agent_A": 90,
+          "Agent_B": 120
+        },
+        "value_per_round": [
+          92,
+          45,
+          36,
+          46,
+          81,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "cumulative_value_per_round": [
+          92,
+          137,
+          173,
+          219,
+          300,
+          300,
+          300,
+          300,
+          300,
+          300
+        ],
+        "agent_value_per_round": {
+          "Agent_A": [
+            30,
+            0,
+            30,
+            0,
+            30,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "Agent_B": [
+            25,
+            0,
+            25,
+            35,
+            35,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "agent_cumulative_value_per_round": {
+          "Agent_A": [
+            30,
+            30,
+            60,
+            60,
+            90,
+            90,
+            90,
+            90,
+            90,
+            90
+          ],
+          "Agent_B": [
+            25,
+            25,
+            50,
+            85,
+            120,
+            120,
+            120,
+            120,
+            120,
+            120
+          ]
+        },
+        "avg_decision_quality": 0.8567901234567902,
+        "best_available_picks": 2,
+        "best_available_picks_ratio": 0.4,
+        "property_accuracy": 0.56,
+        "rule_inference_accuracy": 1.0,
+        "rule_inference_accuracy_f1": 0.6666666666666666,
+        "rule_inference_accuracy_llm": 1.0,
+        "value_prediction_accuracy": 0.37544283413848634,
+        "rule_confidence": 85,
+        "random_selection_value": 175.0,
+        "random_selection_accuracy": 0.5833333333333334,
+        "random_property_accuracy_baseline": 0.30666666666666664,
+        "single_agent_trust_values": {
+          "Agent_A": 209,
+          "Agent_B": 209
+        },
+        "property_accuracy_vs_random": 0.2533333333333334,
+        "value_vs_random": 125.0,
+        "value_vs_best_agent": 91,
+        "no_agent_baseline": null,
+        "value_vs_no_agent": null
+      },
+      "estimator_metrics": {
+        "property_accuracy": 0.4,
+        "rule_inference_accuracy": 0.0
+      }
+    },
+    {
+      "oracle_budget": 8,
+      "seed": 101,
+      "metrics": {
+        "total_value": 177,
+        "optimal_value": 181,
+        "selection_accuracy": 0.9779005524861878,
+        "optimal_overlap": 4,
+        "optimal_overlap_ratio": 0.8,
+        "oracle_queries_used": 0,
+        "oracle_budget": 8,
+        "oracle_efficiency": 177,
+        "agent_win_rates": {
+          "Agent_A": 0.2,
+          "Agent_B": 0.2
+        },
+        "agent_cumulative_values": {
+          "Agent_A": 80,
+          "Agent_B": 40
+        },
+        "value_per_round": [
+          39,
+          37,
+          43,
+          44,
+          14,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "cumulative_value_per_round": [
+          39,
+          76,
+          119,
+          163,
+          177,
+          177,
+          177,
+          177,
+          177,
+          177
+        ],
+        "agent_value_per_round": {
+          "Agent_A": [
+            0,
+            40,
+            40,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "Agent_B": [
+            0,
+            0,
+            0,
+            40,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "agent_cumulative_value_per_round": {
+          "Agent_A": [
+            0,
+            40,
+            80,
+            80,
+            80,
+            80,
+            80,
+            80,
+            80,
+            80
+          ],
+          "Agent_B": [
+            0,
+            0,
+            0,
+            40,
+            40,
+            40,
+            40,
+            40,
+            40,
+            40
+          ]
+        },
+        "avg_decision_quality": 0.9482323232323232,
+        "best_available_picks": 1,
+        "best_available_picks_ratio": 0.2,
+        "property_accuracy": 0.68,
+        "rule_inference_accuracy": 0.7,
+        "rule_inference_accuracy_f1": 0.6666666666666666,
+        "rule_inference_accuracy_llm": 0.7,
+        "value_prediction_accuracy": 0.3931978402908636,
+        "rule_confidence": 85,
+        "random_selection_value": 111.0,
+        "random_selection_accuracy": 0.6132596685082873,
+        "random_property_accuracy_baseline": 0.30666666666666664,
+        "single_agent_trust_values": {
+          "Agent_A": 152,
+          "Agent_B": 152
+        },
+        "property_accuracy_vs_random": 0.3733333333333334,
+        "value_vs_random": 66.0,
+        "value_vs_best_agent": 25,
+        "no_agent_baseline": null,
+        "value_vs_no_agent": null
+      },
+      "estimator_metrics": {
+        "property_accuracy": 0.34,
+        "rule_inference_accuracy": 0.0
+      }
+    }
+  ],
+  "config": {
+    "n_objects": 10,
+    "n_agents": 2,
+    "n_rounds": 10,
+    "selection_size": 5,
+    "enable_estimator": true,
+    "infer_agent_objectives": false,
+    "enable_agent_thinking": false,
+    "observer_condition": "interests",
+    "use_agent_value_functions": true,
+    "agent_value_function_complexity": "medium",
+    "rule_complexity": "medium",
+    "random_oracle": false
+  }
+}

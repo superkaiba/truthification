@@ -1,0 +1,18 @@
+{
+  "summary": {},
+  "all_results": [],
+  "config": {
+    "n_objects": 10,
+    "n_agents": 2,
+    "n_rounds": 10,
+    "selection_size": 5,
+    "enable_estimator": true,
+    "infer_agent_objectives": false,
+    "enable_agent_thinking": false,
+    "observer_condition": "interests",
+    "use_agent_value_functions": true,
+    "agent_value_function_complexity": "medium",
+    "rule_complexity": "medium",
+    "random_oracle": false
+  }
+}

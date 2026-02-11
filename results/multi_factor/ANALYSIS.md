@@ -419,6 +419,39 @@ Random Baseline: --------------------------------- 30.7% -----------------
 
 ---
 
+## No-Oracle Experiment
+
+To measure the true value of oracle access, we ran an experiment comparing `oracle_budget=0` vs `oracle_budget=8`.
+
+### Results
+
+| Condition | Property Accuracy | Rule Inference | Total Value | Estimator Acc |
+|-----------|-------------------|----------------|-------------|---------------|
+| **No Oracle (budget=0)** | 30.0% (±8.0%) | 77.0% | 154.6 | 14.0% |
+| **With Oracle (budget=8)** | 44.4% (±7.9%) | 79.0% | 165.2 | 25.2% |
+| **Random Baseline** | 30.7% | - | - | - |
+
+**Key Finding:** Oracle access provides **+14.4% property accuracy** (44.4% vs 30.0%).
+
+### Interpretation
+
+- **Without oracle, property accuracy equals random baseline (30.0% ≈ 30.7%)**
+  - Agent statements alone provide almost zero reliable information
+  - The Judge cannot distinguish truth from deception without verification
+
+- **Oracle queries are essential for truth recovery**
+  - Each of the 8 queries provides ~1.8% accuracy improvement
+  - Queries allow the Judge to calibrate agent credibility
+
+- **Estimator accuracy also depends on oracle**
+  - With oracle: 25.2% (sees verified facts)
+  - Without oracle: 14.0% (sees only unverified claims)
+  - Even the passive Estimator benefits from oracle results
+
+W&B Run: https://wandb.ai/thomasjiralerspong/truthification/runs/oh9exmlw
+
+---
+
 ## Conclusions
 
 ### What Helps Truth Recovery
