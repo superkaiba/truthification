@@ -697,6 +697,7 @@ class HiddenValueGame:
                 oracle_results=[oracle_query] if oracle_query else [],
                 prior_beliefs=self.estimator_beliefs,
                 agents=[a.to_dict() for a in self.agents],
+                world=self.world,
             )
 
         return (

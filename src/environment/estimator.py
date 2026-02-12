@@ -58,6 +58,7 @@ class Estimator:
         oracle_results: list[OracleQuery],
         prior_beliefs: dict,
         agents: list[dict],
+        world: World | None = None,
     ) -> dict:
         """
         Analyze a round and update beliefs.
@@ -67,6 +68,7 @@ class Estimator:
             oracle_results: Oracle query results from this round
             prior_beliefs: Estimator's beliefs before this round
             agents: Agent info (for "interests" condition)
+            world: World object for property definitions and object list
 
         Returns:
             Updated beliefs dict with property_beliefs, value_rule_guess, reasoning
@@ -74,9 +76,12 @@ class Estimator:
         # Format statements based on condition
         stmt_text = self._format_statements(statements, agents)
         oracle_text = self._format_oracle_results(oracle_results)
+        world_text = self._format_world_info(world) if world else ""
 
         prompt = f"""You are analyzing a game where agents make claims about objects.
 Your task: Infer what is TRUE about the objects based on the statements.
+
+{world_text}
 
 {stmt_text}
 
@@ -91,7 +96,10 @@ Based on ALL information, provide your updated beliefs as JSON:
   "reasoning": "..."
 }}
 
-Important: Only include property beliefs where you have some evidence.
+IMPORTANT: You MUST make a prediction for EVERY property of EVERY object.
+- If you have evidence, use it
+- If you have no evidence, make your best guess based on agent credibility patterns or guess randomly
+- Do NOT leave any properties blank - you must predict all {len(world.list_objects()) if world else 'N'} objects x {len(world.property_definitions) if world else 'N'} properties
 Respond ONLY with the JSON object, no other text."""
 
         response = self._client.messages.create(
@@ -147,6 +155,21 @@ Respond ONLY with the JSON object, no other text."""
                 lines.append(
                     f"- {query.object_id}'s {query.property_name}: {query.result}"
                 )
+
+        return "\n".join(lines)
+
+    def _format_world_info(self, world: World) -> str:
+        """Format world information for the prompt."""
+        lines = ["== World Information =="]
+
+        # List all objects
+        objects = world.list_objects()
+        lines.append(f"Objects: {', '.join(objects)}")
+
+        # List all properties and their possible values
+        lines.append("\nProperties and possible values:")
+        for prop_def in world.property_definitions:
+            lines.append(f"- {prop_def.name}: {prop_def.possible_values}")
 
         return "\n".join(lines)
 
