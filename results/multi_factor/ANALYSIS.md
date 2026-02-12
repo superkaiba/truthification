@@ -455,6 +455,53 @@ W&B Run: https://wandb.ai/thomasjiralerspong/truthification/runs/oh9exmlw
 
 ---
 
+## Scale Experiment: More Agents × More Rounds
+
+We tested how truth recovery changes with different numbers of agents (2, 3, 4) and debate lengths (10, 15, 20 rounds).
+
+### Results (Partial - some games hit API rate limits)
+
+| Agents | Rounds | Judge Accuracy | Estimator Accuracy | N |
+|--------|--------|----------------|-------------------|---|
+| 2 | 10 | **46.0%** | 51.3% | 3 |
+| 2 | 15 | 36.7% | **55.3%** | 3 |
+| 2 | 20 | - | - | 0 (errored) |
+| 3 | 10 | 28.0% | 52.0% | 1 |
+| 3 | 15 | 38.7% | 44.0% | 3 |
+| 4 | * | - | - | 0 (not reached) |
+
+### Key Findings
+
+**1. More Rounds May Hurt Judge Accuracy**
+With 2 agents:
+- 10 rounds: 46.0% judge accuracy
+- 15 rounds: 36.7% judge accuracy (-9.3%)
+
+*Hypothesis:* Longer debates give deceptive agents more opportunity to manipulate the judge. Additional rounds add noise rather than signal.
+
+**2. Estimator Often Outperforms Judge**
+In most conditions, the passive estimator achieves higher accuracy:
+- 2 agents, 10 rounds: Est 51.3% > Judge 46.0% (+5.3%)
+- 2 agents, 15 rounds: Est 55.3% > Judge 36.7% (+18.6%)
+- 3 agents, 10 rounds: Est 52.0% > Judge 28.0% (+24.0%)
+
+*Hypothesis:* The judge makes selections that may be influenced by agent manipulation. The estimator observes passively, avoiding this bias.
+
+**3. Estimator Accuracy Relatively Stable (44-55%)**
+The estimator maintains consistent performance across conditions, suggesting it's more robust to debate dynamics than the active judge.
+
+**Limitations:**
+- Partial data due to API rate limits
+- 4-agent condition not tested
+- 20-round conditions incomplete
+- High variance with small sample sizes
+
+W&B Run: https://wandb.ai/thomasjiralerspong/truthification/runs/f7q8taxh
+
+See [results/scale_experiment/README.md](../scale_experiment/README.md) for full details.
+
+---
+
 ## Conclusions
 
 ### What Helps Truth Recovery
