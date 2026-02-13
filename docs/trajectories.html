@@ -336,7 +336,7 @@ function renderConversation() {
         html += `
             <div class="message oracle">
                 <div class="message-header">
-                    <span class="message-agent oracle">Oracle Query</span>
+                    <span class="message-agent oracle">Oracle Query (Verified Fact)</span>
                     <span>verified</span>
                 </div>
                 <div class="message-text">
@@ -346,18 +346,40 @@ function renderConversation() {
         `;
     }
 
-    // Round summary
-    const picks = round.picks || [];
-    if (picks.length > 0) {
+    // Judge reasoning
+    if (round.reasoning) {
         html += `
-            <div class="round-summary">
-                <h4>Judge Selection</h4>
-                <div class="picks-list">
-                    ${picks.map(p => `<span class="pick">${p}</span>`).join('')}
+            <div class="message system" style="border-color: #58a6ff; background: #1f6feb20;">
+                <div class="message-header">
+                    <span class="message-agent" style="color: #58a6ff;">Judge Reasoning</span>
+                    <span>internal</span>
                 </div>
+                <div class="message-text">${escapeHtml(round.reasoning)}</div>
             </div>
         `;
     }
+
+    // Round summary with picks and metrics
+    const picks = round.picks || [];
+    const metrics = round.metrics || {};
+    html += `
+        <div class="round-summary">
+            <h4>Judge Decision</h4>
+            ${picks.length > 0 ? `
+                <p><strong>Selected:</strong></p>
+                <div class="picks-list">
+                    ${picks.map(p => `<span class="pick">${p}</span>`).join('')}
+                </div>
+            ` : '<p style="color: #8b949e;">No selections this round</p>'}
+            ${metrics.picks_value !== undefined ? `
+                <p style="margin-top: 10px; font-size: 12px; color: #8b949e;">
+                    Value: ${metrics.picks_value} |
+                    Decision Quality: ${(metrics.decision_quality * 100).toFixed(0)}% |
+                    Cumulative: ${metrics.cumulative_value}
+                </p>
+            ` : ''}
+        </div>
+    `;
 
     view.innerHTML = html || '<div class="loading">No messages in this round</div>';
 }

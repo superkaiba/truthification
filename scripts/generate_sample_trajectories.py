@@ -59,7 +59,8 @@ def run_sample_game(config_dict):
             "round_number": round_data["round_number"],
             "statements": [format_statement(s) for s in round_data.get("agent_statements", [])],
             "observer_action": round_data.get("observer_action", ""),
-            "picks": round_data.get("picks", []),
+            "picks": round_data.get("observer_current_picks", []) or [],
+            "reasoning": round_data.get("observer_reasoning", ""),
         }
 
         # Add oracle query if present
@@ -69,7 +70,16 @@ def run_sample_game(config_dict):
                 "object": oracle.get("object_id", ""),
                 "type": oracle.get("query_type", ""),
                 "property": oracle.get("property_name", ""),
-                "result": oracle.get("result", ""),
+                "result": str(oracle.get("result", "")),
+            }
+
+        # Add round metrics if present
+        metrics = round_data.get("round_metrics")
+        if metrics:
+            formatted_round["metrics"] = {
+                "picks_value": metrics.get("picks_value", 0),
+                "decision_quality": metrics.get("decision_quality", 0),
+                "cumulative_value": metrics.get("cumulative_value", 0),
             }
 
         formatted_rounds.append(formatted_round)
