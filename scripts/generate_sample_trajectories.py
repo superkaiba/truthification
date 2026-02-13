@@ -53,34 +53,58 @@ def run_sample_game(config_dict):
     result = game.run()
 
     # Format rounds for display
+    # result.rounds can contain GameRound dataclass objects or dicts
     formatted_rounds = []
-    for round_data in result.rounds:
+    for round_obj in result.rounds:
+        # Handle both dict and object formats
+        is_dict = isinstance(round_obj, dict)
+
+        def get_attr(obj, attr, default=None):
+            if is_dict:
+                return obj.get(attr, default)
+            return getattr(obj, attr, default)
+
         formatted_round = {
-            "round_number": round_data["round_number"],
-            "statements": [format_statement(s) for s in round_data.get("agent_statements", [])],
-            "observer_action": round_data.get("observer_action", ""),
-            "picks": round_data.get("observer_current_picks", []) or [],
-            "reasoning": round_data.get("observer_reasoning", ""),
+            "round_number": get_attr(round_obj, "round_number"),
+            "statements": [format_statement(s) for s in (get_attr(round_obj, "agent_statements") or [])],
+            "observer_action": get_attr(round_obj, "observer_action", ""),
+            "picks": get_attr(round_obj, "observer_current_picks") or [],
+            "reasoning": get_attr(round_obj, "observer_reasoning", ""),
         }
 
         # Add oracle query if present
-        oracle = round_data.get("oracle_query")
+        oracle = get_attr(round_obj, "oracle_query")
         if oracle:
-            formatted_round["oracle"] = {
-                "object": oracle.get("object_id", ""),
-                "type": oracle.get("query_type", ""),
-                "property": oracle.get("property_name", ""),
-                "result": str(oracle.get("result", "")),
-            }
+            if isinstance(oracle, dict):
+                formatted_round["oracle"] = {
+                    "object": oracle.get("object_id", ""),
+                    "type": oracle.get("query_type", ""),
+                    "property": oracle.get("property_name", ""),
+                    "result": str(oracle.get("result", "")),
+                }
+            else:
+                formatted_round["oracle"] = {
+                    "object": oracle.object_id,
+                    "type": oracle.query_type,
+                    "property": oracle.property_name,
+                    "result": str(oracle.result),
+                }
 
         # Add round metrics if present
-        metrics = round_data.get("round_metrics")
+        metrics = get_attr(round_obj, "round_metrics")
         if metrics:
-            formatted_round["metrics"] = {
-                "picks_value": metrics.get("picks_value", 0),
-                "decision_quality": metrics.get("decision_quality", 0),
-                "cumulative_value": metrics.get("cumulative_value", 0),
-            }
+            if isinstance(metrics, dict):
+                formatted_round["metrics"] = {
+                    "picks_value": metrics.get("picks_value", 0),
+                    "decision_quality": metrics.get("decision_quality", 0),
+                    "cumulative_value": metrics.get("cumulative_value", 0),
+                }
+            else:
+                formatted_round["metrics"] = {
+                    "picks_value": metrics.picks_value,
+                    "decision_quality": metrics.decision_quality,
+                    "cumulative_value": metrics.cumulative_value,
+                }
 
         formatted_rounds.append(formatted_round)
 
