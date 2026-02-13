@@ -127,6 +127,9 @@ def run_single_game(condition: ExperimentCondition, seed: int) -> dict:
         "estimator_metrics": result.estimator_metrics,
         "accuracy_progression": result.accuracy_progression,
         "config": result.config,
+        "rounds": result.rounds,  # Include conversation transcripts
+        "agents": result.agents,  # Include agent info
+        "value_rule": result.value_rule,  # Include value rule for context
     }
 
 

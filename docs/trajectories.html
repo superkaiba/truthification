@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trajectory Viewer - Truthification</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0; padding: 20px; background: #0d1117; color: #c9d1d9;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #58a6ff; border-bottom: 2px solid #30363d; padding-bottom: 10px; }
+        h2 { color: #8b949e; margin-top: 30px; font-size: 1.2em; }
+        .back-link { color: #58a6ff; text-decoration: none; margin-bottom: 20px; display: inline-block; }
+        .back-link:hover { text-decoration: underline; }
+
+        /* Game selector */
+        .game-selector {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .game-selector select {
+            padding: 10px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+
+        /* Game info */
+        .game-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .info-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 15px;
+        }
+        .info-card h3 {
+            margin: 0 0 10px 0;
+            color: #58a6ff;
+            font-size: 14px;
+        }
+        .info-card p {
+            margin: 5px 0;
+            font-size: 13px;
+        }
+        .metric-value { color: #7ee787; font-weight: bold; }
+
+        /* Round viewer */
+        .round-nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .round-btn {
+            padding: 8px 16px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .round-btn:hover { background: #30363d; }
+        .round-btn.active { background: #238636; border-color: #238636; color: white; }
+
+        /* Conversation view */
+        .conversation {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 3px solid #30363d;
+        }
+        .message.agent-a { border-color: #58a6ff; background: #161b2280; }
+        .message.agent-b { border-color: #f0883e; background: #161b2280; }
+        .message.agent-c { border-color: #a371f7; background: #161b2280; }
+        .message.agent-d { border-color: #7ee787; background: #161b2280; }
+        .message.system { border-color: #8b949e; background: #21262d; font-style: italic; }
+        .message.oracle { border-color: #238636; background: #23863620; }
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        .message-agent {
+            font-weight: bold;
+        }
+        .message-agent.agent-a { color: #58a6ff; }
+        .message-agent.agent-b { color: #f0883e; }
+        .message-agent.agent-c { color: #a371f7; }
+        .message-agent.agent-d { color: #7ee787; }
+        .message-agent.system { color: #8b949e; }
+        .message-agent.oracle { color: #238636; }
+        .message-text {
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        /* Round summary */
+        .round-summary {
+            background: #21262d;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .round-summary h4 {
+            margin: 0 0 10px 0;
+            color: #58a6ff;
+            font-size: 14px;
+        }
+        .picks-list {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .pick {
+            padding: 4px 10px;
+            background: #238636;
+            border-radius: 20px;
+            font-size: 12px;
+            color: white;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #8b949e;
+        }
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: #da3633;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="index.html" class="back-link">← Back to Dashboard</a>
+    <h1>Game Trajectory Viewer</h1>
+    <p>Explore individual games round-by-round to see agent statements, oracle queries, and judge decisions.</p>
+
+    <div class="game-selector">
+        <label>Select Game: </label>
+        <select id="game-select" onchange="selectGame(this.value)">
+            <option value="">Loading...</option>
+        </select>
+    </div>
+
+    <div id="game-content">
+        <div class="loading">Select a game to view its trajectory</div>
+    </div>
+</div>
+
+<script>
+let trajectories = [];
+let currentGame = null;
+let currentRound = 0;
+
+// Load trajectory data
+async function loadTrajectories() {
+    try {
+        const response = await fetch('sample_trajectories.json');
+        if (!response.ok) throw new Error('Failed to load trajectories');
+        trajectories = await response.json();
+
+        // Populate game selector
+        const select = document.getElementById('game-select');
+        select.innerHTML = '<option value="">-- Select a game --</option>';
+        trajectories.forEach((game, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = `${game.name} (Acc: ${(game.metrics.property_accuracy * 100).toFixed(0)}%)`;
+            select.appendChild(option);
+        });
+
+        if (trajectories.length === 0) {
+            document.getElementById('game-content').innerHTML = `
+                <div class="error">
+                    No trajectories available yet. Run the sample trajectory generator to create some.
+                    <br><br>
+                    <code>uv run python scripts/generate_sample_trajectories.py</code>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error loading trajectories:', error);
+        document.getElementById('game-content').innerHTML = `
+            <div class="error">
+                Failed to load trajectory data. Make sure sample_trajectories.json exists.
+                <br><br>
+                Run: <code>uv run python scripts/generate_sample_trajectories.py</code>
+            </div>
+        `;
+    }
+}
+
+function selectGame(index) {
+    if (index === '' || index === null) return;
+    currentGame = trajectories[parseInt(index)];
+    currentRound = 0;
+    renderGame();
+}
+
+function selectRound(roundNum) {
+    currentRound = roundNum;
+    renderConversation();
+}
+
+function getAgentClass(agentId) {
+    if (!agentId) return 'system';
+    const id = agentId.toLowerCase();
+    if (id.includes('oracle') || id.includes('verified')) return 'oracle';
+    if (id.includes('system')) return 'system';
+    if (id.includes('agent_a') || id.includes('a')) return 'agent-a';
+    if (id.includes('agent_b') || id.includes('b')) return 'agent-b';
+    if (id.includes('agent_c') || id.includes('c')) return 'agent-c';
+    if (id.includes('agent_d') || id.includes('d')) return 'agent-d';
+    return 'system';
+}
+
+function renderGame() {
+    if (!currentGame) return;
+
+    const content = document.getElementById('game-content');
+
+    // Game info
+    let agentsHtml = currentGame.agents.map(a => `
+        <p><strong>${a.id}:</strong> ${a.interest || a.value_function || 'Unknown objective'}</p>
+    `).join('');
+
+    // Round navigation
+    const rounds = currentGame.rounds || [];
+    let roundBtns = rounds.map((r, i) => `
+        <button class="round-btn ${i === currentRound ? 'active' : ''}" onclick="selectRound(${i})">
+            Round ${r.round_number}
+        </button>
+    `).join('');
+
+    content.innerHTML = `
+        <div class="game-info">
+            <div class="info-card">
+                <h3>Game Configuration</h3>
+                <p>Agents: <span class="metric-value">${currentGame.config?.n_agents || '?'}</span></p>
+                <p>Rounds: <span class="metric-value">${currentGame.config?.n_rounds || '?'}</span></p>
+                <p>Seed: <span class="metric-value">${currentGame.config?.seed || '?'}</span></p>
+            </div>
+            <div class="info-card">
+                <h3>Results</h3>
+                <p>Property Accuracy: <span class="metric-value">${((currentGame.metrics?.property_accuracy || 0) * 100).toFixed(1)}%</span></p>
+                <p>Total Value: <span class="metric-value">${currentGame.metrics?.total_value || 0}</span></p>
+                <p>Rule Inference: <span class="metric-value">${((currentGame.metrics?.rule_inference_accuracy || 0) * 100).toFixed(1)}%</span></p>
+            </div>
+            <div class="info-card">
+                <h3>Agents</h3>
+                ${agentsHtml}
+            </div>
+            <div class="info-card">
+                <h3>Value Rule</h3>
+                <p style="font-size: 12px;">${currentGame.value_rule || 'Unknown'}</p>
+            </div>
+        </div>
+
+        <h2>Conversation</h2>
+        <div class="round-nav">
+            ${roundBtns}
+            <button class="round-btn" onclick="showAllRounds()">Show All</button>
+        </div>
+        <div id="conversation-view" class="conversation">
+            Loading...
+        </div>
+    `;
+
+    renderConversation();
+}
+
+function renderConversation() {
+    if (!currentGame) return;
+
+    const view = document.getElementById('conversation-view');
+    const rounds = currentGame.rounds || [];
+
+    if (rounds.length === 0) {
+        view.innerHTML = '<div class="loading">No conversation data available</div>';
+        return;
+    }
+
+    const round = rounds[currentRound];
+    if (!round) {
+        view.innerHTML = '<div class="loading">Round not found</div>';
+        return;
+    }
+
+    let html = '';
+
+    // Statements
+    const statements = round.statements || [];
+    for (const stmt of statements) {
+        const agentClass = getAgentClass(stmt.agent);
+        html += `
+            <div class="message ${agentClass}">
+                <div class="message-header">
+                    <span class="message-agent ${agentClass}">${stmt.agent || 'Unknown'}</span>
+                    <span>${stmt.type || 'statement'}</span>
+                </div>
+                <div class="message-text">${escapeHtml(stmt.text || '')}</div>
+            </div>
+        `;
+    }
+
+    // Oracle query
+    if (round.oracle) {
+        html += `
+            <div class="message oracle">
+                <div class="message-header">
+                    <span class="message-agent oracle">Oracle Query</span>
+                    <span>verified</span>
+                </div>
+                <div class="message-text">
+                    <strong>${round.oracle.object}</strong> - ${round.oracle.property || round.oracle.type}: <strong>${round.oracle.result}</strong>
+                </div>
+            </div>
+        `;
+    }
+
+    // Round summary
+    const picks = round.picks || [];
+    if (picks.length > 0) {
+        html += `
+            <div class="round-summary">
+                <h4>Judge Selection</h4>
+                <div class="picks-list">
+                    ${picks.map(p => `<span class="pick">${p}</span>`).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    view.innerHTML = html || '<div class="loading">No messages in this round</div>';
+}
+
+function showAllRounds() {
+    if (!currentGame) return;
+
+    const view = document.getElementById('conversation-view');
+    const rounds = currentGame.rounds || [];
+
+    let html = '';
+    for (const round of rounds) {
+        html += `<h3 style="color: #58a6ff; margin-top: 20px;">Round ${round.round_number}</h3>`;
+
+        const statements = round.statements || [];
+        for (const stmt of statements) {
+            const agentClass = getAgentClass(stmt.agent);
+            html += `
+                <div class="message ${agentClass}">
+                    <div class="message-header">
+                        <span class="message-agent ${agentClass}">${stmt.agent || 'Unknown'}</span>
+                    </div>
+                    <div class="message-text">${escapeHtml(stmt.text || '')}</div>
+                </div>
+            `;
+        }
+
+        if (round.oracle) {
+            html += `
+                <div class="message oracle">
+                    <div class="message-header">
+                        <span class="message-agent oracle">Oracle</span>
+                    </div>
+                    <div class="message-text">
+                        ${round.oracle.object} ${round.oracle.property || round.oracle.type}: ${round.oracle.result}
+                    </div>
+                </div>
+            `;
+        }
+
+        const picks = round.picks || [];
+        if (picks.length > 0) {
+            html += `
+                <div class="round-summary">
+                    <h4>Picks: ${picks.join(', ')}</h4>
+                </div>
+            `;
+        }
+    }
+
+    view.innerHTML = html;
+
+    // Update button states
+    document.querySelectorAll('.round-btn').forEach(btn => btn.classList.remove('active'));
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Load on page load
+loadTrajectories();
+</script>
+</body>
+</html>
