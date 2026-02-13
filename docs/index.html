@@ -11,11 +11,11 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            background: #f5f5f5;
-            color: #333;
+            background: #0d1117;
+            color: #c9d1d9;
         }
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #238636 0%, #1f6feb 100%);
             color: white;
             padding: 40px;
             border-radius: 12px;
@@ -31,21 +31,33 @@
             opacity: 0.9;
             font-size: 1.1em;
         }
+        .section-title {
+            color: #58a6ff;
+            font-size: 1.3em;
+            margin: 30px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #30363d;
+        }
         .experiments {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 20px;
         }
         .experiment-card {
-            background: white;
+            background: #161b22;
+            border: 1px solid #30363d;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             overflow: hidden;
             transition: transform 0.2s, box-shadow 0.2s;
         }
         .experiment-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            border-color: #58a6ff;
+        }
+        .experiment-card.featured {
+            border-color: #238636;
+            border-width: 2px;
         }
         .experiment-card a {
             display: block;
@@ -55,20 +67,29 @@
         }
         .experiment-card h2 {
             margin: 0 0 10px 0;
-            color: #333;
-            font-size: 1.3em;
+            color: #58a6ff;
+            font-size: 1.2em;
         }
         .experiment-card .summary {
-            color: #666;
+            color: #8b949e;
             font-size: 0.95em;
             line-height: 1.5;
             margin-bottom: 15px;
+        }
+        .experiment-card .key-finding {
+            background: #21262d;
+            border-left: 3px solid #238636;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 0.9em;
+            color: #7ee787;
         }
         .experiment-card .meta {
             display: flex;
             justify-content: space-between;
             font-size: 0.85em;
-            color: #999;
+            color: #8b949e;
+            margin-top: 15px;
         }
         .experiment-card .tags {
             display: flex;
@@ -82,99 +103,164 @@
             border-radius: 20px;
             font-size: 12px;
         }
-        .tag-plot { background: #e3f2fd; color: #1976d2; }
-        .tag-data { background: #e8f5e9; color: #388e3c; }
-        .tag-doc { background: #fff3e0; color: #f57c00; }
+        .tag-interactive { background: #1f6feb33; color: #58a6ff; }
+        .tag-complete { background: #23863633; color: #7ee787; }
+        .tag-partial { background: #d2992233; color: #d29922; }
         .footer {
             text-align: center;
             margin-top: 40px;
             padding: 20px;
-            color: #666;
+            color: #8b949e;
             font-size: 0.9em;
         }
         .footer a {
-            color: #667eea;
+            color: #58a6ff;
+        }
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #7ee787;
+        }
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
         }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>Truthification Experiments</h1>
-        <p>Research on teaching LLMs to distinguish facts, claims, and opinions</p>
+        <p>Research on truth recovery from multi-agent debates with strategic deception</p>
+        <div class="stats-bar">
+            <div class="stat">
+                <div class="stat-value">200+</div>
+                <div class="stat-label">Games Run</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">30.7%</div>
+                <div class="stat-label">Random Baseline</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">68%</div>
+                <div class="stat-label">Best Accuracy</div>
+            </div>
+        </div>
     </div>
 
+    <h2 class="section-title">Latest Experiments</h2>
+    <div class="experiments">
+        <div class="experiment-card featured">
+            <a href="multi_factor.html">
+                <h2>Multi-Factor Experiment Dashboard</h2>
+                <p class="summary">179 games testing observer conditions, oracle strategies, agent complexity, and rule complexity. Interactive plots and factor analysis.</p>
+                <div class="key-finding">Key: Complex agents + complex rules = 68% accuracy (vs 31% random)</div>
+                <div class="tags">
+                    <span class="tag tag-interactive">Interactive</span>
+                    <span class="tag tag-complete">Complete</span>
+                </div>
+                <div class="meta">
+                    <span>36 conditions x 5 seeds</span>
+                    <span>Feb 2026</span>
+                </div>
+            </a>
+        </div>
+        <div class="experiment-card featured">
+            <a href="scale_experiment.html">
+                <h2>Scale Experiment: Agents x Rounds</h2>
+                <p class="summary">How does truth recovery change with 2-4 agents and 10-20 rounds? Tests the interaction between debate length and number of participants.</p>
+                <div class="key-finding">Key: More agents need more rounds (4 agents: 19% at 10 rounds → 44% at 20 rounds)</div>
+                <div class="tags">
+                    <span class="tag tag-interactive">Interactive</span>
+                    <span class="tag tag-complete">24/27 games</span>
+                </div>
+                <div class="meta">
+                    <span>9 conditions x 3 seeds</span>
+                    <span>Feb 2026</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <h2 class="section-title">Earlier Experiments</h2>
     <div class="experiments">
         <div class="experiment-card">
             <a href="experiments/debate_structure_experiment/index.html">
-                <h2>Debate Structure Experiment Results</h2>
-                <p class="summary">**Date:** February 4, 2026 **Duration:** 2.3 hours (139.6 minutes) **Raw Data:** `outputs/debate_structure_test/20260204_183117/`</p>
-                <div class="tags"><span class="tag tag-plot">4 plots</span><span class="tag tag-doc">documented</span></div>
-                <div class="meta">
-                    <span>debate_structure_experiment</span>
-                    <span>2026-02-06</span>
+                <h2>Debate Structure Experiment</h2>
+                <p class="summary">Testing debate turn structures (alternating, sequential, interleaved) and oracle timing (before/after statements).</p>
+                <div class="key-finding">Key: after_statements oracle timing outperforms before_response (20% vs 13%)</div>
+                <div class="tags">
+                    <span class="tag tag-complete">Complete</span>
                 </div>
-            </a>
-        </div>
-        <div class="experiment-card">
-            <a href="experiments/v2_comprehensive_opus/index.html">
-                <h2>V2 Hidden Value Game: Comprehensive Test with Opus 4.5</h2>
-                <p class="summary"></p>
-                <div class="tags"><span class="tag tag-data">3 files</span><span class="tag tag-doc">documented</span></div>
                 <div class="meta">
-                    <span>v2_comprehensive_opus</span>
-                    <span>2026-01-30</span>
-                </div>
-            </a>
-        </div>
-        <div class="experiment-card">
-            <a href="experiments/v2_minimal_test/index.html">
-                <h2>V2 Hidden Value Game: Minimal Test Run</h2>
-                <p class="summary"></p>
-                <div class="tags"><span class="tag tag-data">1 files</span><span class="tag tag-doc">documented</span></div>
-                <div class="meta">
-                    <span>v2_minimal_test</span>
-                    <span>2026-01-30</span>
+                    <span>8 conditions</span>
+                    <span>Feb 2026</span>
                 </div>
             </a>
         </div>
         <div class="experiment-card">
             <a href="experiments/icl_baseline/index.html">
-                <h2>ICL Baseline Experiment: Isolated-Query</h2>
-                <p class="summary">**Date**: January 2026 **Config**: `configs/experiment/icl_baseline.yaml` **Script**: `experiments/run_icl.py`</p>
-                <div class="tags"><span class="tag tag-plot">7 plots</span><span class="tag tag-doc">documented</span></div>
+                <h2>ICL Baseline Experiment</h2>
+                <p class="summary">In-context learning baseline for truth estimation from isolated queries.</p>
+                <div class="tags">
+                    <span class="tag tag-complete">Complete</span>
+                </div>
                 <div class="meta">
                     <span>icl_baseline</span>
-                    <span>2026-01-27</span>
-                </div>
-            </a>
-        </div>
-        <div class="experiment-card">
-            <a href="experiments/icl_context_scaling/index.html">
-                <h2>ICL Context Scaling Experiment</h2>
-                <p class="summary">**Date**: January 2026 **Config**: `configs/experiment/icl_context_scaling.yaml` **Script**: `experiments/run_icl_context_scaling.py`</p>
-                <div class="tags"><span class="tag tag-doc">documented</span></div>
-                <div class="meta">
-                    <span>icl_context_scaling</span>
-                    <span>2026-01-21</span>
+                    <span>Jan 2026</span>
                 </div>
             </a>
         </div>
         <div class="experiment-card">
             <a href="experiments/icl_full_context/index.html">
                 <h2>ICL Full-Context Experiment</h2>
-                <p class="summary">**Date**: January 2026 **Config**: `configs/experiment/icl_full_context.yaml` **Script**: `experiments/run_icl_full_context.py`</p>
-                <div class="tags"><span class="tag tag-plot">3 plots</span><span class="tag tag-doc">documented</span></div>
+                <p class="summary">Full conversation context for truth estimation.</p>
+                <div class="tags">
+                    <span class="tag tag-complete">Complete</span>
+                </div>
                 <div class="meta">
                     <span>icl_full_context</span>
-                    <span>2026-01-21</span>
+                    <span>Jan 2026</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <h2 class="section-title">Key Findings Summary</h2>
+    <div class="experiments">
+        <div class="experiment-card">
+            <a href="analysis.html">
+                <h2>Comprehensive Analysis</h2>
+                <p class="summary">
+                    <strong>What helps truth recovery:</strong><br>
+                    • Know agent motivations (+4.6%)<br>
+                    • Complex scenarios (+15-20%)<br>
+                    • Random oracle sampling (+6.9%)<br>
+                    <br>
+                    <strong>What doesn't help:</strong><br>
+                    • Just knowing agent IDs (-2.3%)<br>
+                    • Strategic oracle (-6.9%)<br>
+                    • Passive observation (~0% above random)
+                </p>
+                <div class="tags">
+                    <span class="tag tag-interactive">Interactive Charts</span>
                 </div>
             </a>
         </div>
     </div>
 
     <div class="footer">
-        <p>Generated: 2026-02-06 12:17:17</p>
-        <p><a href="https://github.com/thomasjiralerspong/truthification">View on GitHub</a></p>
+        <p>Generated: 2026-02-12</p>
+        <p><a href="https://github.com/superkaiba/truthification">View on GitHub</a> | <a href="https://wandb.ai/thomasjiralerspong/truthification">W&B Dashboard</a></p>
     </div>
 </body>
 </html>
