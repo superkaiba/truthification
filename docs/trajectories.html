@@ -4,13 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trajectory Viewer - Truthification</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         * { box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             margin: 0; padding: 20px; background: #0d1117; color: #c9d1d9;
         }
-        .container { max-width: 1200px; margin: 0 auto; }
+        .container { max-width: 1400px; margin: 0 auto; }
         h1 { color: #58a6ff; border-bottom: 2px solid #30363d; padding-bottom: 10px; }
         h2 { color: #8b949e; margin-top: 30px; font-size: 1.2em; }
         .back-link { color: #58a6ff; text-decoration: none; margin-bottom: 20px; display: inline-block; }
@@ -33,6 +34,27 @@
             font-size: 14px;
             margin-right: 10px;
         }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .tab {
+            padding: 10px 20px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #8b949e;
+            font-size: 14px;
+        }
+        .tab:hover { background: #30363d; }
+        .tab.active { background: #238636; color: white; border-color: #238636; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
         /* Game info */
         .game-info {
@@ -104,9 +126,7 @@
             margin-bottom: 8px;
             font-size: 12px;
         }
-        .message-agent {
-            font-weight: bold;
-        }
+        .message-agent { font-weight: bold; }
         .message-agent.agent-a { color: #58a6ff; }
         .message-agent.agent-b { color: #f0883e; }
         .message-agent.agent-c { color: #a371f7; }
@@ -144,6 +164,81 @@
             color: white;
         }
 
+        /* Property grid */
+        .property-grid {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 15px;
+            overflow-x: auto;
+        }
+        .property-grid table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .property-grid th, .property-grid td {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #30363d;
+        }
+        .property-grid th {
+            background: #21262d;
+            color: #58a6ff;
+            font-weight: bold;
+        }
+        .property-grid td {
+            background: #161b22;
+        }
+        .property-grid tr:hover td {
+            background: #21262d;
+        }
+        .selected-object {
+            background: #23863640 !important;
+        }
+
+        /* Value rule display */
+        .value-rule-box {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .value-rule-box h3 {
+            margin: 0 0 15px 0;
+            color: #58a6ff;
+        }
+        .condition {
+            background: #21262d;
+            border-left: 3px solid #7ee787;
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        .condition .bonus {
+            color: #7ee787;
+            font-weight: bold;
+        }
+        .condition .penalty {
+            color: #da3633;
+            font-weight: bold;
+        }
+
+        /* Charts */
+        .chart-container {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+        }
+
         /* Loading */
         .loading {
             text-align: center;
@@ -179,6 +274,7 @@
 let trajectories = [];
 let currentGame = null;
 let currentRound = 0;
+let currentTab = 'conversation';
 
 // Load trajectory data
 async function loadTrajectories() {
@@ -187,7 +283,6 @@ async function loadTrajectories() {
         if (!response.ok) throw new Error('Failed to load trajectories');
         trajectories = await response.json();
 
-        // Populate game selector
         const select = document.getElementById('game-select');
         select.innerHTML = '<option value="">-- Select a game --</option>';
         trajectories.forEach((game, index) => {
@@ -222,7 +317,20 @@ function selectGame(index) {
     if (index === '' || index === null) return;
     currentGame = trajectories[parseInt(index)];
     currentRound = 0;
+    currentTab = 'conversation';
     renderGame();
+}
+
+function selectTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelector(`.tab[data-tab="${tab}"]`).classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById(`tab-${tab}`).classList.add('active');
+
+    if (tab === 'charts') {
+        renderCharts();
+    }
 }
 
 function selectRound(roundNum) {
@@ -235,10 +343,10 @@ function getAgentClass(agentId) {
     const id = agentId.toLowerCase();
     if (id.includes('oracle') || id.includes('verified')) return 'oracle';
     if (id.includes('system')) return 'system';
-    if (id.includes('agent_a') || id.includes('a')) return 'agent-a';
-    if (id.includes('agent_b') || id.includes('b')) return 'agent-b';
-    if (id.includes('agent_c') || id.includes('c')) return 'agent-c';
-    if (id.includes('agent_d') || id.includes('d')) return 'agent-d';
+    if (id.includes('agent_a') || id === 'a') return 'agent-a';
+    if (id.includes('agent_b') || id === 'b') return 'agent-b';
+    if (id.includes('agent_c') || id === 'c') return 'agent-c';
+    if (id.includes('agent_d') || id === 'd') return 'agent-d';
     return 'system';
 }
 
@@ -247,10 +355,58 @@ function renderGame() {
 
     const content = document.getElementById('game-content');
 
-    // Game info
+    // Game info cards
     let agentsHtml = currentGame.agents.map(a => `
         <p><strong>${a.id}:</strong> ${a.interest || a.value_function || 'Unknown objective'}</p>
     `).join('');
+
+    // Value rule display
+    const valueRule = currentGame.value_rule || {};
+    let valueRuleHtml = '';
+    if (typeof valueRule === 'object') {
+        valueRuleHtml = `<p><strong>Description:</strong> ${valueRule.description || 'Unknown'}</p>`;
+        if (valueRule.conditions && valueRule.conditions.length > 0) {
+            valueRuleHtml += valueRule.conditions.map(c => `
+                <div class="condition">
+                    <span>${c.description || c}</span>
+                    ${c.bonus ? `<span class="bonus"> (+${c.bonus})</span>` : ''}
+                </div>
+            `).join('');
+        }
+    } else {
+        valueRuleHtml = `<p>${valueRule}</p>`;
+    }
+
+    // Ground truth - property grid
+    const groundTruth = currentGame.ground_truth || {};
+    const objects = Object.keys(groundTruth).sort();
+    const properties = objects.length > 0 ? Object.keys(groundTruth[objects[0]] || {}) : [];
+    const selectedObjects = currentGame.final_selection || [];
+
+    let propertyGridHtml = '';
+    if (objects.length > 0 && properties.length > 0) {
+        propertyGridHtml = `
+            <table>
+                <tr>
+                    <th>Object</th>
+                    ${properties.map(p => `<th>${p}</th>`).join('')}
+                </tr>
+                ${objects.map(obj => `
+                    <tr>
+                        <td class="${selectedObjects.includes(obj) ? 'selected-object' : ''}">
+                            <strong>${obj}</strong>
+                            ${selectedObjects.includes(obj) ? ' ✓' : ''}
+                        </td>
+                        ${properties.map(p => `
+                            <td class="${selectedObjects.includes(obj) ? 'selected-object' : ''}">${groundTruth[obj][p] || '-'}</td>
+                        `).join('')}
+                    </tr>
+                `).join('')}
+            </table>
+        `;
+    } else {
+        propertyGridHtml = '<p style="color: #8b949e;">No ground truth data available</p>';
+    }
 
     // Round navigation
     const rounds = currentGame.rounds || [];
@@ -275,26 +431,141 @@ function renderGame() {
                 <p>Rule Inference: <span class="metric-value">${((currentGame.metrics?.rule_inference_accuracy || 0) * 100).toFixed(1)}%</span></p>
             </div>
             <div class="info-card">
-                <h3>Agents</h3>
+                <h3>Agents & Objectives</h3>
                 ${agentsHtml}
             </div>
             <div class="info-card">
-                <h3>Value Rule</h3>
-                <p style="font-size: 12px;">${currentGame.value_rule || 'Unknown'}</p>
+                <h3>Final Selection</h3>
+                <div class="picks-list">
+                    ${selectedObjects.map(p => `<span class="pick">${p}</span>`).join('') || '<p style="color: #8b949e;">None</p>'}
+                </div>
             </div>
         </div>
 
-        <h2>Conversation</h2>
-        <div class="round-nav">
-            ${roundBtns}
-            <button class="round-btn" onclick="showAllRounds()">Show All</button>
+        <div class="tabs">
+            <button class="tab active" data-tab="conversation" onclick="selectTab('conversation')">Conversation</button>
+            <button class="tab" data-tab="ground-truth" onclick="selectTab('ground-truth')">Ground Truth</button>
+            <button class="tab" data-tab="charts" onclick="selectTab('charts')">Charts</button>
         </div>
-        <div id="conversation-view" class="conversation">
-            Loading...
+
+        <div id="tab-conversation" class="tab-content active">
+            <div class="value-rule-box">
+                <h3>Hidden Value Rule</h3>
+                ${valueRuleHtml}
+            </div>
+
+            <h2>Conversation</h2>
+            <div class="round-nav">
+                ${roundBtns}
+                <button class="round-btn" onclick="showAllRounds()">Show All</button>
+            </div>
+            <div id="conversation-view" class="conversation">
+                Loading...
+            </div>
+        </div>
+
+        <div id="tab-ground-truth" class="tab-content">
+            <h2>Object Property Grid (Ground Truth)</h2>
+            <p style="color: #8b949e; margin-bottom: 15px;">Green highlighted rows = selected by judge. This is the true state of the world that agents may lie about.</p>
+            <div class="property-grid">
+                ${propertyGridHtml}
+            </div>
+
+            <div class="value-rule-box" style="margin-top: 20px;">
+                <h3>Hidden Value Rule</h3>
+                ${valueRuleHtml}
+            </div>
+        </div>
+
+        <div id="tab-charts" class="tab-content">
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <div id="value-chart"></div>
+                </div>
+                <div class="chart-container">
+                    <div id="agent-value-chart"></div>
+                </div>
+            </div>
         </div>
     `;
 
     renderConversation();
+}
+
+function renderCharts() {
+    if (!currentGame) return;
+
+    // Value over rounds chart
+    const cumulative = currentGame.cumulative_value_per_round || [];
+    const perRound = currentGame.value_per_round || [];
+    const rounds = cumulative.map((_, i) => i + 1);
+
+    if (cumulative.length > 0) {
+        Plotly.newPlot('value-chart', [
+            {
+                x: rounds,
+                y: cumulative,
+                name: 'Cumulative Value',
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: { color: '#7ee787', width: 3 },
+                marker: { size: 8 }
+            },
+            {
+                x: rounds,
+                y: perRound,
+                name: 'Value per Round',
+                type: 'bar',
+                marker: { color: '#58a6ff', opacity: 0.7 }
+            }
+        ], {
+            title: { text: 'Judge Value Over Rounds', font: { color: '#58a6ff' } },
+            xaxis: { title: 'Round', color: '#c9d1d9', gridcolor: '#30363d' },
+            yaxis: { title: 'Value', color: '#c9d1d9', gridcolor: '#30363d' },
+            paper_bgcolor: '#161b22',
+            plot_bgcolor: '#161b22',
+            font: { color: '#c9d1d9' },
+            legend: { x: 0.02, y: 0.98 },
+            barmode: 'overlay'
+        });
+    } else {
+        document.getElementById('value-chart').innerHTML = '<p style="color: #8b949e; text-align: center; padding: 40px;">No value data available</p>';
+    }
+
+    // Agent value over rounds chart
+    const agentValues = currentGame.agent_value_over_rounds || {};
+    const agentTraces = [];
+    const colors = ['#58a6ff', '#f0883e', '#a371f7', '#7ee787'];
+    let colorIdx = 0;
+
+    for (const [agentId, values] of Object.entries(agentValues)) {
+        if (Array.isArray(values) && values.length > 0) {
+            agentTraces.push({
+                x: values.map((_, i) => i + 1),
+                y: values,
+                name: agentId,
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: { color: colors[colorIdx % colors.length], width: 2 },
+                marker: { size: 6 }
+            });
+            colorIdx++;
+        }
+    }
+
+    if (agentTraces.length > 0) {
+        Plotly.newPlot('agent-value-chart', agentTraces, {
+            title: { text: 'Agent Cumulative Value Over Rounds', font: { color: '#58a6ff' } },
+            xaxis: { title: 'Round', color: '#c9d1d9', gridcolor: '#30363d' },
+            yaxis: { title: 'Cumulative Value', color: '#c9d1d9', gridcolor: '#30363d' },
+            paper_bgcolor: '#161b22',
+            plot_bgcolor: '#161b22',
+            font: { color: '#c9d1d9' },
+            legend: { x: 0.02, y: 0.98 }
+        });
+    } else {
+        document.getElementById('agent-value-chart').innerHTML = '<p style="color: #8b949e; text-align: center; padding: 40px;">No agent value data available</p>';
+    }
 }
 
 function renderConversation() {
@@ -359,7 +630,7 @@ function renderConversation() {
         `;
     }
 
-    // Round summary with picks and metrics
+    // Round summary
     const picks = round.picks || [];
     const metrics = round.metrics || {};
     html += `
@@ -382,6 +653,13 @@ function renderConversation() {
     `;
 
     view.innerHTML = html || '<div class="loading">No messages in this round</div>';
+
+    // Update round button states
+    document.querySelectorAll('.round-btn').forEach((btn, i) => {
+        if (i < rounds.length) {
+            btn.classList.toggle('active', i === currentRound);
+        }
+    });
 }
 
 function showAllRounds() {
@@ -392,7 +670,7 @@ function showAllRounds() {
 
     let html = '';
     for (const round of rounds) {
-        html += `<h3 style="color: #58a6ff; margin-top: 20px;">Round ${round.round_number}</h3>`;
+        html += `<h3 style="color: #58a6ff; margin-top: 20px; border-bottom: 1px solid #30363d; padding-bottom: 5px;">Round ${round.round_number}</h3>`;
 
         const statements = round.statements || [];
         for (const stmt of statements) {
@@ -431,8 +709,6 @@ function showAllRounds() {
     }
 
     view.innerHTML = html;
-
-    // Update button states
     document.querySelectorAll('.round-btn').forEach(btn => btn.classList.remove('active'));
 }
 

@@ -117,6 +117,67 @@ def run_sample_game(config_dict):
             "value_function": agent.get("value_function", {}).get("description", "") if agent.get("value_function") else "",
         })
 
+    # Extract ground truth - object properties
+    world_state = result.world_state
+    objects_ground_truth = {}
+    if isinstance(world_state, dict) and "objects" in world_state:
+        for obj_id, obj_data in world_state["objects"].items():
+            objects_ground_truth[obj_id] = obj_data.get("properties", {})
+
+    # Extract value rule details
+    value_rule_data = result.value_rule
+    if isinstance(value_rule_data, dict):
+        value_rule_info = {
+            "description": value_rule_data.get("description", ""),
+            "conditions": value_rule_data.get("conditions", []),
+        }
+    else:
+        value_rule_info = {"description": str(value_rule_data), "conditions": []}
+
+    # Extract per-round accuracy and agent values from round metrics
+    accuracy_over_rounds = []
+    agent_value_over_rounds = {agent["id"]: [] for agent in formatted_agents}
+
+    for round_obj in result.rounds:
+        is_dict = isinstance(round_obj, dict)
+
+        def get_attr(obj, attr, default=None):
+            if is_dict:
+                return obj.get(attr, default)
+            return getattr(obj, attr, default)
+
+        metrics = get_attr(round_obj, "round_metrics")
+        if metrics:
+            if isinstance(metrics, dict):
+                accuracy_over_rounds.append({
+                    "round": get_attr(round_obj, "round_number"),
+                    "judge_property_accuracy": metrics.get("judge_property_accuracy", 0),
+                    "estimator_property_accuracy": metrics.get("estimator_property_accuracy", 0),
+                    "cumulative_value": metrics.get("cumulative_value", 0),
+                })
+                # Agent cumulative values
+                agent_cum = metrics.get("agent_cumulative_value", {})
+                for agent_id, value in agent_cum.items():
+                    if agent_id in agent_value_over_rounds:
+                        agent_value_over_rounds[agent_id].append(value)
+            else:
+                accuracy_over_rounds.append({
+                    "round": get_attr(round_obj, "round_number"),
+                    "judge_property_accuracy": getattr(metrics, "judge_property_accuracy", 0),
+                    "estimator_property_accuracy": getattr(metrics, "estimator_property_accuracy", 0),
+                    "cumulative_value": metrics.cumulative_value,
+                })
+                # Agent cumulative values from metrics
+                agent_cum = getattr(metrics, "agent_cumulative_value", {})
+                for agent_id, value in agent_cum.items():
+                    if agent_id in agent_value_over_rounds:
+                        agent_value_over_rounds[agent_id].append(value)
+
+    # Also get agent cumulative values from final metrics if not captured per-round
+    final_agent_values = result.metrics.get("agent_cumulative_value_per_round", {})
+    if final_agent_values:
+        agent_value_over_rounds = final_agent_values
+
     return {
         "name": config_dict["name"],
         "config": {
@@ -125,13 +186,18 @@ def run_sample_game(config_dict):
             "seed": config_dict["seed"],
         },
         "agents": formatted_agents,
-        "value_rule": result.value_rule.get("description", "") if isinstance(result.value_rule, dict) else str(result.value_rule),
+        "value_rule": value_rule_info,
+        "ground_truth": objects_ground_truth,
         "rounds": formatted_rounds,
         "metrics": {
             "property_accuracy": result.metrics.get("property_accuracy", 0),
             "total_value": result.metrics.get("total_value", 0),
             "rule_inference_accuracy": result.metrics.get("rule_inference_accuracy", 0),
         },
+        "accuracy_over_rounds": accuracy_over_rounds,
+        "agent_value_over_rounds": agent_value_over_rounds,
+        "value_per_round": result.metrics.get("value_per_round", []),
+        "cumulative_value_per_round": result.metrics.get("cumulative_value_per_round", []),
         "final_selection": result.final_selection,
     }
 
