@@ -253,6 +253,11 @@ class GameConfig:
     # instead of being chosen strategically by the observer. Tests whether strategic
     # querying matters for truth recovery.
 
+    # Force Oracle (ensures oracle is used when budget available)
+    force_oracle: bool = False  # Force LLM to make a strategic query each round
+    # When True, the observer MUST choose what to query (can't decline).
+    # Unlike random_oracle, the LLM still chooses strategically what to query.
+
     # Additional Baselines (disabled by default to save API costs)
     compute_no_agent_baseline: bool = False  # Run LLM without agent input
     # When True, runs a separate evaluation where the observer/LLM makes selections
@@ -634,6 +639,11 @@ class HiddenValueGame:
             if self.config.random_oracle:
                 # Random oracle: always query with random selection
                 query_request = self._generate_random_oracle_query(remaining_objects)
+            elif self.config.force_oracle:
+                # Forced strategic oracle: LLM must choose what to query
+                query_request = self._observer_forced_oracle_query(
+                    all_statements, current_beliefs, remaining_objects
+                )
             else:
                 # Strategic oracle: ask observer if they want to query
                 query_request = self._observer_consider_oracle(
@@ -1001,6 +1011,65 @@ If no, respond with JSON: {{"query": false}}"""
             logger.warning(f"Failed to parse oracle consideration response: {e}. Response: {text[:200]}")
 
         return None
+
+    def _observer_forced_oracle_query(
+        self,
+        statements: list[Statement],
+        current_beliefs: dict[str, Any],
+        remaining_objects: list[str] | None = None,
+    ) -> dict:
+        """Force observer to make a strategic oracle query.
+
+        Unlike _observer_consider_oracle, this doesn't ask IF the observer wants
+        to query - it forces them to choose WHAT to query.
+        """
+        stmt_text = self._format_statements_for_observer(statements)
+        objects = remaining_objects or self.world.list_objects()
+        property_names = [p.name for p in self.world.property_definitions]
+
+        prompt = f"""You are an observer trying to select valuable objects.
+You have {self.config.oracle_budget - self.oracle_queries_used} oracle queries remaining.
+
+Recent statements from agents:
+{stmt_text}
+
+Your current beliefs: {json.dumps(current_beliefs, indent=2) if current_beliefs else "None yet"}
+
+Available objects: {objects[:15]}{'...' if len(objects) > 15 else ''}
+Available properties: {property_names}
+
+You MUST make an oracle query now. Choose strategically what to verify.
+
+Options:
+- Query an object's value: {{"type": "value", "object_id": "object_X"}}
+- Query an object's property: {{"type": "property", "object_id": "object_X", "property_name": "color"}}
+
+Respond with ONLY the JSON for your query choice."""
+
+        response = self.client.messages.create(
+            model=self.config.observer_model,
+            max_tokens=200,
+            messages=[{"role": "user", "content": prompt}],
+        )
+
+        text = response.content[0].text.strip()
+
+        # Parse JSON response
+        try:
+            start = text.find("{")
+            end = text.rfind("}") + 1
+            if start >= 0 and end > start:
+                data = json.loads(text[start:end])
+                return {
+                    "type": data.get("type", "value"),
+                    "object_id": data.get("object_id", objects[0] if objects else "object_0"),
+                    "property_name": data.get("property_name"),
+                }
+        except json.JSONDecodeError as e:
+            logger.warning(f"Failed to parse forced oracle query response: {e}. Response: {text[:200]}")
+
+        # Fallback: random query if parsing fails
+        return self._generate_random_oracle_query(remaining_objects)
 
     def _generate_random_oracle_query(
         self,
@@ -2392,6 +2461,7 @@ def run_game(
     agent_value_function_complexity: str = "medium",
     infer_agent_objectives: bool = False,
     random_oracle: bool = False,
+    force_oracle: bool = False,
     compute_no_agent_baseline: bool = False,
 ) -> GameResult:
     """
@@ -2426,6 +2496,7 @@ def run_game(
         agent_value_function_complexity: "simple", "medium", or "complex"
         infer_agent_objectives: Estimator infers agent value functions from behavior
         random_oracle: Use random queries instead of strategic observer queries
+        force_oracle: Force LLM to make strategic oracle query each round (vs optional)
         compute_no_agent_baseline: Compute baseline where LLM decides without agent input
 
     Returns:
@@ -2459,6 +2530,7 @@ def run_game(
         agent_value_function_complexity=agent_value_function_complexity,
         infer_agent_objectives=infer_agent_objectives,
         random_oracle=random_oracle,
+        force_oracle=force_oracle,
         compute_no_agent_baseline=compute_no_agent_baseline,
     )
 

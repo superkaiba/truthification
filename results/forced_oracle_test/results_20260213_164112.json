@@ -1,0 +1,36 @@
+{
+  "no_oracle": [
+    {
+      "seed": 42,
+      "property_accuracy": 0.34,
+      "oracle_used": 0
+    },
+    {
+      "seed": 123,
+      "property_accuracy": 0.22,
+      "oracle_used": 0
+    },
+    {
+      "seed": 456,
+      "property_accuracy": 0.2,
+      "oracle_used": 0
+    }
+  ],
+  "forced_oracle": [
+    {
+      "seed": 42,
+      "property_accuracy": 0.62,
+      "oracle_used": 8
+    },
+    {
+      "seed": 123,
+      "property_accuracy": 0.68,
+      "oracle_used": 8
+    },
+    {
+      "seed": 456,
+      "property_accuracy": 0.82,
+      "oracle_used": 8
+    }
+  ]
+}
