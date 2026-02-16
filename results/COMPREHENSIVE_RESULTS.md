@@ -14,7 +14,7 @@ This document summarizes all experimental results from the Truthification resear
 
 | Dimension | Key Result | Implication |
 |-----------|------------|-------------|
-| **Oracle Queries** | +14.4pp improvement with 8 queries | Verified information dramatically improves accuracy |
+| **Oracle Queries** | +45pp improvement with forced oracle | Verified information dramatically improves accuracy when actually used |
 | **Information Conditions** | IDs > Interests > Blind | Knowing agent identities helps more than knowing their goals |
 | **Rule Complexity** | Medium > Simple > Complex | Moderate complexity provides optimal signal |
 | **Scale (Agents)** | 4 agents need 20+ rounds | More agents require more rounds for convergence |
@@ -24,7 +24,7 @@ This document summarizes all experimental results from the Truthification resear
 
 | Metric | Random Baseline | Best Observed |
 |--------|-----------------|---------------|
-| Property Accuracy | 30.7% | 56% (+25pp) |
+| Property Accuracy | 30.7% | 82% (+51pp) |
 | Rule Inference | 20.7% | 85% (+64pp) |
 | Selection Accuracy | 50% | 92% (+42pp) |
 
@@ -40,21 +40,32 @@ This document summarizes all experimental results from the Truthification resear
 
 **Research Question:** How much does access to verified ground truth help judges make better decisions?
 
-### Results
+### Methodological Note
 
-![Oracle Queries Effect](plots/oracle_queries_effect.png)
+> **Important**: Initial experiments comparing oracle_budget=0 vs oracle_budget=8 were **invalid** because the LLM judge declined to use the oracle even when available. Analysis revealed `oracle_queries_used=0` in all games regardless of budget. The results below are from a corrected experiment using `force_oracle=True`, which requires the LLM to make strategic queries each round.
 
-| Oracle Budget | Judge Property Acc | Estimator Acc | Rule Inference |
-|--------------|-------------------|---------------|----------------|
-| 0 queries | 30.0% (±8.0%) | 14.0% (±8.0%) | 77.0% |
-| 8 queries | **44.4%** (±7.9%) | **25.2%** (±11.8%) | **79.0%** |
-| **Improvement** | +14.4pp | +11.2pp | +2.0pp |
+### Results (Forced Oracle Experiment)
+
+| Condition | Property Accuracy | Oracle Queries Used |
+|-----------|------------------|---------------------|
+| No Oracle (budget=0) | 25.3% (±7.4%) | 0 |
+| **Forced Oracle (budget=8)** | **70.7%** (±10.2%) | 8 |
+| **Improvement** | **+45.3pp** | - |
+
+### Per-Seed Results
+
+| Seed | No Oracle | Forced Oracle | Improvement |
+|------|-----------|---------------|-------------|
+| 42 | 34% | 62% | +28pp |
+| 123 | 22% | 68% | +46pp |
+| 456 | 20% | 82% | +62pp |
 
 ### Key Insights
 
-1. **Oracle access substantially improves property accuracy** (+14.4 percentage points for judge)
-2. **Estimator benefits too**, despite not having direct oracle access (passive learning from debate)
-3. **Rule inference already high** with or without oracle (agents reveal rule structure through behavior)
+1. **Oracle access nearly triples property accuracy** (25% → 71%) when actually used
+2. **LLMs don't voluntarily use verification tools** - the judge declined oracle queries even when available
+3. **Forcing oracle use is necessary** to realize the benefits of ground truth access
+4. **Improvement is consistent** - all seeds showed large gains (+28pp to +62pp)
 
 ### Interpretation
 
@@ -62,6 +73,15 @@ Oracle queries provide "anchor points" of verified truth that help judges:
 - Calibrate agent credibility (whose claims match oracle results?)
 - Identify consistent vs inconsistent agents
 - Ground abstract reasoning in verified facts
+
+### Why LLMs Don't Use Oracle Voluntarily
+
+The prompt asks "Would you like to query the oracle?" and the LLM consistently says no. Possible reasons:
+- **Overconfidence** in internal reasoning abilities
+- **Preference for inference** over external verification
+- **Prompt framing** doesn't emphasize the value of verification
+
+This finding has implications for AI safety: LLMs may not leverage verification mechanisms even when available.
 
 ---
 
@@ -207,32 +227,36 @@ Early rounds are most information-rich. As the game progresses:
 
 ![Judge vs Estimator](plots/judge_vs_estimator.png)
 
+#### Scale Experiment Results (Valid Comparison)
+
 | Experiment | Judge | Estimator | Winner |
 |------------|-------|-----------|--------|
-| 0 oracle queries | 30.0% | 14.0% | Judge +16pp |
-| 8 oracle queries | 44.4% | 25.2% | Judge +19pp |
 | 2A × 10R | 46.0% | 51.3% | **Est +5pp** |
 | 2A × 15R | 36.7% | 55.3% | **Est +19pp** |
 | 4A × 10R | 18.7% | 42.7% | **Est +24pp** |
 | 4A × 20R | 44.0% | 58.7% | **Est +15pp** |
 
+> **Note on Oracle Comparison**: The original oracle experiment (0 vs 8 queries) did not collect estimator accuracy in a way that allows valid comparison, because the oracle was never actually used (see Section 1). Future work should re-run the forced oracle experiment with estimator tracking to determine whether oracle access benefits the judge relative to the passive estimator.
+
 ### Key Insights
 
-1. **Estimator often outperforms judge** in longer/more complex debates
-2. **Judge advantage with oracle** - direct access to verified info helps active participant
-3. **Estimator advantage with complexity** - passive observation resists manipulation better
+1. **Estimator consistently outperforms judge** across all scale experiment conditions (+5pp to +24pp)
+2. **Advantage increases with complexity** - gap widens with more agents (2A: +5pp avg, 4A: +20pp avg)
+3. **Passive observation resists manipulation better** than active participation
 
 ### Interpretation
 
-The judge's active participation creates a double-edged sword:
-- **Pro**: Direct interaction, oracle access, can ask questions
+The judge's active participation creates vulnerabilities:
 - **Con**: Agent targeting (agents tailor deception to judge's revealed beliefs)
 - **Con**: Selection pressure (must commit to choices that agents can exploit)
+- **Con**: May become anchored to early incorrect beliefs
 
-The estimator's passivity provides:
+The estimator's passivity provides advantages:
 - **Pro**: No exposure to targeted manipulation
-- **Pro**: Can observe without revealing beliefs
-- **Con**: No direct oracle access or questioning ability
+- **Pro**: Can observe agent-to-agent interactions without influencing them
+- **Pro**: No commitment pressure allows holistic pattern analysis
+
+This suggests that in strategic debate settings, passive observation may be more robust than active participation for truth recovery.
 
 ---
 
@@ -279,10 +303,18 @@ Based on random rule guesses evaluated against actual value rules.
 
 ## Appendix: Experiment Details
 
-### A. No-Oracle Comparison (10 games)
+### A. No-Oracle Comparison (10 games) - INVALID
 - **Config**: 2 agents, 10 rounds, 10 objects, selection_size=5
 - **Seeds**: 42, 123, 456, 789, 101
 - **Oracle budgets**: 0, 8
+- **Status**: ⚠️ **INVALID** - Oracle was never used (oracle_queries_used=0 in all games)
+- **Superseded by**: Forced Oracle Experiment (A2)
+
+### A2. Forced Oracle Experiment (6 games) - VALID
+- **Config**: 2 agents, 10 rounds, 10 objects, selection_size=5, condition=interests, rule_complexity=medium
+- **Seeds**: 42, 123, 456
+- **Conditions**: No oracle (budget=0) vs Forced oracle (budget=8, force_oracle=True)
+- **Key Result**: +45.3pp improvement (25.3% → 70.7%) when oracle is actually used
 
 ### B. Scale Experiment (27 games)
 - **Config**: 10 objects, oracle_budget=8, selection_size=5
@@ -307,7 +339,8 @@ Based on random rule guesses evaluated against actual value rules.
 
 | Experiment | Location | Key Files |
 |------------|----------|-----------|
-| No-Oracle | `results/no_oracle_comparison/` | `results_20260211_030456.json` |
+| No-Oracle (invalid) | `results/no_oracle_comparison/` | `results_20260211_030456.json` |
+| **Forced Oracle** | `results/forced_oracle_test/` | `results_20260213_164112.json` |
 | Scale | `results/scale_experiment/` | `results_20260212_173323.json`, `README.md` |
 | V2 Comprehensive | `results/v2_comprehensive_opus/` | `all_results.json`, `README.md` |
 | Multi-Factor | `results/multi_factor/` | `condition_stats_*.json`, `trajectory_data.json` |
@@ -323,7 +356,7 @@ Based on random rule guesses evaluated against actual value rules.
 
 ## Conclusions
 
-1. **Oracle access is valuable** - Verified information dramatically improves judge accuracy
+1. **Oracle access is transformative** - Verified information nearly triples accuracy (25% → 71%) when actually used. However, LLMs don't voluntarily use verification tools, suggesting they may not leverage safety mechanisms unless forced.
 
 2. **Information is non-monotonic** - More information about agents isn't always better; IDs help, interests hurt
 
@@ -331,12 +364,12 @@ Based on random rule guesses evaluated against actual value rules.
 
 4. **Scale requires time** - More agents need more rounds to converge on truth
 
-5. **Passive observation can beat active participation** - Estimators often outperform judges in complex scenarios
+5. **Passive observation can beat active participation** - Estimators consistently outperform judges (+5pp to +24pp), likely because they avoid targeted manipulation
 
 6. **Debate structure matters** - Interleaved turns and delayed oracle reveal work best
 
 These findings suggest that effective truth recovery from strategic debates requires:
-- Access to verified ground truth (oracle queries)
+- **Mandatory** verification mechanisms (not just available, but enforced)
 - Ability to track agent identity without knowing too much about their goals
 - Sufficient rounds to identify patterns (especially with many agents)
 - Debate structures that maximize agent-to-agent contradiction
