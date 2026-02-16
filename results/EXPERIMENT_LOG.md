@@ -33,7 +33,7 @@ This file tracks all experiments run in the truthification project.
 - Estimator infers agent objectives
 - 5 seeds (42, 123, 456, 789, 101112)
 
-**Key Result:** Judge accuracy 44.4% with oracle (vs 30.0% no-oracle baseline). Estimator matches or exceeds judge in many conditions. Agent objective inference averages 0.54 (scale 0-1).
+**Key Result:** Estimator matches or exceeds judge in many conditions. Agent objective inference averages 0.54 (scale 0-1). ⚠️ Note: Oracle comparison from this experiment is invalid (see Forced Oracle Experiment).
 
 **Results:** [results/multi_factor/ANALYSIS.md](multi_factor/ANALYSIS.md)
 
@@ -41,7 +41,7 @@ This file tracks all experiments run in the truthification project.
 
 ---
 
-## 2026-02-11: No-Oracle Experiment
+## 2026-02-11: No-Oracle Experiment ⚠️ INVALID
 
 **Goal:** Measure the value of oracle access by comparing oracle_budget=8 vs oracle_budget=0
 
@@ -50,9 +50,26 @@ This file tracks all experiments run in the truthification project.
 - 5 seeds each condition
 - Conditions: with_oracle (budget=8) vs no_oracle (budget=0)
 
-**Key Result:** Oracle provides +14.4% accuracy boost (44.4% with vs 30.0% without). No-oracle accuracy equals random baseline (30.7%).
+**Key Result:** ⚠️ **INVALID** - Analysis revealed oracle_queries_used=0 in ALL games, even with budget=8. The LLM judge declined to use the oracle when offered. See Forced Oracle Experiment below for valid comparison.
 
-**Results:** [results/multi_factor/ANALYSIS.md#oracle-value](multi_factor/ANALYSIS.md)
+**Results:** [results/no_oracle_comparison/](no_oracle_comparison/)
+
+---
+
+## 2026-02-13: Forced Oracle Experiment ✓
+
+**Goal:** Re-run oracle comparison with force_oracle=True to ensure oracle is actually used
+
+**Config:**
+- 10 objects, 10 rounds, 5 selections, condition=interests, rule_complexity=medium
+- 3 seeds (42, 123, 456)
+- Conditions: no_oracle (budget=0) vs forced_oracle (budget=8, force_oracle=True)
+
+**Key Result:** Oracle nearly triples property accuracy: 25.3% → 70.7% (+45.3pp) when forced to use it. All seeds showed large gains (+28pp to +62pp).
+
+**Key Finding:** LLMs don't voluntarily use verification tools even when available. Implications for AI safety: verification mechanisms must be mandatory, not optional.
+
+**Results:** [results/forced_oracle_test/](forced_oracle_test/)
 
 ---
 
