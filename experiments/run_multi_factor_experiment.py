@@ -130,6 +130,7 @@ def run_single_game(condition: ExperimentCondition, seed: int) -> dict:
         "rounds": result.rounds,  # Include conversation transcripts
         "agents": result.agents,  # Include agent info
         "value_rule": result.value_rule,  # Include value rule for context
+        "world_state": result.world_state,  # Include ground truth object properties
     }
 
 
@@ -324,6 +325,13 @@ def run_experiment():
 
                 all_results.append(result)
                 condition_results[condition.condition_id].append(result)
+
+                # Save individual trajectory file for viewer
+                trajectory_dir = output_dir / "trajectories"
+                trajectory_dir.mkdir(exist_ok=True)
+                trajectory_file = trajectory_dir / f"game_{condition.condition_id}_seed{seed}.json"
+                with open(trajectory_file, "w") as f:
+                    json.dump(result, f, indent=2)
 
                 # Quick summary
                 metrics = result["metrics"]

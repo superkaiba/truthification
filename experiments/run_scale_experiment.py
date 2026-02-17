@@ -126,6 +126,13 @@ def run_experiment():
                         "metrics": metrics,
                         "estimator_metrics": est_metrics,
                     })
+
+                    # Save full game trajectory for viewer
+                    trajectory_dir = output_dir / "trajectories"
+                    trajectory_dir.mkdir(exist_ok=True)
+                    trajectory_file = trajectory_dir / f"game_{n_agents}a_{n_rounds}r_seed{seed}.json"
+                    with open(trajectory_file, "w") as f:
+                        json.dump(result.to_dict(), f, indent=2)
                     
                     print(f"    Judge Acc: {metrics['property_accuracy']*100:.1f}%, Est Acc: {est_metrics.get('property_accuracy', 0)*100:.1f}%", flush=True)
                     
