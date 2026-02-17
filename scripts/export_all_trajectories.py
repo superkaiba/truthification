@@ -42,27 +42,39 @@ def convert_game_to_trajectory(game_data: dict, name: str) -> dict:
     for round_data in game_data.get("rounds", []):
         round_num = round_data.get("round_number", 0)
 
-        # Extract statements
+        # Extract statements - field is "agent_statements" in raw data
         statements = []
-        for stmt in round_data.get("statements", []):
+        raw_statements = round_data.get("agent_statements", []) or round_data.get("statements", [])
+        for stmt in raw_statements:
             statements.append({
-                "agent": stmt.get("agent_id", "Unknown"),
+                "agent": stmt.get("agent_id", stmt.get("agent", "Unknown")),
                 "text": stmt.get("text", ""),
                 "about": stmt.get("object_id", ""),
                 "claim": stmt.get("claimed_value", "")
             })
 
-        # Extract oracle queries
+        # Extract oracle queries - can be single query or list
         oracle_queries = []
-        for query in round_data.get("oracle_queries", []):
-            oracle_queries.append({
-                "object": query.get("object_id", ""),
-                "property": query.get("property", ""),
-                "result": query.get("result", "")
-            })
+        oracle_query = round_data.get("oracle_query")
+        if oracle_query:
+            if isinstance(oracle_query, list):
+                for query in oracle_query:
+                    oracle_queries.append({
+                        "object": query.get("object_id", ""),
+                        "property": query.get("property", ""),
+                        "result": str(query.get("result", ""))
+                    })
+            elif isinstance(oracle_query, dict) and oracle_query.get("object_id"):
+                oracle_queries.append({
+                    "object": oracle_query.get("object_id", ""),
+                    "property": oracle_query.get("property", ""),
+                    "result": str(oracle_query.get("result", ""))
+                })
 
         # Extract picks/selection
-        selection = round_data.get("selection", [])
+        selection = round_data.get("observer_current_picks", [])
+        if not selection:
+            selection = round_data.get("selection", [])
         if not selection:
             selection = round_data.get("picks", [])
 
