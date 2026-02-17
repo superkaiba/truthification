@@ -32,6 +32,13 @@ oracle_data = {
 # Overall
 overall = {"mean": 50.6, "std": 3.0}
 
+# Random baseline (computed empirically)
+RANDOM_BASELINE = {
+    "simple_interest": 18.6,
+    "complex_vf": 20.0,
+    "overall": 19.1,
+}
+
 
 def create_plots():
     output_dir = Path("results/plots")
@@ -55,7 +62,9 @@ def create_plots():
 
     bars1 = ax1.bar(categories, means, yerr=stds, capsize=5,
                     color=[colors[0], colors[1]], edgecolor="black", linewidth=1.2)
-    ax1.axhline(y=50, color="gray", linestyle="--", linewidth=1, label="50% baseline")
+    # Add baseline for each bar type
+    ax1.axhline(y=RANDOM_BASELINE["simple_interest"], color="green", linestyle="--", linewidth=1, alpha=0.5)
+    ax1.axhline(y=RANDOM_BASELINE["complex_vf"], color="red", linestyle="--", linewidth=1, alpha=0.5)
     ax1.set_ylabel("Inference Accuracy (%)")
     ax1.set_title("By Agent Type", fontweight="bold")
     ax1.set_ylim(0, 80)
@@ -73,7 +82,7 @@ def create_plots():
 
     bars2 = ax2.bar(categories, means, yerr=stds, capsize=5,
                     color=[colors[0], colors[2], colors[3]], edgecolor="black", linewidth=1.2)
-    ax2.axhline(y=50, color="gray", linestyle="--", linewidth=1, label="50% baseline")
+    ax2.axhline(y=RANDOM_BASELINE["overall"], color="gray", linestyle="--", linewidth=1, label=f"{RANDOM_BASELINE['overall']:.0f}% baseline")
     ax2.set_title("By Observer Condition", fontweight="bold")
     ax2.set_ylim(0, 80)
     ax2.tick_params(axis='x', rotation=15)
@@ -90,7 +99,7 @@ def create_plots():
 
     bars3 = ax3.bar(categories, means, yerr=stds, capsize=5,
                     color=[colors[2], colors[1]], edgecolor="black", linewidth=1.2)
-    ax3.axhline(y=50, color="gray", linestyle="--", linewidth=1, label="50% baseline")
+    ax3.axhline(y=RANDOM_BASELINE["overall"], color="gray", linestyle="--", linewidth=1, label=f"{RANDOM_BASELINE['overall']:.0f}% baseline")
     ax3.set_title("By Oracle Type", fontweight="bold")
     ax3.set_ylim(0, 80)
 
@@ -142,7 +151,7 @@ def create_plots():
     bars = ax.bar(all_categories, all_means, yerr=all_stds, capsize=4,
                   color=bar_colors, edgecolor="black", linewidth=1)
 
-    ax.axhline(y=50, color="gray", linestyle="--", linewidth=1.5, label="50% baseline")
+    ax.axhline(y=RANDOM_BASELINE["overall"], color="gray", linestyle="--", linewidth=1.5, label=f"{RANDOM_BASELINE['overall']:.0f}% random baseline")
     ax.set_ylabel("Agent Objective Inference Accuracy (%)", fontsize=12)
     ax.set_title("Ability to Infer Agent Goals/Interests\n(Estimator Performance)", fontsize=14, fontweight="bold")
     ax.set_ylim(0, 80)
