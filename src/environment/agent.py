@@ -727,7 +727,15 @@ def generate_agent_value_function(
     Args:
         agent_id: ID of the agent (used in naming)
         rng: Random number generator for reproducibility
-        complexity: "simple" (1 condition), "medium" (2-3), "complex" (3-5)
+        complexity: Complexity level, one of:
+            - "simple" (1 condition) - alias for L1
+            - "medium" (2-3 conditions) - alias for L3
+            - "complex" (3-5 conditions) - alias for L5
+            - "L1" - 1 property condition (e.g., "wants blue objects")
+            - "L2" - 2 properties (AND) (e.g., "wants blue AND large")
+            - "L3" - 2 + combination bonus (e.g., "blue +20, large +15, combo +25")
+            - "L4" - 3-4 conditions (multiple bonuses)
+            - "L5" - 4-5 + penalties (bonuses + negative conditions)
         exclude_conditions: List of (property, value) tuples to avoid
             (useful for ensuring agents have different preferences)
 
@@ -737,19 +745,50 @@ def generate_agent_value_function(
     exclude_conditions = exclude_conditions or []
     exclude_set = set(exclude_conditions)
 
-    # Determine number of conditions based on complexity
-    if complexity == "simple":
-        n_conditions = 1
-    elif complexity == "complex":
-        n_conditions = rng.randint(3, 5)
-    else:  # medium
-        n_conditions = rng.randint(2, 3)
+    # Map complexity to L1-L5 levels for unified handling
+    complexity_map = {
+        "simple": "L1",
+        "medium": "L3",
+        "complex": "L5",
+    }
+    level = complexity_map.get(complexity, complexity)
+
+    # Determine structure based on level
+    if level == "L1":
+        # L1-Simple: Single property condition
+        n_single = 1
+        add_combo = False
+        add_penalty = False
+    elif level == "L2":
+        # L2-Dual: Two properties (as separate conditions)
+        n_single = 2
+        add_combo = False
+        add_penalty = False
+    elif level == "L3":
+        # L3-Combo: Two properties + combination bonus
+        n_single = 2
+        add_combo = True
+        add_penalty = False
+    elif level == "L4":
+        # L4-Complex: 3-4 conditions
+        n_single = rng.randint(3, 4)
+        add_combo = rng.random() < 0.5  # 50% chance of combo
+        add_penalty = False
+    elif level == "L5":
+        # L5-Penalty: 4-5 conditions + penalties
+        n_single = rng.randint(3, 4)
+        add_combo = rng.random() < 0.7  # 70% chance of combo
+        add_penalty = True
+    else:
+        # Default to medium/L3
+        n_single = 2
+        add_combo = True
+        add_penalty = False
 
     conditions = []
     used_properties: set[str] = set()
 
     # Generate single-property conditions
-    n_single = min(n_conditions, rng.randint(1, max(1, n_conditions - 1)))
     for _ in range(n_single):
         # Pick a property we haven't used yet
         available_props = [p for p in PROPERTY_VALUES_POOL.keys() if p not in used_properties]
@@ -785,7 +824,7 @@ def generate_agent_value_function(
         ))
 
     # Maybe add a combination condition (AND)
-    if n_conditions > n_single and len(used_properties) >= 2:
+    if add_combo and len(used_properties) >= 2:
         # Pick two properties for combination
         combo_props = rng.sample(list(used_properties), 2)
         prop1, prop2 = combo_props
@@ -811,7 +850,7 @@ def generate_agent_value_function(
         ))
 
     # Maybe add a penalty condition
-    if complexity == "complex" and rng.random() < 0.5:
+    if add_penalty:
         # Pick a property to penalize
         penalty_prop = rng.choice(list(PROPERTY_VALUES_POOL.keys()))
         penalty_val = rng.choice(PROPERTY_VALUES_POOL[penalty_prop])

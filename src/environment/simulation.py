@@ -247,6 +247,16 @@ class GameConfig:
     # When True, the estimator analyzes agent behavior to infer their objectives.
     # Requires enable_estimator=True. Results are evaluated with an LLM judge.
 
+    # Objective Inference Mode
+    objective_inference_mode: str = "freeform"
+    # Mode for inferring agent objectives:
+    # - "freeform": LLM generates any hypothesis (current default)
+    # - "multiple_choice_2": Binary choice (correct vs 1 distractor)
+    # - "multiple_choice_4": 1 correct, 3 distractors
+    # - "multiple_choice_8": 1 correct, 7 distractors
+    # - "multiple_choice_16": 1 correct, 15 distractors
+    # - "structured": Select from enumerated property=value pairs
+
     # Random Oracle (for ablation experiments)
     random_oracle: bool = False  # Use random queries instead of strategic queries
     # When True, oracle queries are randomly selected (random object + random property/value)
@@ -2294,13 +2304,31 @@ Respond with JSON:
                     )
                     all_statements.append(stmt)
 
-            # Infer agent objectives
+            # Infer agent objectives based on configured mode
             agent_dicts = [agent.to_dict() for agent in self.agents]
-            inferences = self.estimator.infer_agent_objectives(
-                all_statements=all_statements,
-                agents=agent_dicts,
-                world=self.world,
-            )
+            inference_mode = self.config.objective_inference_mode
+
+            if inference_mode.startswith("multiple_choice_"):
+                # Extract number of choices from mode string
+                n_choices = int(inference_mode.split("_")[-1])
+                inferences = self.estimator.infer_agent_objectives_multiple_choice(
+                    all_statements=all_statements,
+                    agents=agent_dicts,
+                    world=self.world,
+                    n_choices=n_choices,
+                )
+            elif inference_mode == "structured":
+                inferences = self.estimator.infer_agent_objectives_structured(
+                    all_statements=all_statements,
+                    agents=agent_dicts,
+                    world=self.world,
+                )
+            else:  # "freeform" or default
+                inferences = self.estimator.infer_agent_objectives(
+                    all_statements=all_statements,
+                    agents=agent_dicts,
+                    world=self.world,
+                )
 
             # Evaluate inferences with LLM judge
             result = self.estimator.evaluate_objective_inference(
@@ -2316,6 +2344,9 @@ Respond with JSON:
                     "confidence": inf.confidence,
                     "reasoning": inf.reasoning,
                     "evidence": inf.evidence,
+                    "inference_mode": inf.inference_mode,
+                    "selected_option": inf.selected_option,
+                    "n_options": inf.n_options,
                 }
                 for agent_id, inf in result.agent_inferences.items()
             }
@@ -2417,6 +2448,7 @@ Respond with JSON:
                 "agent_value_function_complexity": self.config.agent_value_function_complexity,
                 # Agent objective inference
                 "infer_agent_objectives": self.config.infer_agent_objectives,
+                "objective_inference_mode": self.config.objective_inference_mode,
             },
             inferred_rule=inferred_rule_dict,
             observer_property_beliefs=self.observer_property_beliefs,
@@ -2460,6 +2492,7 @@ def run_game(
     use_agent_value_functions: bool = False,
     agent_value_function_complexity: str = "medium",
     infer_agent_objectives: bool = False,
+    objective_inference_mode: str = "freeform",
     random_oracle: bool = False,
     force_oracle: bool = False,
     compute_no_agent_baseline: bool = False,
@@ -2495,6 +2528,7 @@ def run_game(
         use_agent_value_functions: Give agents complex value functions (vs simple interests)
         agent_value_function_complexity: "simple", "medium", or "complex"
         infer_agent_objectives: Estimator infers agent value functions from behavior
+        objective_inference_mode: Mode for objective inference (freeform, multiple_choice_N, structured)
         random_oracle: Use random queries instead of strategic observer queries
         force_oracle: Force LLM to make strategic oracle query each round (vs optional)
         compute_no_agent_baseline: Compute baseline where LLM decides without agent input
@@ -2529,6 +2563,7 @@ def run_game(
         use_agent_value_functions=use_agent_value_functions,
         agent_value_function_complexity=agent_value_function_complexity,
         infer_agent_objectives=infer_agent_objectives,
+        objective_inference_mode=objective_inference_mode,
         random_oracle=random_oracle,
         force_oracle=force_oracle,
         compute_no_agent_baseline=compute_no_agent_baseline,
