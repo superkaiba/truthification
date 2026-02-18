@@ -37,7 +37,7 @@ from src.environment.simulation import GameConfig, HiddenValueGame
 # ============================================================================
 
 # Seeds for replication
-SEEDS = [42, 123, 456, 789, 101]  # 5 seeds per condition
+SEEDS = [42, 123, 456, 789, 101, 202, 303, 404, 505, 606]  # 10 seeds per condition
 
 # Complexity levels to test
 COMPLEXITY_LEVELS = ["L1", "L2", "L3", "L4", "L5"]

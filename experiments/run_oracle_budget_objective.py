@@ -32,7 +32,7 @@ from src.environment.simulation import GameConfig, HiddenValueGame
 # ============================================================================
 
 # Seeds for replication
-SEEDS = [42, 123, 456, 789, 101]  # 5 seeds per condition
+SEEDS = [42, 123, 456, 789, 101, 202, 303, 404, 505, 606]  # 10 seeds per condition
 
 # Oracle budgets to test
 ORACLE_BUDGETS = [0, 1, 2, 4, 6, 8]
