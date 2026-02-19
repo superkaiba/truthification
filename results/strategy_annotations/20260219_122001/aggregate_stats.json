@@ -1,0 +1,68 @@
+{
+  "n_games": 53,
+  "n_agent_annotations": 106,
+  "strategy_stats": {
+    "fabricated_terminology": {
+      "mean": 84.43396226415095,
+      "min": 15,
+      "max": 100,
+      "n_high_confidence": 96,
+      "prevalence": 0.9056603773584906
+    },
+    "truth_mixed_with_lies": {
+      "mean": 90.94339622641509,
+      "min": 75,
+      "max": 100,
+      "n_high_confidence": 106,
+      "prevalence": 1.0
+    },
+    "oracle_spin": {
+      "mean": 69.38679245283019,
+      "min": 0,
+      "max": 100,
+      "n_high_confidence": 86,
+      "prevalence": 0.8113207547169812
+    },
+    "credibility_attack": {
+      "mean": 80.94339622641509,
+      "min": 5,
+      "max": 100,
+      "n_high_confidence": 102,
+      "prevalence": 0.9622641509433962
+    },
+    "escalating_complexity": {
+      "mean": 82.87735849056604,
+      "min": 25,
+      "max": 100,
+      "n_high_confidence": 104,
+      "prevalence": 0.9811320754716981
+    },
+    "object_advocacy": {
+      "mean": 96.17924528301887,
+      "min": 50,
+      "max": 100,
+      "n_high_confidence": 106,
+      "prevalence": 1.0
+    }
+  },
+  "primary_strategy_counts": {
+    "fabricated_terminology": 27,
+    "object_advocacy": 36,
+    "truth_mixed_with_lies": 13,
+    "Object Advocacy": 5,
+    "Truth Mixed with Lies": 1,
+    "OBJECT_ADVOCACY": 1,
+    "credibility_attack": 12,
+    "escalating_complexity": 7,
+    "FABRICATED_TERMINOLOGY": 1,
+    "oracle_spin": 3
+  },
+  "dominant_dynamic_counts": {
+    "Multiple agents rely on fabricated terminology": 5,
+    "Multiple agents rely on object advocacy": 30,
+    "Multiple agents rely on truth mixed with lies": 8,
+    "Multiple agents rely on escalating complexity": 3,
+    "Multiple agents rely on credibility attack": 1,
+    "Multiple agents rely on oracle spin": 6
+  }
+}

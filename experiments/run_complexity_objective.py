@@ -139,6 +139,7 @@ def run_single_game(condition: ExperimentCondition, seed: int) -> dict:
         "agent_value_functions": agent_vf_details,
         "config": result.config,
         "agents": result.agents,
+        "rounds": result.rounds,  # Include for strategy annotation
     }
 
 
