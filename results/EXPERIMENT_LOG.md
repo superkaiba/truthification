@@ -91,6 +91,80 @@ This file tracks all experiments run in the truthification project.
 
 ---
 
+## 2026-02-18: Oracle Budget Effect on Objective Inference
+
+**Goal:** Test if more oracle queries help the estimator infer agent objectives
+
+**Config:**
+- 10 objects, 10 rounds, 5 selections
+- Oracle budgets: [0, 1, 2, 4, 6, 8]
+- Fixed: L3 complexity, freeform inference mode
+- 10 seeds per condition (53 games completed due to some errors)
+
+**Duration:** 15.3 hours (916 minutes)
+
+**Key Result:** Oracle budget significantly improves objective inference. Optimal at budget=6 (27.1%), with diminishing returns after. Baseline (budget=0) achieves only 5.0%.
+
+**Results:** [results/oracle_budget_objective_experiment/README_20260218_002133.md](oracle_budget_objective_experiment/README_20260218_002133.md)
+
+**Raw Data:** `outputs/oracle_budget_objective/20260218_002133/`
+
+**W&B:** https://wandb.ai/thomasjiralerspong/truthification
+
+---
+
+## 2026-02-18: Objective Complexity Effect on Inference
+
+**Goal:** Test how objective complexity (L1-L5) affects inference accuracy
+
+**Config:**
+- 10 objects, 10 rounds, 5 selections
+- Complexity levels: L1 (simple), L2 (dual), L3 (combo), L4 (complex), L5 (penalty)
+- Fixed: oracle_budget=4, freeform inference mode
+- 10 seeds per condition (47 games completed due to some errors)
+
+**Duration:** 13.8 hours (831 minutes)
+
+**Key Result:** Hypothesis confirmed - simpler objectives are easier to infer. L1 (1 property): 39.5% vs L5 (4-5 conditions + penalties): 16.4%. Clear monotonic decrease with complexity.
+
+**Results:** [results/complexity_objective_experiment/README_20260218_002133.md](complexity_objective_experiment/README_20260218_002133.md)
+
+**Raw Data:** `outputs/complexity_objective/20260218_002133/`
+
+**W&B:** https://wandb.ai/thomasjiralerspong/truthification
+
+---
+
+## 2026-02-19: Search Space Constraint Effect (COMPLETE)
+
+**Goal:** Compare inference accuracy across multiple-choice (2,4,8,16 options) vs freeform vs structured methods
+
+**Config:**
+- 10 objects, 10 rounds, 5 selections
+- Methods: multiple_choice_2/4/8/16, freeform, structured
+- Complexity levels: L1, L5
+- 10 seeds per condition (116 games completed, 4 failed due to API errors)
+
+**Duration:** 34.3 hours (2060 minutes)
+
+**Key Finding:** **Multiple-choice VASTLY outperforms freeform/structured!** (90-95% vs 30-34%). Hypothesis was completely wrong - more choices don't decrease accuracy. This suggests LLMs are better at selection than generation for objective inference.
+
+| Mode | Accuracy |
+|------|----------|
+| multiple_choice_16 | 95.0% |
+| multiple_choice_8 | 94.9% |
+| multiple_choice_2/4 | 90.0% |
+| structured | 33.8% |
+| freeform | 30.5% |
+
+**Results:** [results/search_space_experiment/README_20260218_002133.md](search_space_experiment/README_20260218_002133.md)
+
+**Raw Data:** `outputs/search_space/20260218_002133/`
+
+**W&B:** https://wandb.ai/thomasjiralerspong/truthification
+
+---
+
 ## Template for New Experiments
 
 ```markdown

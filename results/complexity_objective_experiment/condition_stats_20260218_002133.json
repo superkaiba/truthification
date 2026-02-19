@@ -1,0 +1,287 @@
+{
+  "complexity_L1": {
+    "condition": {
+      "condition_id": "complexity_L1",
+      "complexity": "L1",
+      "description": "Simple: 1 property (e.g., 'wants blue')"
+    },
+    "n_games": 10,
+    "stats": {
+      "total_value": {
+        "mean": 168.6,
+        "std": 63.305607966435325,
+        "n": 10
+      },
+      "selection_accuracy": {
+        "mean": 0.8295780983418246,
+        "std": 0.16567007254391947,
+        "n": 10
+      },
+      "property_accuracy": {
+        "mean": 0.394,
+        "std": 0.19299971214716588,
+        "n": 10
+      },
+      "rule_inference_accuracy": {
+        "mean": 0.63,
+        "std": 0.22261077142752,
+        "n": 10
+      },
+      "objective_inference_score": {
+        "mean": 0.395,
+        "std": 0.2783383233085632,
+        "n": 10
+      },
+      "per_agent_objective_scores": {
+        "Agent_A": {
+          "mean": 0.19,
+          "std": 0.28848262031225075,
+          "n": 10
+        },
+        "Agent_B": {
+          "mean": 0.6,
+          "std": 0.38873012632302,
+          "n": 10
+        }
+      },
+      "avg_n_conditions": {
+        "mean": 1,
+        "std": 0.0,
+        "n": 20
+      },
+      "avg_confidence": {
+        "mean": 90.5,
+        "std": 5.104177855340404,
+        "n": 20
+      }
+    }
+  },
+  "complexity_L2": {
+    "condition": {
+      "condition_id": "complexity_L2",
+      "complexity": "L2",
+      "description": "Dual: 2 properties (e.g., 'wants blue AND large')"
+    },
+    "n_games": 10,
+    "stats": {
+      "total_value": {
+        "mean": 149.2,
+        "std": 68.18732368344655,
+        "n": 10
+      },
+      "selection_accuracy": {
+        "mean": 0.7316885452263122,
+        "std": 0.2733312490105488,
+        "n": 10
+      },
+      "property_accuracy": {
+        "mean": 0.38,
+        "std": 0.16411378166788226,
+        "n": 10
+      },
+      "rule_inference_accuracy": {
+        "mean": 0.565,
+        "std": 0.2677581827777527,
+        "n": 10
+      },
+      "objective_inference_score": {
+        "mean": 0.215,
+        "std": 0.22490738834758928,
+        "n": 10
+      },
+      "per_agent_objective_scores": {
+        "Agent_A": {
+          "mean": 0.17,
+          "std": 0.21628170930011115,
+          "n": 10
+        },
+        "Agent_B": {
+          "mean": 0.26,
+          "std": 0.33399933466334264,
+          "n": 10
+        }
+      },
+      "avg_n_conditions": {
+        "mean": 2,
+        "std": 0.0,
+        "n": 20
+      },
+      "avg_confidence": {
+        "mean": 89.5,
+        "std": 6.048053188292994,
+        "n": 20
+      }
+    }
+  },
+  "complexity_L3": {
+    "condition": {
+      "condition_id": "complexity_L3",
+      "complexity": "L3",
+      "description": "Combo: 2 properties + combination bonus"
+    },
+    "n_games": 10,
+    "stats": {
+      "total_value": {
+        "mean": 147.8,
+        "std": 63.40837659349293,
+        "n": 10
+      },
+      "selection_accuracy": {
+        "mean": 0.7118005664577635,
+        "std": 0.15608674237741063,
+        "n": 10
+      },
+      "property_accuracy": {
+        "mean": 0.492,
+        "std": 0.13505554412907306,
+        "n": 10
+      },
+      "rule_inference_accuracy": {
+        "mean": 0.7,
+        "std": 0.1914854215512676,
+        "n": 10
+      },
+      "objective_inference_score": {
+        "mean": 0.23,
+        "std": 0.2110818693198342,
+        "n": 10
+      },
+      "per_agent_objective_scores": {
+        "Agent_A": {
+          "mean": 0.16,
+          "std": 0.1505545305418162,
+          "n": 10
+        },
+        "Agent_B": {
+          "mean": 0.3,
+          "std": 0.32659863237109044,
+          "n": 10
+        }
+      },
+      "avg_n_conditions": {
+        "mean": 3,
+        "std": 0.0,
+        "n": 20
+      },
+      "avg_confidence": {
+        "mean": 88,
+        "std": 6.569466853317863,
+        "n": 20
+      }
+    }
+  },
+  "complexity_L4": {
+    "condition": {
+      "condition_id": "complexity_L4",
+      "complexity": "L4",
+      "description": "Complex: 3-4 conditions with multiple bonuses"
+    },
+    "n_games": 10,
+    "stats": {
+      "total_value": {
+        "mean": 171.3,
+        "std": 52.01078947893622,
+        "n": 10
+      },
+      "selection_accuracy": {
+        "mean": 0.8412575349201602,
+        "std": 0.0969804931109297,
+        "n": 10
+      },
+      "property_accuracy": {
+        "mean": 0.49,
+        "std": 0.19165942015286735,
+        "n": 10
+      },
+      "rule_inference_accuracy": {
+        "mean": 0.7849999999999999,
+        "std": 0.1292069829554287,
+        "n": 10
+      },
+      "objective_inference_score": {
+        "mean": 0.17500000000000002,
+        "std": 0.12747548783981963,
+        "n": 10
+      },
+      "per_agent_objective_scores": {
+        "Agent_A": {
+          "mean": 0.21,
+          "std": 0.25144029554194813,
+          "n": 10
+        },
+        "Agent_B": {
+          "mean": 0.14,
+          "std": 0.1264911064067352,
+          "n": 10
+        }
+      },
+      "avg_n_conditions": {
+        "mean": 3.95,
+        "std": 0.6048053188292994,
+        "n": 20
+      },
+      "avg_confidence": {
+        "mean": 88,
+        "std": 5.712405705774794,
+        "n": 20
+      }
+    }
+  },
+  "complexity_L5": {
+    "condition": {
+      "condition_id": "complexity_L5",
+      "complexity": "L5",
+      "description": "Penalty: 4-5 conditions including penalties"
+    },
+    "n_games": 7,
+    "stats": {
+      "total_value": {
+        "mean": 144.28571428571428,
+        "std": 62.4999047618322,
+        "n": 7
+      },
+      "selection_accuracy": {
+        "mean": 0.7721678679489468,
+        "std": 0.17658808206555102,
+        "n": 7
+      },
+      "property_accuracy": {
+        "mean": 0.36,
+        "std": 0.1986621923433512,
+        "n": 7
+      },
+      "rule_inference_accuracy": {
+        "mean": 0.45714285714285713,
+        "std": 0.28784916685156975,
+        "n": 7
+      },
+      "objective_inference_score": {
+        "mean": 0.16428571428571428,
+        "std": 0.12817398889233114,
+        "n": 7
+      },
+      "per_agent_objective_scores": {
+        "Agent_A": {
+          "mean": 0.1,
+          "std": 0.1,
+          "n": 7
+        },
+        "Agent_B": {
+          "mean": 0.22857142857142856,
+          "std": 0.19760470401187075,
+          "n": 7
+        }
+      },
+      "avg_n_conditions": {
+        "mean": 5.214285714285714,
+        "std": 0.5789342235218394,
+        "n": 14
+      },
+      "avg_confidence": {
+        "mean": 89.28571428571429,
+        "std": 7.559289460184544,
+        "n": 14
+      }
+    }
+  }
+}

@@ -1,0 +1,626 @@
+{
+  "multiple_choice_2_L1": {
+    "condition": {
+      "condition_id": "multiple_choice_2_L1",
+      "inference_mode": "multiple_choice_2",
+      "complexity": "L1"
+    },
+    "n_games": 10,
+    "stats": {
+      "total_value": {
+        "mean": 146,
+        "std": 61.949800466004554,
+        "n": 10
+      },
+      "selection_accuracy": {
+        "mean": 0.730013481443498,
+        "std": 0.20341794936942958,
+        "n": 10
+      },
+      "property_accuracy": {
+        "mean": 0.416,
+        "std": 0.17908408949739535,
+        "n": 10
+      },
+      "rule_inference_accuracy": {
+        "mean": 0.745,
+        "std": 0.1499073788117924,
+        "n": 10
+      },
+      "objective_inference_score": {
+        "mean": 0.85,
+        "std": 0.24152294576982397,
+        "n": 10
+      },
+      "per_agent_objective_scores": {
+        "Agent_A": {
+          "mean": 0.7,
+          "std": 0.48304589153964794,
+          "n": 10
+        },
+        "Agent_B": {
+          "mean": 1.0,
+          "std": 0.0,
+          "n": 10
+        }
+      },
+      "avg_confidence": {
+        "mean": 87.25,
+        "std": 21.056003019516663,
+        "n": 20
+      }
+    }
+  },
+  "multiple_choice_2_L5": {
+    "condition": {
+      "condition_id": "multiple_choice_2_L5",
+      "inference_mode": "multiple_choice_2",
+      "complexity": "L5"
+    },
+    "n_games": 10,
+    "stats": {
+      "total_value": {
+        "mean": 129.6,
+        "std": 36.17918370186554,
+        "n": 10
+      },
+      "selection_accuracy": {
+        "mean": 0.6495808283147735,
+        "std": 0.16269995032677392,
+        "n": 10
+      },
+      "property_accuracy": {
+        "mean": 0.394,
+        "std": 0.16574411335281597,
+        "n": 10
+      },
+      "rule_inference_accuracy": {
+        "mean": 0.7,
+        "std": 0.17638342073763938,
+        "n": 10
+      },
+      "objective_inference_score": {
+        "mean": 0.95,
+        "std": 0.15811388300841897,
+        "n": 10
+      },
+      "per_agent_objective_scores": {
+        "Agent_A": {
+          "mean": 1.0,
+          "std": 0.0,
+          "n": 10
+        },
+        "Agent_B": {
+          "mean": 0.9,
+          "std": 0.31622776601683794,
+          "n": 10
+        }
+      },
+      "avg_confidence": {
+        "mean": 90,
+        "std": 5.12989176042577,
+        "n": 20
+      }
+    }
+  },
+  "multiple_choice_4_L1": {
+    "condition": {
+      "condition_id": "multiple_choice_4_L1",
+      "inference_mode": "multiple_choice_4",
+      "complexity": "L1"
+    },
+    "n_games": 10,
+    "stats": {
+      "total_value": {
+        "mean": 154.5,
+        "std": 68.34755949475364,
+        "n": 10
+      },
+      "selection_accuracy": {
+        "mean": 0.7504349842543787,
+        "std": 0.2123273734921543,
+        "n": 10
+      },
+      "property_accuracy": {
+        "mean": 0.382,
+        "std": 0.18629725351348222,
+        "n": 10
+      },
+      "rule_inference_accuracy": {
+        "mean": 0.6516666666666666,
+        "std": 0.31627168349028306,
+        "n": 10
+      },
+      "objective_inference_score": {
+        "mean": 0.8,
+        "std": 0.25819888974716115,
+        "n": 10
+      },
+      "per_agent_objective_scores": {
+        "Agent_A": {
+          "mean": 0.6,
+          "std": 0.5163977794943223,
+          "n": 10
+        },
+        "Agent_B": {
+          "mean": 1.0,
+          "std": 0.0,
+          "n": 10
+        }
+      },
+      "avg_confidence": {
+        "mean": 91,
+        "std": 5.026246899500346,
+        "n": 20
+      }
+    }
+  },
+  "multiple_choice_4_L5": {
+    "condition": {
+      "condition_id": "multiple_choice_4_L5",
+      "inference_mode": "multiple_choice_4",
+      "complexity": "L5"
+    },
+    "n_games": 10,
+    "stats": {
+      "total_value": {
+        "mean": 149.5,
+        "std": 50.70009861923347,
+        "n": 10
+      },
+      "selection_accuracy": {
+        "mean": 0.7534407483507004,
+        "std": 0.20318703349343198,
+        "n": 10
+      },
+      "property_accuracy": {
+        "mean": 0.44,
+        "std": 0.16465452046971293,
+        "n": 10
+      },
+      "rule_inference_accuracy": {
+        "mean": 0.715,
+        "std": 0.18715709384839724,
+        "n": 10
+      },
+      "objective_inference_score": {
+        "mean": 1.0,
+        "std": 0.0,
+        "n": 10
+      },
+      "per_agent_objective_scores": {
+        "Agent_A": {
+          "mean": 1.0,
+          "std": 0.0,
+          "n": 10
+        },
+        "Agent_B": {
+          "mean": 1.0,
+          "std": 0.0,
+          "n": 10
+        }
+      },
+      "avg_confidence": {
+        "mean": 90.5,
+        "std": 5.104177855340404,
+        "n": 20
+      }
+    }
+  },
+  "multiple_choice_8_L1": {
+    "condition": {
+      "condition_id": "multiple_choice_8_L1",
+      "inference_mode": "multiple_choice_8",
+      "complexity": "L1"
+    },
+    "n_games": 7,
+    "stats": {
+      "total_value": {
+        "mean": 139.85714285714286,
+        "std": 72.08890014287584,
+        "n": 7
+      },
+      "selection_accuracy": {
+        "mean": 0.7506610960998455,
+        "std": 0.22349986352106627,
+        "n": 7
+      },
+      "property_accuracy": {
+        "mean": 0.4342857142857143,
+        "std": 0.13842653200129218,
+        "n": 7
+      },
+      "rule_inference_accuracy": {
+        "mean": 0.5857142857142857,
+        "std": 0.2528410002918265,
+        "n": 7
+      },
+      "objective_inference_score": {
+        "mean": 0.9928571428571429,
+        "std": 0.018898223650461378,
+        "n": 7
+      },
+      "per_agent_objective_scores": {
+        "Agent_A": {
+          "mean": 1.0,
+          "std": 0.0,
+          "n": 7
+        },
+        "Agent_B": {
+          "mean": 0.9857142857142858,
+          "std": 0.037796447300922714,
+          "n": 7
+        }
+      },
+      "avg_confidence": {
+        "mean": 92.14285714285714,
+        "std": 4.688072309384954,
+        "n": 14
+      }
+    }
+  },
+  "multiple_choice_8_L5": {
+    "condition": {
+      "condition_id": "multiple_choice_8_L5",
+      "inference_mode": "multiple_choice_8",
+      "complexity": "L5"
+    },
+    "n_games": 9,
+    "stats": {
+      "total_value": {
+        "mean": 168.33333333333334,
+        "std": 53.71917720888882,
+        "n": 9
+      },
+      "selection_accuracy": {
+        "mean": 0.8057203003134779,
+        "std": 0.1691373970208762,
+        "n": 9
+      },
+      "property_accuracy": {
+        "mean": 0.45555555555555555,
+        "std": 0.11907047399661168,
+        "n": 9
+      },
+      "rule_inference_accuracy": {
+        "mean": 0.6222222222222222,
+        "std": 0.21376258897301098,
+        "n": 9
+      },
+      "objective_inference_score": {
+        "mean": 0.9055555555555556,
+        "std": 0.19112241568632857,
+        "n": 9
+      },
+      "per_agent_objective_scores": {
+        "Agent_A": {
+          "mean": 0.9222222222222223,
+          "std": 0.23333333333333334,
+          "n": 9
+        },
+        "Agent_B": {
+          "mean": 0.8888888888888888,
+          "std": 0.3333333333333333,
+          "n": 9
+        }
+      },
+      "avg_confidence": {
+        "mean": 93.33333333333333,
+        "std": 3.834824944236852,
+        "n": 18
+      }
+    }
+  },
+  "multiple_choice_16_L1": {
+    "condition": {
+      "condition_id": "multiple_choice_16_L1",
+      "inference_mode": "multiple_choice_16",
+      "complexity": "L1"
+    },
+    "n_games": 10,
+    "stats": {
+      "total_value": {
+        "mean": 133.3,
+        "std": 60.01490555594409,
+        "n": 10
+      },
+      "selection_accuracy": {
+        "mean": 0.6592948848557533,
+        "std": 0.19752597778894898,
+        "n": 10
+      },
+      "property_accuracy": {
+        "mean": 0.47800000000000004,
+        "std": 0.23766456287053914,
+        "n": 10
+      },
+      "rule_inference_accuracy": {
+        "mean": 0.6,
+        "std": 0.24832774042918898,
+        "n": 10
+      },
+      "objective_inference_score": {
+        "mean": 0.94,
+        "std": 0.1559914527573012,
+        "n": 10
+      },
+      "per_agent_objective_scores": {
+        "Agent_A": {
+          "mean": 0.9,
+          "std": 0.31622776601683794,
+          "n": 10
+        },
+        "Agent_B": {
+          "mean": 0.98,
+          "std": 0.04216370213557838,
+          "n": 10
+        }
+      },
+      "avg_confidence": {
+        "mean": 92,
+        "std": 4.701623459816273,
+        "n": 20
+      }
+    }
+  },
+  "multiple_choice_16_L5": {
+    "condition": {
+      "condition_id": "multiple_choice_16_L5",
+      "inference_mode": "multiple_choice_16",
+      "complexity": "L5"
+    },
+    "n_games": 10,
+    "stats": {
+      "total_value": {
+        "mean": 128.4,
+        "std": 24.28625582962969,
+        "n": 10
+      },
+      "selection_accuracy": {
+        "mean": 0.6679913125696368,
+        "std": 0.17352385211724286,
+        "n": 10
+      },
+      "property_accuracy": {
+        "mean": 0.506,
+        "std": 0.1784002989534117,
+        "n": 10
+      },
+      "rule_inference_accuracy": {
+        "mean": 0.725,
+        "std": 0.1736055554666638,
+        "n": 10
+      },
+      "objective_inference_score": {
+        "mean": 0.96,
+        "std": 0.1264911064067352,
+        "n": 10
+      },
+      "per_agent_objective_scores": {
+        "Agent_A": {
+          "mean": 1.0,
+          "std": 0.0,
+          "n": 10
+        },
+        "Agent_B": {
+          "mean": 0.92,
+          "std": 0.25298221281347033,
+          "n": 10
+        }
+      },
+      "avg_confidence": {
+        "mean": 91.5,
+        "std": 4.8936048492959285,
+        "n": 20
+      }
+    }
+  },
+  "freeform_L1": {
+    "condition": {
+      "condition_id": "freeform_L1",
+      "inference_mode": "freeform",
+      "complexity": "L1"
+    },
+    "n_games": 10,
+    "stats": {
+      "total_value": {
+        "mean": 123.8,
+        "std": 75.51865111789714,
+        "n": 10
+      },
+      "selection_accuracy": {
+        "mean": 0.6039376366961123,
+        "std": 0.2434000478779854,
+        "n": 10
+      },
+      "property_accuracy": {
+        "mean": 0.42,
+        "std": 0.12754084313139327,
+        "n": 10
+      },
+      "rule_inference_accuracy": {
+        "mean": 0.635,
+        "std": 0.2779388421937459,
+        "n": 10
+      },
+      "objective_inference_score": {
+        "mean": 0.4,
+        "std": 0.291547594742265,
+        "n": 10
+      },
+      "per_agent_objective_scores": {
+        "Agent_A": {
+          "mean": 0.36,
+          "std": 0.44522154285504,
+          "n": 10
+        },
+        "Agent_B": {
+          "mean": 0.44,
+          "std": 0.33730961708462714,
+          "n": 10
+        }
+      },
+      "avg_confidence": {
+        "mean": 93,
+        "std": 4.103913408340617,
+        "n": 20
+      }
+    }
+  },
+  "freeform_L5": {
+    "condition": {
+      "condition_id": "freeform_L5",
+      "inference_mode": "freeform",
+      "complexity": "L5"
+    },
+    "n_games": 10,
+    "stats": {
+      "total_value": {
+        "mean": 133,
+        "std": 69.38299503480663,
+        "n": 10
+      },
+      "selection_accuracy": {
+        "mean": 0.6523332065777787,
+        "std": 0.23616324568411756,
+        "n": 10
+      },
+      "property_accuracy": {
+        "mean": 0.442,
+        "std": 0.18534052743831045,
+        "n": 10
+      },
+      "rule_inference_accuracy": {
+        "mean": 0.71,
+        "std": 0.2674987019698517,
+        "n": 10
+      },
+      "objective_inference_score": {
+        "mean": 0.21,
+        "std": 0.18973665961010275,
+        "n": 10
+      },
+      "per_agent_objective_scores": {
+        "Agent_A": {
+          "mean": 0.19,
+          "std": 0.26012817353502227,
+          "n": 10
+        },
+        "Agent_B": {
+          "mean": 0.22999999999999998,
+          "std": 0.24060109910158117,
+          "n": 10
+        }
+      },
+      "avg_confidence": {
+        "mean": 89.5,
+        "std": 5.104177855340404,
+        "n": 20
+      }
+    }
+  },
+  "structured_L1": {
+    "condition": {
+      "condition_id": "structured_L1",
+      "inference_mode": "structured",
+      "complexity": "L1"
+    },
+    "n_games": 10,
+    "stats": {
+      "total_value": {
+        "mean": 147.6,
+        "std": 67.19160000410105,
+        "n": 10
+      },
+      "selection_accuracy": {
+        "mean": 0.7328987064774868,
+        "std": 0.20997065358651573,
+        "n": 10
+      },
+      "property_accuracy": {
+        "mean": 0.468,
+        "std": 0.1995995991979944,
+        "n": 10
+      },
+      "rule_inference_accuracy": {
+        "mean": 0.6599999999999999,
+        "std": 0.22211108331943574,
+        "n": 10
+      },
+      "objective_inference_score": {
+        "mean": 0.345,
+        "std": 0.16574746520602426,
+        "n": 10
+      },
+      "per_agent_objective_scores": {
+        "Agent_A": {
+          "mean": 0.25,
+          "std": 0.23213980461973532,
+          "n": 10
+        },
+        "Agent_B": {
+          "mean": 0.44,
+          "std": 0.17126976771553504,
+          "n": 10
+        }
+      },
+      "avg_confidence": {
+        "mean": 89.7,
+        "std": 5.161599099422377,
+        "n": 20
+      }
+    }
+  },
+  "structured_L5": {
+    "condition": {
+      "condition_id": "structured_L5",
+      "inference_mode": "structured",
+      "complexity": "L5"
+    },
+    "n_games": 10,
+    "stats": {
+      "total_value": {
+        "mean": 150,
+        "std": 46.04104449051713,
+        "n": 10
+      },
+      "selection_accuracy": {
+        "mean": 0.7509316094892546,
+        "std": 0.15300416729066751,
+        "n": 10
+      },
+      "property_accuracy": {
+        "mean": 0.44,
+        "std": 0.20720360357226736,
+        "n": 10
+      },
+      "rule_inference_accuracy": {
+        "mean": 0.7849999999999999,
+        "std": 0.12703892666773003,
+        "n": 10
+      },
+      "objective_inference_score": {
+        "mean": 0.33,
+        "std": 0.11105554165971787,
+        "n": 10
+      },
+      "per_agent_objective_scores": {
+        "Agent_A": {
+          "mean": 0.3,
+          "std": 0.22110831935702666,
+          "n": 10
+        },
+        "Agent_B": {
+          "mean": 0.36,
+          "std": 0.20655911179772887,
+          "n": 10
+        }
+      },
+      "avg_confidence": {
+        "mean": 91.3,
+        "std": 2.5975697143777743,
+        "n": 20
+      }
+    }
+  }
+}
