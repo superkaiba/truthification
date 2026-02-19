@@ -1,0 +1,275 @@
+{
+  "summary": {
+    "0": {
+      "mean_accuracy": 0.45999999999999996,
+      "std_accuracy": 0.034641016151377546,
+      "mean_oracle_used": 0,
+      "n": 3
+    },
+    "1": {
+      "mean_accuracy": 0.38,
+      "std_accuracy": 0.13114877048604,
+      "mean_oracle_used": 1,
+      "n": 3
+    },
+    "2": {
+      "mean_accuracy": 0.5,
+      "std_accuracy": 0.14,
+      "mean_oracle_used": 2,
+      "n": 3
+    },
+    "3": {
+      "mean_accuracy": 0.4866666666666667,
+      "std_accuracy": 0.13316656236958785,
+      "mean_oracle_used": 3,
+      "n": 3
+    },
+    "4": {
+      "mean_accuracy": 0.6,
+      "std_accuracy": 0.07211102550927981,
+      "mean_oracle_used": 4,
+      "n": 3
+    },
+    "5": {
+      "mean_accuracy": 0.5333333333333333,
+      "std_accuracy": 0.1361371857110809,
+      "mean_oracle_used": 5,
+      "n": 3
+    },
+    "6": {
+      "mean_accuracy": 0.56,
+      "std_accuracy": 0.15620499351813308,
+      "mean_oracle_used": 6,
+      "n": 3
+    },
+    "7": {
+      "mean_accuracy": 0.49333333333333335,
+      "std_accuracy": 0.09451631252505216,
+      "mean_oracle_used": 7,
+      "n": 3
+    },
+    "8": {
+      "mean_accuracy": 0.5866666666666667,
+      "std_accuracy": 0.17009801096230767,
+      "mean_oracle_used": 8,
+      "n": 3
+    }
+  },
+  "all_results": [
+    {
+      "oracle_budget": 0,
+      "seed": 42,
+      "property_accuracy": 0.42,
+      "oracle_queries_used": 0,
+      "total_value": 135
+    },
+    {
+      "oracle_budget": 0,
+      "seed": 123,
+      "property_accuracy": 0.48,
+      "oracle_queries_used": 0,
+      "total_value": 126
+    },
+    {
+      "oracle_budget": 0,
+      "seed": 456,
+      "property_accuracy": 0.48,
+      "oracle_queries_used": 0,
+      "total_value": 186
+    },
+    {
+      "oracle_budget": 1,
+      "seed": 42,
+      "property_accuracy": 0.4,
+      "oracle_queries_used": 1,
+      "total_value": 117
+    },
+    {
+      "oracle_budget": 1,
+      "seed": 123,
+      "property_accuracy": 0.5,
+      "oracle_queries_used": 1,
+      "total_value": 130
+    },
+    {
+      "oracle_budget": 1,
+      "seed": 456,
+      "property_accuracy": 0.24,
+      "oracle_queries_used": 1,
+      "total_value": 154
+    },
+    {
+      "oracle_budget": 2,
+      "seed": 42,
+      "property_accuracy": 0.66,
+      "oracle_queries_used": 2,
+      "total_value": 77
+    },
+    {
+      "oracle_budget": 2,
+      "seed": 123,
+      "property_accuracy": 0.4,
+      "oracle_queries_used": 2,
+      "total_value": 130
+    },
+    {
+      "oracle_budget": 2,
+      "seed": 456,
+      "property_accuracy": 0.44,
+      "oracle_queries_used": 2,
+      "total_value": 169
+    },
+    {
+      "oracle_budget": 3,
+      "seed": 42,
+      "property_accuracy": 0.52,
+      "oracle_queries_used": 3,
+      "total_value": 130
+    },
+    {
+      "oracle_budget": 3,
+      "seed": 123,
+      "property_accuracy": 0.34,
+      "oracle_queries_used": 3,
+      "total_value": 128
+    },
+    {
+      "oracle_budget": 3,
+      "seed": 456,
+      "property_accuracy": 0.6,
+      "oracle_queries_used": 3,
+      "total_value": 141
+    },
+    {
+      "oracle_budget": 4,
+      "seed": 42,
+      "property_accuracy": 0.58,
+      "oracle_queries_used": 4,
+      "total_value": 135
+    },
+    {
+      "oracle_budget": 4,
+      "seed": 123,
+      "property_accuracy": 0.68,
+      "oracle_queries_used": 4,
+      "total_value": 128
+    },
+    {
+      "oracle_budget": 4,
+      "seed": 456,
+      "property_accuracy": 0.54,
+      "oracle_queries_used": 4,
+      "total_value": 122
+    },
+    {
+      "oracle_budget": 5,
+      "seed": 42,
+      "property_accuracy": 0.38,
+      "oracle_queries_used": 5,
+      "total_value": 125
+    },
+    {
+      "oracle_budget": 5,
+      "seed": 123,
+      "property_accuracy": 0.58,
+      "oracle_queries_used": 5,
+      "total_value": 81
+    },
+    {
+      "oracle_budget": 5,
+      "seed": 456,
+      "property_accuracy": 0.64,
+      "oracle_queries_used": 5,
+      "total_value": 183
+    },
+    {
+      "oracle_budget": 6,
+      "seed": 42,
+      "property_accuracy": 0.74,
+      "oracle_queries_used": 6,
+      "total_value": 112
+    },
+    {
+      "oracle_budget": 6,
+      "seed": 123,
+      "property_accuracy": 0.46,
+      "oracle_queries_used": 6,
+      "total_value": 118
+    },
+    {
+      "oracle_budget": 6,
+      "seed": 456,
+      "property_accuracy": 0.48,
+      "oracle_queries_used": 6,
+      "total_value": 134
+    },
+    {
+      "oracle_budget": 7,
+      "seed": 42,
+      "property_accuracy": 0.6,
+      "oracle_queries_used": 7,
+      "total_value": 135
+    },
+    {
+      "oracle_budget": 7,
+      "seed": 123,
+      "property_accuracy": 0.46,
+      "oracle_queries_used": 7,
+      "total_value": 63
+    },
+    {
+      "oracle_budget": 7,
+      "seed": 456,
+      "property_accuracy": 0.42,
+      "oracle_queries_used": 7,
+      "total_value": 183
+    },
+    {
+      "oracle_budget": 8,
+      "seed": 42,
+      "property_accuracy": 0.76,
+      "oracle_queries_used": 8,
+      "total_value": 123
+    },
+    {
+      "oracle_budget": 8,
+      "seed": 123,
+      "property_accuracy": 0.58,
+      "oracle_queries_used": 8,
+      "total_value": 126
+    },
+    {
+      "oracle_budget": 8,
+      "seed": 456,
+      "property_accuracy": 0.42,
+      "oracle_queries_used": 8,
+      "total_value": 151
+    }
+  ],
+  "config": {
+    "n_objects": 10,
+    "n_agents": 2,
+    "n_rounds": 10,
+    "selection_size": 5,
+    "condition": "interests",
+    "rule_complexity": "medium",
+    "enable_estimator": false,
+    "force_oracle": true
+  },
+  "oracle_budgets": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "seeds": [
+    42,
+    123,
+    456
+  ]
+}

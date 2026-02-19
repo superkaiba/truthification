@@ -1,0 +1,30 @@
+{
+  "summary": {},
+  "all_results": [],
+  "config": {
+    "n_objects": 10,
+    "n_agents": 2,
+    "n_rounds": 10,
+    "selection_size": 5,
+    "condition": "interests",
+    "rule_complexity": "medium",
+    "enable_estimator": false,
+    "force_oracle": true
+  },
+  "oracle_budgets": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "seeds": [
+    42,
+    123,
+    456
+  ]
+}
