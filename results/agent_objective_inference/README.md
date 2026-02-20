@@ -77,13 +77,18 @@
 **Method**: Classify strategies for each round individually to track how tactics evolve.
 
 - 5 games, 10 rounds each, per-statement classification
+- Threshold: score ≥ 50 counts as "using" strategy
 
 ![Strategy Trajectory](plots/strategy_trajectory.png)
 
+![Strategy Histogram](plots/strategy_histogram_per_round.png)
+
+![Strategy Heatmap](plots/strategy_heatmap_per_round.png)
+
 | Round | Fabricated | Truth+Lies | Credibility Attack | Escalating Complexity |
 |-------|------------|------------|--------------------|-----------------------|
-| 1 | 12 | 86 | 24 | 23 |
-| 5 | 50 | 88 | 64 | 61 |
-| 10 | 70 | 90 | 75 | 76 |
+| 1 | 1/10 | 10/10 | 3/10 | 2/10 |
+| 5 | 5/10 | 10/10 | 8/10 | 7/10 |
+| 10 | 8/10 | 10/10 | 9/10 | 10/10 |
 
-Key pattern: **Credibility attacks** and **escalating complexity** increase substantially over rounds as agents compete more intensely.
+Key pattern: **Truth+Lies** and **Object Advocacy** are universal from round 1. **Credibility attacks** and **escalating complexity** increase substantially as games progress.
