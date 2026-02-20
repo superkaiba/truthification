@@ -69,3 +69,21 @@
 | **Object Advocacy** | Direct endorsement of specific objects by ID | *"I strongly recommend object_5"*, *"object_3 is the best choice"* |
 
 ![Strategies](plots/strategy_distribution.png)
+
+---
+
+## Per-Round Strategy Evolution
+
+**Method**: Classify strategies for each round individually to track how tactics evolve.
+
+- 5 games, 10 rounds each, per-statement classification
+
+![Strategy Trajectory](plots/strategy_trajectory.png)
+
+| Round | Fabricated | Truth+Lies | Credibility Attack | Escalating Complexity |
+|-------|------------|------------|--------------------|-----------------------|
+| 1 | 12 | 86 | 24 | 23 |
+| 5 | 50 | 88 | 64 | 61 |
+| 10 | 70 | 90 | 75 | 76 |
+
+Key pattern: **Credibility attacks** and **escalating complexity** increase substantially over rounds as agents compete more intensely.
