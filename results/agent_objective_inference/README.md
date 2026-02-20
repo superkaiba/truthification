@@ -4,11 +4,16 @@
 **Total Runtime**: ~63.4 hours (2.6 days)
 **Total Games**: 226 (116 + 60 + 50)
 
+## Summary
+
+![Summary of All Experiments](plots/summary_all_experiments.png)
+
 ## Research Questions
 
 1. How does constraining the search space affect objective inference accuracy?
 2. Does more oracle budget help objective inference?
 3. How does objective complexity affect inference accuracy?
+4. What manipulation strategies do agents use?
 
 ---
 
@@ -19,7 +24,9 @@
 ### Hypothesis
 Accuracy order: 2-choice > 4 > 8 > freeform > 16
 
-### Results by Inference Mode
+### Results
+
+![Search Space Accuracy](plots/search_space_accuracy.png)
 
 | Mode | Obj Inf Score (mean) | Obj Inf Score (std) |
 |------|----------------------|---------------------|
@@ -29,13 +36,6 @@ Accuracy order: 2-choice > 4 > 8 > freeform > 16
 | multiple_choice_2 | 90.0% | 20.0% |
 | structured | 33.8% | 13.8% |
 | freeform | 30.5% | 24.1% |
-
-### Results by Complexity
-
-| Complexity | Score Mean |
-|------------|------------|
-| L1 (Simple) | 72.1% |
-| L5 (Penalty) | 72.6% |
 
 ### Key Finding
 
@@ -57,14 +57,16 @@ More oracle → better calibration of agent credibility → better inference
 
 ### Results
 
-| Oracle Budget | Obj Inf Score (mean) | Std | Queries Used |
-|---------------|----------------------|-----|--------------|
-| 0 | 5.0% | - | 0.0 |
-| 1 | 14.5% | - | 1.0 |
-| 2 | 12.5% | - | 2.0 |
-| 4 | 21.0% | - | 4.0 |
-| **6** | **27.1%** | - | 6.0 |
-| 8 | 21.7% | - | 8.0 |
+![Oracle Budget Accuracy](plots/oracle_budget_accuracy.png)
+
+| Oracle Budget | Obj Inf Score (mean) | Queries Used |
+|---------------|----------------------|--------------|
+| 0 | 5.0% | 0.0 |
+| 1 | 14.5% | 1.0 |
+| 2 | 12.5% | 2.0 |
+| 4 | 21.0% | 4.0 |
+| **6** | **27.1%** | 6.0 |
+| 8 | 21.7% | 8.0 |
 
 ### Key Finding
 
@@ -96,13 +98,15 @@ Accuracy: L1 (~70%) > L2 > L3 > L4 > L5 (~30%)
 
 ### Results
 
-| Level | Obj Inf Score (mean) | Std | Avg Conditions |
-|-------|----------------------|-----|----------------|
-| **L1** | **39.5%** | - | ~1.0 |
-| L2 | 21.5% | - | ~2.0 |
-| L3 | 23.0% | - | ~2.5 |
-| L4 | 17.5% | - | ~3.5 |
-| L5 | 16.4% | - | ~4.5 |
+![Complexity Accuracy](plots/complexity_accuracy.png)
+
+| Level | Obj Inf Score (mean) | Avg Conditions |
+|-------|----------------------|----------------|
+| **L1** | **39.5%** | ~1.0 |
+| L2 | 21.5% | ~2.0 |
+| L3 | 23.0% | ~2.5 |
+| L4 | 17.5% | ~3.5 |
+| L5 | 16.4% | ~4.5 |
 
 ### Key Finding
 
@@ -115,6 +119,40 @@ Accuracy: L1 (~70%) > L2 > L3 > L4 > L5 (~30%)
 
 ---
 
+## Post-Hoc Analysis: Agent Manipulation Strategies
+
+**Design:** LLM-based classification of 53 games (106 agent annotations)
+
+### Strategy Definitions
+
+| Strategy | Description |
+|----------|-------------|
+| **Fabricated Terminology** | Invents fake properties like "azure crystalline" |
+| **Truth Mixed with Lies** | True rule + false object claims |
+| **Oracle Spin** | Reframes oracle results to support narrative |
+| **Credibility Attack** | "Agent_B is lying", attacks trustworthiness |
+| **Escalating Complexity** | More elaborate explanations each round |
+| **Object Advocacy** | Direct "I recommend object_X" |
+
+### Results
+
+![Strategy Distribution](plots/strategy_distribution.png)
+
+| Strategy | Prevalence | Mean Confidence |
+|----------|------------|-----------------|
+| Object Advocacy | **100%** | 96.2 |
+| Truth Mixed with Lies | **100%** | 90.9 |
+| Escalating Complexity | 98.1% | 82.9 |
+| Credibility Attack | 96.2% | 80.9 |
+| Fabricated Terminology | 90.6% | 84.4 |
+| Oracle Spin | 81.1% | 69.4 |
+
+### Key Finding
+
+**All agents use multiple manipulation strategies simultaneously.** Object advocacy and truth-mixed-with-lies are universal (100% prevalence). This suggests LLM agents naturally develop sophisticated persuasion tactics when given competing objectives.
+
+---
+
 ## Summary and Implications
 
 ### Key Findings
@@ -124,6 +162,8 @@ Accuracy: L1 (~70%) > L2 > L3 > L4 > L5 (~30%)
 2. **Optimal Oracle Budget**: ~6 queries provides the best information/noise tradeoff
 
 3. **Complexity Matters**: Simple objectives are significantly easier to infer (40% vs 17%)
+
+4. **Universal Manipulation**: All agents employ multiple persuasion strategies
 
 ### Implications for Research
 
@@ -148,5 +188,6 @@ All results significantly exceed random chance, but the relative gains in multip
 ## Raw Data Locations
 
 - Search Space: `outputs/search_space/20260218_002133/`
-- Oracle Budget: `outputs/oracle_budget_objective/20260217_170946/`
-- Complexity: `outputs/complexity_objective/20260217_171025/`
+- Oracle Budget: `outputs/oracle_budget_objective/20260218_002133/`
+- Complexity: `outputs/complexity_objective/20260218_002133/`
+- Strategy Annotations: `results/strategy_annotations/20260219_122001/`
