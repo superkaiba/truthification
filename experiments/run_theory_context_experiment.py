@@ -200,12 +200,82 @@ def compute_condition_stats(results: list[dict]) -> dict:
     return stats
 
 
-def run_experiment():
-    """Run the theory context experiment."""
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+def find_latest_run_dir(base_dir: Path) -> Path | None:
+    """Find the most recent run directory for resuming."""
+    if not base_dir.exists():
+        return None
+    subdirs = [d for d in base_dir.iterdir() if d.is_dir()]
+    if not subdirs:
+        return None
+    return sorted(subdirs)[-1]
+
+
+def load_existing_results(output_dir: Path) -> tuple[list[dict], dict[str, list[dict]], set[tuple[str, int]]]:
+    """Load existing results from a previous run."""
+    all_results = []
+    condition_results = {tc: [] for tc in THEORY_CONDITIONS}
+    completed_games = set()
+
+    if not output_dir.exists():
+        return all_results, condition_results, completed_games
+
+    for game_file in output_dir.glob("game_*.json"):
+        try:
+            with open(game_file) as f:
+                result = json.load(f)
+            condition = result.get("condition", {})
+            theory_context = condition.get("theory_context", "")
+            seed = result.get("seed")
+            if theory_context and seed is not None:
+                all_results.append(result)
+                if theory_context in condition_results:
+                    condition_results[theory_context].append(result)
+                completed_games.add((theory_context, seed))
+        except Exception as e:
+            print(f"Warning: Failed to load {game_file}: {e}")
+
+    return all_results, condition_results, completed_games
+
+
+def run_experiment(resume_dir: str | None = None):
+    """Run the theory context experiment.
+
+    Args:
+        resume_dir: Optional path to previous run directory to resume from.
+    """
+    base_output_dir = Path("outputs/theory_context_experiment")
+
+    if resume_dir:
+        output_dir = Path(resume_dir)
+        timestamp = output_dir.name
+        print(f"Resuming from: {output_dir}")
+    else:
+        latest_dir = find_latest_run_dir(base_output_dir)
+        if latest_dir:
+            completed = list(latest_dir.glob("game_*.json"))
+            total_expected = len(THEORY_CONDITIONS) * len(SEEDS)
+            if len(completed) < total_expected:
+                print(f"Found incomplete run at {latest_dir}")
+                print(f"  Completed: {len(completed)}/{total_expected} games")
+                response = input("Resume this run? [Y/n]: ").strip().lower()
+                if response != 'n':
+                    output_dir = latest_dir
+                    timestamp = latest_dir.name
+                else:
+                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    output_dir = base_output_dir / timestamp
+            else:
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                output_dir = base_output_dir / timestamp
+        else:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            output_dir = base_output_dir / timestamp
 
     conditions = [ExperimentCondition(theory_context=tc) for tc in THEORY_CONDITIONS]
     total_games = len(conditions) * len(SEEDS)
+
+    all_results, condition_results, completed_games = load_existing_results(output_dir)
+    n_completed = len(completed_games)
 
     print(f"\n{'='*70}")
     print("Experiment: Theoretical Context for Objective Inference")
@@ -213,12 +283,13 @@ def run_experiment():
     print(f"Theory contexts: {THEORY_CONDITIONS}")
     print(f"Seeds per condition: {len(SEEDS)}")
     print(f"Total games: {total_games}")
+    if n_completed > 0:
+        print(f"Already completed: {n_completed} games (resuming)")
     print(f"Complexity: L3 (3 properties)")
     print(f"CoT Access: False (testing theory on observable behavior)")
     print(f"Deception Strategy: baseline (isolating theory context effect)")
     print(f"{'='*70}\n")
 
-    # Initialize wandb
     wandb_run = wandb.init(
         project="truthification",
         name=f"theory-context-experiment-{timestamp}",
@@ -229,20 +300,14 @@ def run_experiment():
             "total_games": total_games,
             **BASE_CONFIG,
         },
+        resume="allow",
     )
 
-    # Output directories
-    output_dir = Path("outputs/theory_context_experiment") / timestamp
     output_dir.mkdir(parents=True, exist_ok=True)
-
     results_dir = Path("results/theory_context_experiment")
     results_dir.mkdir(parents=True, exist_ok=True)
 
-    # Track results
-    all_results = []
-    condition_results = {tc: [] for tc in THEORY_CONDITIONS}
-
-    game_count = 0
+    game_count = n_completed
     start_time = time.time()
 
     for condition in conditions:
@@ -250,8 +315,14 @@ def run_experiment():
 
         for seed in SEEDS:
             game_count += 1
+
+            if (condition.theory_context, seed) in completed_games:
+                print(f"  [{game_count}/{total_games}] seed={seed} - SKIPPED (already done)")
+                continue
+
             elapsed = time.time() - start_time
-            eta = (elapsed / game_count) * (total_games - game_count) if game_count > 0 else 0
+            games_run = game_count - n_completed
+            eta = (elapsed / games_run) * (total_games - game_count) if games_run > 0 else 0
 
             print(f"  [{game_count}/{total_games}] seed={seed} (ETA: {eta/60:.1f}m)...", end=" ", flush=True)
 
@@ -263,12 +334,10 @@ def run_experiment():
                 all_results.append(result)
                 condition_results[condition.theory_context].append(result)
 
-                # Save individual game result
                 game_file = output_dir / f"game_{condition.theory_context}_seed{seed}.json"
                 with open(game_file, "w") as f:
                     json.dump(result, f, indent=2)
 
-                # Quick summary
                 obj_score = result.get("agent_objective_overall_score", 0)
                 print(f"done ({game_elapsed:.0f}s) - F1: {obj_score*100:.1f}%")
 
@@ -567,4 +636,6 @@ def create_summary_markdown(condition_stats: dict, condition_results: dict, tota
 
 
 if __name__ == "__main__":
-    run_experiment()
+    import sys
+    resume_dir = sys.argv[1] if len(sys.argv) > 1 else None
+    run_experiment(resume_dir=resume_dir)

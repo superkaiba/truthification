@@ -199,12 +199,100 @@ def compute_condition_stats(results: list[dict]) -> dict:
     return stats
 
 
-def run_experiment():
-    """Run the agent communication strategy experiment."""
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+def find_latest_run_dir(base_dir: Path) -> Path | None:
+    """Find the most recent run directory for resuming."""
+    if not base_dir.exists():
+        return None
+    subdirs = [d for d in base_dir.iterdir() if d.is_dir()]
+    if not subdirs:
+        return None
+    # Sort by name (timestamp format ensures chronological order)
+    return sorted(subdirs)[-1]
+
+
+def load_existing_results(output_dir: Path) -> tuple[list[dict], dict[str, list[dict]], set[tuple[str, int]]]:
+    """Load existing results from a previous run.
+
+    Returns:
+        Tuple of (all_results, condition_results, completed_games)
+        where completed_games is a set of (strategy, seed) tuples
+    """
+    all_results = []
+    condition_results = {s: [] for s in STRATEGIES}
+    completed_games = set()
+
+    if not output_dir.exists():
+        return all_results, condition_results, completed_games
+
+    for game_file in output_dir.glob("game_*.json"):
+        try:
+            with open(game_file) as f:
+                result = json.load(f)
+
+            # Extract strategy and seed from filename or result
+            condition = result.get("condition", {})
+            strategy = condition.get("agent_communication_strategy", "")
+            seed = result.get("seed")
+
+            if strategy and seed is not None:
+                all_results.append(result)
+                if strategy in condition_results:
+                    condition_results[strategy].append(result)
+                completed_games.add((strategy, seed))
+        except Exception as e:
+            print(f"Warning: Failed to load {game_file}: {e}")
+
+    return all_results, condition_results, completed_games
+
+
+def run_experiment(resume_dir: str | None = None):
+    """Run the agent communication strategy experiment.
+
+    Args:
+        resume_dir: Optional path to previous run directory to resume from.
+                   If None and previous runs exist, will prompt to resume latest.
+    """
+    # Check for existing runs
+    base_output_dir = Path("outputs/agent_strategy_inference")
+
+    if resume_dir:
+        output_dir = Path(resume_dir)
+        if not output_dir.exists():
+            print(f"Resume directory not found: {resume_dir}")
+            return None
+        timestamp = output_dir.name
+        print(f"Resuming from: {output_dir}")
+    else:
+        # Check if there's a previous run we can resume
+        latest_dir = find_latest_run_dir(base_output_dir)
+        if latest_dir:
+            # Check how many games are completed
+            completed = list(latest_dir.glob("game_*.json"))
+            total_expected = len(STRATEGIES) * len(SEEDS)
+            if len(completed) < total_expected:
+                print(f"Found incomplete run at {latest_dir}")
+                print(f"  Completed: {len(completed)}/{total_expected} games")
+                response = input("Resume this run? [Y/n]: ").strip().lower()
+                if response != 'n':
+                    output_dir = latest_dir
+                    timestamp = latest_dir.name
+                    print(f"Resuming from: {output_dir}")
+                else:
+                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    output_dir = base_output_dir / timestamp
+            else:
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                output_dir = base_output_dir / timestamp
+        else:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            output_dir = base_output_dir / timestamp
 
     conditions = [ExperimentCondition(strategy=s) for s in STRATEGIES]
     total_games = len(conditions) * len(SEEDS)
+
+    # Load existing results if resuming
+    all_results, condition_results, completed_games = load_existing_results(output_dir)
+    n_completed = len(completed_games)
 
     print(f"\n{'='*70}")
     print("Experiment: Agent Communication Strategy Effect on Objective Inference")
@@ -212,11 +300,13 @@ def run_experiment():
     print(f"Strategies: {STRATEGIES}")
     print(f"Seeds per strategy: {len(SEEDS)}")
     print(f"Total games: {total_games}")
+    if n_completed > 0:
+        print(f"Already completed: {n_completed} games (resuming)")
     print(f"Complexity: L3 (3 properties)")
     print(f"CoT Access: False (testing on observable behavior)")
     print(f"{'='*70}\n")
 
-    # Initialize wandb
+    # Initialize wandb (resume if possible)
     wandb_run = wandb.init(
         project="truthification",
         name=f"agent-strategy-inference-{timestamp}",
@@ -227,20 +317,16 @@ def run_experiment():
             "total_games": total_games,
             **BASE_CONFIG,
         },
+        resume="allow",
     )
 
     # Output directories
-    output_dir = Path("outputs/agent_strategy_inference") / timestamp
     output_dir.mkdir(parents=True, exist_ok=True)
 
     results_dir = Path("results/agent_strategy_inference")
     results_dir.mkdir(parents=True, exist_ok=True)
 
-    # Track results
-    all_results = []
-    condition_results = {s: [] for s in STRATEGIES}
-
-    game_count = 0
+    game_count = n_completed
     start_time = time.time()
 
     for condition in conditions:
@@ -248,8 +334,15 @@ def run_experiment():
 
         for seed in SEEDS:
             game_count += 1
+
+            # Skip if already completed
+            if (condition.strategy, seed) in completed_games:
+                print(f"  [{game_count}/{total_games}] seed={seed} - SKIPPED (already done)")
+                continue
+
             elapsed = time.time() - start_time
-            eta = (elapsed / game_count) * (total_games - game_count) if game_count > 0 else 0
+            games_run = game_count - n_completed
+            eta = (elapsed / games_run) * (total_games - game_count) if games_run > 0 else 0
 
             print(f"  [{game_count}/{total_games}] seed={seed} (ETA: {eta/60:.1f}m)...", end=" ", flush=True)
 
@@ -573,4 +666,6 @@ def create_summary_markdown(condition_stats: dict, condition_results: dict, tota
 
 
 if __name__ == "__main__":
-    run_experiment()
+    import sys
+    resume_dir = sys.argv[1] if len(sys.argv) > 1 else None
+    run_experiment(resume_dir=resume_dir)
