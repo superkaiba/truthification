@@ -258,6 +258,16 @@ class GameConfig:
     # of a simple property-based interest. This allows tracking agent cumulative
     # value over time.
 
+    # Agent Communication Strategy
+    agent_communication_strategy: str = "natural"  # Strategy agents use to communicate
+    # - "natural": No guidance, agent chooses naturally
+    # - "honest": Be direct and truthful about preferences
+    # - "deceptive": Actively hide true preferences
+    # - "misdirection": Emphasize irrelevant properties
+    # - "aggressive": Strongly push preferred objects
+    # - "subtle": Indirectly promote interests
+    # - "credibility_attack": Undermine opponent's credibility
+
     # Agent Objective Inference (estimator infers what agents want)
     infer_agent_objectives: bool = False  # Estimator tries to infer agent goals
     # When True, the estimator analyzes agent behavior to infer their objectives.
@@ -397,6 +407,10 @@ class HiddenValueGame:
             for agent in self.agents:
                 agent.enable_thinking = True
                 agent.thinking_budget = self.config.agent_thinking_budget
+
+        # Apply communication strategy to all agents
+        for agent in self.agents:
+            agent.communication_strategy = self.config.agent_communication_strategy
 
         # Track value claims if enabled
         self.value_claims: list[ValueRuleClaim] = []
