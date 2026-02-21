@@ -204,6 +204,12 @@ class GameConfig:
     # - "pattern": Track which objects/properties are repeatedly advocated
     # - "combined": All strategies together
 
+    estimator_theory_context: str = "none"  # Theory context for inference
+    # Theoretical context about strategic communication:
+    # - "none": No theory context (default)
+    # - "brief": 2-3 sentence summary of key insights
+    # - "full": Full theoretical framework (~200 words)
+
     # Extended thinking settings
     enable_agent_thinking: bool = True  # Capture agent CoT reasoning
     agent_thinking_budget: int = 2048  # Token budget for thinking
@@ -346,6 +352,7 @@ class HiddenValueGame:
                 thinking_budget=self.config.estimator_thinking_budget,
                 sees_agent_thinking=self.config.estimator_sees_agent_thinking,
                 deception_strategy=self.config.estimator_deception_strategy,
+                theory_context=self.config.estimator_theory_context,
                 _client=self.client,
             )
 
