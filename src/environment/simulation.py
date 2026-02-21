@@ -193,6 +193,16 @@ class GameConfig:
     # Estimator settings
     enable_estimator: bool = False
     estimator_model: str = "claude-sonnet-4-20250514"
+    enable_estimator_thinking: bool = True  # Capture estimator CoT reasoning
+    estimator_thinking_budget: int = 5000  # Token budget for estimator thinking
+    estimator_sees_agent_thinking: bool = False  # Estimator sees agents' CoT (for experiments)
+    estimator_deception_strategy: str = "baseline"  # Deception detection strategy
+    # Strategy for detecting deceptive agent behavior:
+    # - "baseline": Standard inference with no special guidance
+    # - "consistency": Check for contradictions across statements
+    # - "incentive": Analyze what agent gains from each claim
+    # - "pattern": Track which objects/properties are repeatedly advocated
+    # - "combined": All strategies together
 
     # Extended thinking settings
     enable_agent_thinking: bool = True  # Capture agent CoT reasoning
@@ -256,6 +266,14 @@ class GameConfig:
     # - "multiple_choice_8": 1 correct, 7 distractors
     # - "multiple_choice_16": 1 correct, 15 distractors
     # - "structured": Select from enumerated property=value pairs
+    # - "principled": Estimator told N, predicts exactly N property=value pairs
+    #   (uses deterministic overlap scoring instead of LLM judge)
+
+    # Simple Value Functions (principled evaluation)
+    use_simple_value_functions: bool = True
+    # When True (default), uses SimpleValueFunction with N property=value pairs
+    # instead of the legacy AgentValueFunction with bonuses/combos/penalties.
+    # This enables principled, deterministic evaluation via property overlap metrics.
 
     # Random Oracle (for ablation experiments)
     random_oracle: bool = False  # Use random queries instead of strategic queries
@@ -324,6 +342,10 @@ class HiddenValueGame:
             self.estimator = Estimator(
                 model=self.config.estimator_model,
                 condition=self.config.condition,
+                enable_thinking=self.config.enable_estimator_thinking,
+                thinking_budget=self.config.estimator_thinking_budget,
+                sees_agent_thinking=self.config.estimator_sees_agent_thinking,
+                deception_strategy=self.config.estimator_deception_strategy,
                 _client=self.client,
             )
 
@@ -339,13 +361,14 @@ class HiddenValueGame:
     def _create_agents(self) -> None:
         """Create agents with conflicting interests or value functions."""
         if self.config.use_agent_value_functions:
-            # Create agents with complex value functions
+            # Create agents with value functions
             self.agents = create_agents_with_value_functions(
                 num_agents=self.config.n_agents,
                 complexity=self.config.agent_value_function_complexity,
                 seed=self.config.seed,
                 client=self.client,
                 model=self.config.agent_model,
+                use_simple=self.config.use_simple_value_functions,
             )
         elif self.config.n_agents == 2:
             agent_a, agent_b = create_conflicting_agents(
@@ -2317,11 +2340,34 @@ Respond with JSON:
                     world=self.world,
                     n_choices=n_choices,
                 )
+                # Evaluate with LLM judge
+                result = self.estimator.evaluate_objective_inference(
+                    inferences=inferences,
+                    agents=agent_dicts,
+                )
             elif inference_mode == "structured":
                 inferences = self.estimator.infer_agent_objectives_structured(
                     all_statements=all_statements,
                     agents=agent_dicts,
                     world=self.world,
+                )
+                # Evaluate with LLM judge
+                result = self.estimator.evaluate_objective_inference(
+                    inferences=inferences,
+                    agents=agent_dicts,
+                )
+            elif inference_mode == "principled":
+                # Principled mode: Estimator predicts N property=value pairs
+                # Uses deterministic overlap scoring instead of LLM judge
+                inferences = self.estimator.infer_agent_objectives_principled(
+                    all_statements=all_statements,
+                    agents=agent_dicts,
+                    world=self.world,
+                )
+                # Evaluate with deterministic overlap metrics
+                result = self.estimator.evaluate_objective_inference_overlap(
+                    inferences=inferences,
+                    agents=agent_dicts,
                 )
             else:  # "freeform" or default
                 inferences = self.estimator.infer_agent_objectives(
@@ -2329,12 +2375,11 @@ Respond with JSON:
                     agents=agent_dicts,
                     world=self.world,
                 )
-
-            # Evaluate inferences with LLM judge
-            result = self.estimator.evaluate_objective_inference(
-                inferences=inferences,
-                agents=agent_dicts,
-            )
+                # Evaluate with LLM judge
+                result = self.estimator.evaluate_objective_inference(
+                    inferences=inferences,
+                    agents=agent_dicts,
+                )
 
             # Convert to serializable dict
             agent_objective_inference = {
@@ -2347,11 +2392,22 @@ Respond with JSON:
                     "inference_mode": inf.inference_mode,
                     "selected_option": inf.selected_option,
                     "n_options": inf.n_options,
+                    # New fields for principled mode
+                    "predicted_properties": inf.predicted_properties,
+                    "n_properties": inf.n_properties,
+                    # Extended thinking
+                    "thinking": inf.thinking,
                 }
                 for agent_id, inf in result.agent_inferences.items()
             }
             agent_objective_scores = result.evaluation_scores
             agent_objective_overall_score = result.overall_score
+
+            # Add overlap scores if available (for principled mode)
+            if result.overlap_scores:
+                for agent_id, overlap in result.overlap_scores.items():
+                    if agent_id in agent_objective_inference:
+                        agent_objective_inference[agent_id]["overlap_metrics"] = overlap.to_dict()
 
             # Add to estimator metrics
             if estimator_metrics:
@@ -2446,6 +2502,7 @@ Respond with JSON:
                 # Agent value function settings
                 "use_agent_value_functions": self.config.use_agent_value_functions,
                 "agent_value_function_complexity": self.config.agent_value_function_complexity,
+                "use_simple_value_functions": self.config.use_simple_value_functions,
                 # Agent objective inference
                 "infer_agent_objectives": self.config.infer_agent_objectives,
                 "objective_inference_mode": self.config.objective_inference_mode,
@@ -2491,6 +2548,7 @@ def run_game(
     oracle_timing: str = "before_response",
     use_agent_value_functions: bool = False,
     agent_value_function_complexity: str = "medium",
+    use_simple_value_functions: bool = True,
     infer_agent_objectives: bool = False,
     objective_inference_mode: str = "freeform",
     random_oracle: bool = False,
@@ -2562,6 +2620,7 @@ def run_game(
         oracle_timing=oracle_timing,
         use_agent_value_functions=use_agent_value_functions,
         agent_value_function_complexity=agent_value_function_complexity,
+        use_simple_value_functions=use_simple_value_functions,
         infer_agent_objectives=infer_agent_objectives,
         objective_inference_mode=objective_inference_mode,
         random_oracle=random_oracle,
