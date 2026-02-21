@@ -132,15 +132,15 @@ class Agent:
 
     Agent goals can be specified in two ways:
     1. Simple interest (AgentInterest): Single property condition (backwards compatible)
-    2. Complex value function (AgentValueFunction): Multi-factor value function
-       like the judge's, but with different preferences.
+    2. Value function (SimpleValueFunction or AgentValueFunction): Multi-factor
+       value function with different preferences.
 
     When value_function is set, it takes precedence over interest.
     """
 
     id: str
     interest: AgentInterest
-    value_function: AgentValueFunction | None = None  # Complex value function (overrides interest)
+    value_function: "AgentValueFunction | SimpleValueFunction | None" = None  # Value function (overrides interest)
     knows_value_rule: bool = True
     enable_thinking: bool = False  # Enable extended thinking to capture CoT
     thinking_budget: int = 2048  # Token budget for thinking
@@ -300,13 +300,25 @@ Format: Return one statement per line, no numbering or prefixes."""
         lines = [f"Maximize your value according to YOUR value function:"]
         lines.append(f"  {self.value_function.description}")
         lines.append("")
-        lines.append("Your value function conditions:")
-        for cond in self.value_function.conditions:
-            lines.append(f"  - {cond.description}: {cond.bonus:+d}")
+
+        # Handle both SimpleValueFunction and AgentValueFunction
+        if isinstance(self.value_function, SimpleValueFunction):
+            lines.append("Properties you care about:")
+            for spec in self.value_function.cares_about:
+                prop = spec["property"]
+                val = spec["value"]
+                lines.append(f"  - {prop}={val}")
+            lines.append("")
+            lines.append("Your value = number of matching properties")
+        else:
+            # Legacy AgentValueFunction format
+            lines.append("Your value function conditions:")
+            for cond in self.value_function.conditions:
+                lines.append(f"  - {cond.description}: {cond.bonus:+d}")
         lines.append("")
         lines.append("Your value for each object:")
 
-        # Show top 5 objects by this agent's value function
+        # Show top 10 objects by this agent's value function
         object_values = []
         for obj_id in world.list_objects():
             obj = world.get_object(obj_id)
@@ -586,7 +598,13 @@ Just output your statement, nothing else."""
             "thinking_budget": self.thinking_budget,
         }
         if self.value_function:
-            result["value_function"] = self.value_function.to_dict()
+            vf_dict = self.value_function.to_dict()
+            # Mark the type for deserialization
+            if isinstance(self.value_function, SimpleValueFunction):
+                vf_dict["type"] = "simple"
+            else:
+                vf_dict["type"] = "legacy"
+            result["value_function"] = vf_dict
         return result
 
     @classmethod
@@ -597,26 +615,30 @@ Just output your statement, nothing else."""
     ) -> "Agent":
         """Create an Agent from dictionary representation.
 
-        Note: Value functions are serialized but their condition callables
-        cannot be restored from dict. Use this for display/logging purposes.
+        Note: Legacy AgentValueFunction conditions are serialized but their
+        condition callables cannot be restored from dict.
+        SimpleValueFunction can be fully restored.
         """
         interest = AgentInterest(
             target_condition=data["interest"]["target_condition"],
             description=data["interest"]["description"],
         )
 
-        # Value function is stored for reference but condition callables
-        # cannot be restored - this is used for results logging/display
         value_function = None
         if "value_function" in data:
             vf_data = data["value_function"]
-            # Store the dict representation for display purposes
-            # The callable conditions cannot be restored from serialization
-            value_function = AgentValueFunction(
-                name=vf_data.get("name", ""),
-                description=vf_data.get("description", ""),
-                conditions=[],  # Conditions can't be restored from dict
-            )
+            vf_type = vf_data.get("type", "legacy")
+
+            if vf_type == "simple":
+                # SimpleValueFunction can be fully restored
+                value_function = SimpleValueFunction.from_dict(vf_data)
+            else:
+                # Legacy AgentValueFunction - conditions can't be restored
+                value_function = AgentValueFunction(
+                    name=vf_data.get("name", ""),
+                    description=vf_data.get("description", ""),
+                    conditions=[],  # Conditions can't be restored from dict
+                )
 
         return cls(
             id=data["id"],
@@ -702,7 +724,7 @@ def create_multi_agent_game(
 
 
 # ============================================================================
-# Complex Value Function Generation
+# Value Function Generation
 # ============================================================================
 
 # Property values pool for generating value functions
@@ -715,12 +737,137 @@ PROPERTY_VALUES_POOL = {
 }
 
 
+@dataclass
+class SimpleValueFunction:
+    """
+    Simplified value function: Agent cares about N property=value pairs.
+
+    Value = count of matching properties (no bonuses, combos, or penalties).
+    This enables principled, deterministic evaluation via property overlap.
+    """
+    name: str
+    description: str
+    cares_about: list[dict]  # List of {"property": X, "value": Y} dicts
+
+    @property
+    def n_properties(self) -> int:
+        """Number of properties this agent cares about."""
+        return len(self.cares_about)
+
+    def compute_value(self, obj: Object) -> int:
+        """Compute value as count of matching properties."""
+        matches = 0
+        for prop_spec in self.cares_about:
+            prop_name = prop_spec["property"]
+            desired_value = prop_spec["value"]
+            actual_value = obj.get_property(prop_name)
+            if actual_value == desired_value:
+                matches += 1
+        return matches
+
+    def explain(self) -> str:
+        """Get human-readable explanation of the value function."""
+        lines = [f"Value Function: {self.name}", f"Description: {self.description}", "", "Cares about:"]
+        for spec in self.cares_about:
+            prop = spec["property"]
+            val = spec["value"]
+            lines.append(f"  - {prop}={val}")
+        return "\n".join(lines)
+
+    def to_dict(self) -> dict:
+        """Convert to dictionary representation."""
+        return {
+            "name": self.name,
+            "description": self.description,
+            "cares_about": self.cares_about,
+            "n_properties": self.n_properties,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "SimpleValueFunction":
+        """Create from dictionary representation."""
+        return cls(
+            name=data.get("name", ""),
+            description=data.get("description", ""),
+            cares_about=data.get("cares_about", []),
+        )
+
+
+def generate_simple_value_function(
+    agent_id: str,
+    rng: random.Random,
+    n_properties: int,
+    exclude_conditions: list[tuple[str, Any]] | None = None,
+) -> SimpleValueFunction:
+    """
+    Generate a simplified value function with exactly N property=value pairs.
+
+    Args:
+        agent_id: ID of the agent (used in naming)
+        rng: Random number generator for reproducibility
+        n_properties: Number of properties the agent cares about (1-5)
+        exclude_conditions: List of (property, value) tuples to avoid
+            (useful for ensuring agents have different preferences)
+
+    Returns:
+        SimpleValueFunction with exactly N property=value pairs
+    """
+    exclude_conditions = exclude_conditions or []
+    exclude_set = set(exclude_conditions)
+
+    cares_about = []
+    used_properties: set[str] = set()
+
+    # Generate N property=value pairs
+    for _ in range(n_properties):
+        # Pick a property we haven't used yet
+        available_props = [p for p in PROPERTY_VALUES_POOL.keys() if p not in used_properties]
+        if not available_props:
+            break
+
+        prop = rng.choice(available_props)
+        used_properties.add(prop)
+
+        # Pick a value, avoiding excluded ones
+        available_values = [
+            v for v in PROPERTY_VALUES_POOL[prop]
+            if (prop, v) not in exclude_set
+        ]
+        if not available_values:
+            continue
+
+        value = rng.choice(available_values)
+
+        cares_about.append({
+            "property": prop,
+            "value": value,
+        })
+
+    # Generate description
+    desc_parts = []
+    for spec in cares_about:
+        prop = spec["property"]
+        val = spec["value"]
+        if prop == "is_dangerous":
+            desc_parts.append("dangerous" if val else "not dangerous")
+        else:
+            desc_parts.append(f"{val}")
+    description = f"Wants objects that are: {', '.join(desc_parts)}"
+
+    return SimpleValueFunction(
+        name=f"{agent_id}_simple_vf",
+        description=description,
+        cares_about=cares_about,
+    )
+
+
 def generate_agent_value_function(
     agent_id: str,
     rng: random.Random,
     complexity: str = "medium",
     exclude_conditions: list[tuple[str, Any]] | None = None,
-) -> AgentValueFunction:
+    use_simple: bool = True,
+) -> AgentValueFunction | SimpleValueFunction:
     """
     Generate a random value function for an agent.
 
@@ -731,16 +878,62 @@ def generate_agent_value_function(
             - "simple" (1 condition) - alias for L1
             - "medium" (2-3 conditions) - alias for L3
             - "complex" (3-5 conditions) - alias for L5
-            - "L1" - 1 property condition (e.g., "wants blue objects")
-            - "L2" - 2 properties (AND) (e.g., "wants blue AND large")
-            - "L3" - 2 + combination bonus (e.g., "blue +20, large +15, combo +25")
-            - "L4" - 3-4 conditions (multiple bonuses)
-            - "L5" - 4-5 + penalties (bonuses + negative conditions)
+            - "L1" - 1 property (e.g., "wants blue objects")
+            - "L2" - 2 properties (e.g., "wants blue AND large")
+            - "L3" - 3 properties
+            - "L4" - 4 properties
+            - "L5" - 5 properties
         exclude_conditions: List of (property, value) tuples to avoid
             (useful for ensuring agents have different preferences)
+        use_simple: If True, use SimpleValueFunction (new principled format)
+                   If False, use legacy AgentValueFunction (with bonuses/penalties)
 
     Returns:
-        AgentValueFunction with random conditions
+        SimpleValueFunction or AgentValueFunction with random conditions
+    """
+    exclude_conditions = exclude_conditions or []
+
+    # Map complexity to N properties for simple value functions
+    complexity_to_n = {
+        "simple": 1,
+        "L1": 1,
+        "L2": 2,
+        "medium": 3,
+        "L3": 3,
+        "L4": 4,
+        "complex": 5,
+        "L5": 5,
+    }
+    n_properties = complexity_to_n.get(complexity, 3)
+
+    if use_simple:
+        # New simplified value function format
+        return generate_simple_value_function(
+            agent_id=agent_id,
+            rng=rng,
+            n_properties=n_properties,
+            exclude_conditions=exclude_conditions,
+        )
+
+    # Legacy complex value function format (for backwards compatibility)
+    return _generate_legacy_value_function(
+        agent_id=agent_id,
+        rng=rng,
+        complexity=complexity,
+        exclude_conditions=exclude_conditions,
+    )
+
+
+def _generate_legacy_value_function(
+    agent_id: str,
+    rng: random.Random,
+    complexity: str = "medium",
+    exclude_conditions: list[tuple[str, Any]] | None = None,
+) -> AgentValueFunction:
+    """
+    Generate a legacy value function with bonuses, combos, and penalties.
+
+    This is the old format kept for backwards compatibility.
     """
     exclude_conditions = exclude_conditions or []
     exclude_set = set(exclude_conditions)
@@ -887,19 +1080,22 @@ def create_agents_with_value_functions(
     seed: int | None = None,
     client: anthropic.Anthropic | None = None,
     model: str = "claude-opus-4-5-20251101",
+    use_simple: bool = True,
 ) -> list[Agent]:
     """
     Create agents with unique, randomized value functions.
 
-    Each agent gets a complex value function instead of a simple interest.
+    Each agent gets a value function instead of a simple interest.
     Value functions are generated to be different from each other.
 
     Args:
         num_agents: Number of agents to create
-        complexity: "simple", "medium", or "complex" value functions
+        complexity: "simple"/"L1", "medium"/"L3", "complex"/"L5" or "L2"/"L4"
         seed: Random seed for reproducibility
         client: Anthropic client to use
         model: Model for agents
+        use_simple: If True, use SimpleValueFunction (principled N-property format)
+                   If False, use legacy AgentValueFunction (with bonuses/penalties)
 
     Returns:
         List of agents with value functions
@@ -918,31 +1114,49 @@ def create_agents_with_value_functions(
             rng=rng,
             complexity=complexity,
             exclude_conditions=used_conditions[:5],  # Only exclude a few to allow some overlap
+            use_simple=use_simple,
         )
 
         # Track used conditions to encourage diversity
-        for cond in value_fn.conditions:
-            # Extract property/value from description (approximate)
-            for prop, values in PROPERTY_VALUES_POOL.items():
-                for val in values:
-                    if str(val).lower() in cond.description.lower():
-                        used_conditions.append((prop, val))
-                        break
-
-        # Create a simple interest as fallback (first positive condition)
-        positive_conds = [c for c in value_fn.conditions if c.bonus > 0]
-        if positive_conds:
-            first_cond = positive_conds[0]
-            # Try to extract property=value from description
-            fallback_interest = AgentInterest(
-                target_condition="color=blue",  # Fallback
-                description=first_cond.description,
-            )
+        if isinstance(value_fn, SimpleValueFunction):
+            # SimpleValueFunction: extract from cares_about
+            for spec in value_fn.cares_about:
+                used_conditions.append((spec["property"], spec["value"]))
+            # Create fallback interest from first property
+            if value_fn.cares_about:
+                first = value_fn.cares_about[0]
+                fallback_interest = AgentInterest(
+                    target_condition=f"{first['property']}={first['value']}",
+                    description=value_fn.description,
+                )
+            else:
+                fallback_interest = AgentInterest(
+                    target_condition="color=blue",
+                    description="collect valuable objects",
+                )
+            # Store SimpleValueFunction as the value_function field
+            # Agent class needs to handle both types
         else:
-            fallback_interest = AgentInterest(
-                target_condition="color=blue",
-                description="collect valuable objects",
-            )
+            # Legacy AgentValueFunction: extract from conditions
+            for cond in value_fn.conditions:
+                for prop, values in PROPERTY_VALUES_POOL.items():
+                    for val in values:
+                        if str(val).lower() in cond.description.lower():
+                            used_conditions.append((prop, val))
+                            break
+            # Create fallback interest from first positive condition
+            positive_conds = [c for c in value_fn.conditions if c.bonus > 0]
+            if positive_conds:
+                first_cond = positive_conds[0]
+                fallback_interest = AgentInterest(
+                    target_condition="color=blue",  # Fallback
+                    description=first_cond.description,
+                )
+            else:
+                fallback_interest = AgentInterest(
+                    target_condition="color=blue",
+                    description="collect valuable objects",
+                )
 
         agent = Agent(
             id=agent_id,

@@ -1,0 +1,82 @@
+{
+  "without_cot": {
+    "condition": {
+      "name": "without_cot",
+      "estimator_sees_agent_thinking": false
+    },
+    "n_games": 10,
+    "stats": {
+      "objective_inference_score": {
+        "mean": 0.41666666666666663,
+        "std": 0.23895347964007294,
+        "n": 10
+      },
+      "exact_f1": {
+        "mean": 0.41666666666666663,
+        "std": 0.28356543640780024,
+        "n": 20
+      },
+      "exact_precision": {
+        "mean": 0.41666666666666663,
+        "std": 0.28356543640780024,
+        "n": 20
+      },
+      "exact_recall": {
+        "mean": 0.41666666666666663,
+        "std": 0.28356543640780024,
+        "n": 20
+      },
+      "property_recall": {
+        "mean": 0.6833333333333333,
+        "std": 0.2530515515054161,
+        "n": 20
+      },
+      "avg_confidence": {
+        "mean": 87.75,
+        "std": 4.435206041615085,
+        "n": 20
+      },
+      "pct_with_agent_thinking": 1.0
+    }
+  },
+  "with_cot": {
+    "condition": {
+      "name": "with_cot",
+      "estimator_sees_agent_thinking": true
+    },
+    "n_games": 10,
+    "stats": {
+      "objective_inference_score": {
+        "mean": 0.7666666666666666,
+        "std": 0.1405456737852613,
+        "n": 10
+      },
+      "exact_f1": {
+        "mean": 0.7666666666666666,
+        "std": 0.15672078199387576,
+        "n": 20
+      },
+      "exact_precision": {
+        "mean": 0.7666666666666666,
+        "std": 0.15672078199387576,
+        "n": 20
+      },
+      "exact_recall": {
+        "mean": 0.7666666666666666,
+        "std": 0.15672078199387576,
+        "n": 20
+      },
+      "property_recall": {
+        "mean": 1.0,
+        "std": 0.0,
+        "n": 20
+      },
+      "avg_confidence": {
+        "mean": 99,
+        "std": 2.0519567041703084,
+        "n": 20
+      },
+      "pct_with_agent_thinking": 1.0
+    }
+  }
+}

@@ -1,22 +1,26 @@
 #!/usr/bin/env python3
-"""Objective Complexity Effect on Inference Accuracy.
+"""Objective Complexity Effect on Inference Accuracy (Principled Evaluation).
 
 Research Questions:
 - How does objective complexity affect inference accuracy?
 - Are simple single-property goals easier to infer than multi-factor goals?
-- How do penalties and complex conditions impact inference?
+- How does the number of properties to infer impact accuracy?
 
-Complexity Levels:
-- L1-Simple: 1 property condition (e.g., "wants blue objects")
-- L2-Dual: 2 properties (AND) (e.g., "wants blue AND large")
-- L3-Combo: 2 properties + combination bonus
-- L4-Complex: 3-4 conditions (multiple bonuses)
-- L5-Penalty: 4-5 conditions + penalties
+Complexity Levels (Simplified Value Functions):
+- L1: 1 property (e.g., "wants color=blue")
+- L2: 2 properties (e.g., "wants color=blue AND size=large")
+- L3: 3 properties
+- L4: 4 properties
+- L5: 5 properties
 
-Design: 5 levels x 5 seeds = 25 games
-Fixed: oracle_budget=4, freeform inference
+Evaluation:
+- Principled mode: Estimator is told N, predicts exactly N property=value pairs
+- Deterministic overlap scoring (exact F1, property recall) instead of LLM judge
 
-Hypothesis: Accuracy: L1 (~70%) > L2 > L3 > L4 > L5 (~30%)
+Design: 5 levels x 10 seeds = 50 games
+Fixed: oracle_budget=4, principled inference
+
+Hypothesis: Accuracy: L1 (~80%) > L2 > L3 > L4 > L5 (~30%)
 """
 
 import json
@@ -44,11 +48,11 @@ COMPLEXITY_LEVELS = ["L1", "L2", "L3", "L4", "L5"]
 
 # Level descriptions for documentation
 LEVEL_DESCRIPTIONS = {
-    "L1": "Simple: 1 property (e.g., 'wants blue')",
-    "L2": "Dual: 2 properties (e.g., 'wants blue AND large')",
-    "L3": "Combo: 2 properties + combination bonus",
-    "L4": "Complex: 3-4 conditions with multiple bonuses",
-    "L5": "Penalty: 4-5 conditions including penalties",
+    "L1": "1 property (e.g., 'color=blue')",
+    "L2": "2 properties (e.g., 'color=blue, size=large')",
+    "L3": "3 properties",
+    "L4": "4 properties",
+    "L5": "5 properties",
 }
 
 # Fixed game parameters
@@ -61,9 +65,12 @@ BASE_CONFIG = {
     "enable_estimator": True,
     "infer_agent_objectives": True,
     "use_agent_value_functions": True,
-    "objective_inference_mode": "freeform",  # Standard freeform inference
+    "use_simple_value_functions": True,  # Use new simplified N-property format
+    "objective_inference_mode": "principled",  # Principled inference with overlap scoring
     "enable_agent_thinking": True,
     "agent_thinking_budget": 5000,
+    "enable_estimator_thinking": True,  # Capture estimator CoT
+    "estimator_thinking_budget": 5000,
     "force_oracle": True,
     # Models
     "estimator_model": "claude-sonnet-4-20250514",
@@ -120,13 +127,30 @@ def run_single_game(condition: ExperimentCondition, seed: int) -> dict:
     agent_vf_details = []
     for agent in result.agents:
         vf = agent.get("value_function", {})
-        agent_vf_details.append({
-            "agent_id": agent.get("id"),
-            "value_function_name": vf.get("name", ""),
-            "description": vf.get("description", ""),
-            "n_conditions": len(vf.get("conditions", [])),
-            "conditions": vf.get("conditions", []),
-        })
+        vf_type = vf.get("type", "legacy")
+
+        if vf_type == "simple":
+            # SimpleValueFunction format
+            cares_about = vf.get("cares_about", [])
+            agent_vf_details.append({
+                "agent_id": agent.get("id"),
+                "value_function_name": vf.get("name", ""),
+                "description": vf.get("description", ""),
+                "type": "simple",
+                "n_properties": len(cares_about),
+                "cares_about": cares_about,
+            })
+        else:
+            # Legacy AgentValueFunction format
+            conditions = vf.get("conditions", [])
+            agent_vf_details.append({
+                "agent_id": agent.get("id"),
+                "value_function_name": vf.get("name", ""),
+                "description": vf.get("description", ""),
+                "type": "legacy",
+                "n_conditions": len(conditions),
+                "conditions": conditions,
+            })
 
     return {
         "condition": condition.to_dict(),
@@ -164,7 +188,7 @@ def compute_condition_stats(results: list[dict]) -> dict:
         values = [r["metrics"].get(key) for r in results]
         stats[key] = safe_stats(values)
 
-    # Objective inference scores (primary metric)
+    # Objective inference scores (primary metric - exact F1 for principled mode)
     obj_scores = [r.get("agent_objective_overall_score") for r in results]
     stats["objective_inference_score"] = safe_stats(obj_scores)
 
@@ -182,12 +206,14 @@ def compute_condition_stats(results: list[dict]) -> dict:
         for agent_id, scores in agent_scores.items()
     }
 
-    # Condition counts from value functions
-    n_conditions_list = []
+    # N properties from value functions (cares_about for simple VFs)
+    n_properties_list = []
     for r in results:
         for vf in r.get("agent_value_functions", []):
-            n_conditions_list.append(vf.get("n_conditions", 0))
-    stats["avg_n_conditions"] = safe_stats(n_conditions_list)
+            # Support both old (n_conditions) and new (n_properties/cares_about) formats
+            n_props = vf.get("n_properties") or vf.get("n_conditions") or len(vf.get("cares_about", []))
+            n_properties_list.append(n_props)
+    stats["avg_n_properties"] = safe_stats(n_properties_list)
 
     # Confidence levels
     confidences = []
@@ -198,6 +224,36 @@ def compute_condition_stats(results: list[dict]) -> dict:
                 conf = data.get("confidence", 0)
                 confidences.append(conf)
     stats["avg_confidence"] = safe_stats(confidences)
+
+    # Overlap metrics (for principled mode)
+    exact_f1_list = []
+    exact_precision_list = []
+    exact_recall_list = []
+    property_precision_list = []
+    property_recall_list = []
+    n_exact_matches_list = []
+    n_property_matches_list = []
+
+    for r in results:
+        inf = r.get("agent_objective_inference", {})
+        for agent_id, data in inf.items():
+            if isinstance(data, dict) and "overlap_metrics" in data:
+                om = data["overlap_metrics"]
+                exact_f1_list.append(om.get("exact_f1", 0))
+                exact_precision_list.append(om.get("exact_precision", 0))
+                exact_recall_list.append(om.get("exact_recall", 0))
+                property_precision_list.append(om.get("property_precision", 0))
+                property_recall_list.append(om.get("property_recall", 0))
+                n_exact_matches_list.append(om.get("n_exact_matches", 0))
+                n_property_matches_list.append(om.get("n_property_matches", 0))
+
+    stats["exact_f1"] = safe_stats(exact_f1_list)
+    stats["exact_precision"] = safe_stats(exact_precision_list)
+    stats["exact_recall"] = safe_stats(exact_recall_list)
+    stats["property_precision"] = safe_stats(property_precision_list)
+    stats["property_recall"] = safe_stats(property_recall_list)
+    stats["avg_exact_matches"] = safe_stats(n_exact_matches_list)
+    stats["avg_property_matches"] = safe_stats(n_property_matches_list)
 
     return stats
 
@@ -276,8 +332,20 @@ def run_experiment():
 
                 # Quick summary
                 obj_score = result.get("agent_objective_overall_score", 0)
-                n_conds = sum(vf.get("n_conditions", 0) for vf in result.get("agent_value_functions", []))
-                print(f"done ({game_elapsed:.0f}s) - ObjInf: {obj_score*100:.1f}%, Conditions: {n_conds}")
+                # Count N properties (support both simple and legacy formats)
+                n_props = 0
+                for vf in result.get("agent_value_functions", []):
+                    n_props += vf.get("n_properties") or vf.get("n_conditions") or len(vf.get("cares_about", []))
+                print(f"done ({game_elapsed:.0f}s) - Exact F1: {obj_score*100:.1f}%, N props: {n_props}")
+
+                # Extract overlap metrics for logging
+                overlap_log = {}
+                inf_data = result.get("agent_objective_inference", {})
+                for agent_id, data in inf_data.items():
+                    if isinstance(data, dict) and "overlap_metrics" in data:
+                        om = data["overlap_metrics"]
+                        overlap_log[f"{agent_id}_exact_f1"] = om.get("exact_f1", 0)
+                        overlap_log[f"{agent_id}_prop_recall"] = om.get("property_recall", 0)
 
                 # Log to wandb
                 wandb.log({
@@ -286,9 +354,10 @@ def run_experiment():
                     "complexity": condition.complexity,
                     "seed": seed,
                     "game_time_seconds": game_elapsed,
-                    "objective_inference_score": obj_score,
-                    "total_conditions": n_conds,
+                    "objective_inference_score": obj_score,  # Now exact F1
+                    "total_n_properties": n_props,
                     **{f"agent_{k}_score": v for k, v in result.get("agent_objective_scores", {}).items()},
+                    **overlap_log,
                 })
 
             except Exception as e:
@@ -349,18 +418,22 @@ def run_experiment():
             level,
             LEVEL_DESCRIPTIONS[level],
             data["n_games"],
-            stats.get("objective_inference_score", {}).get("mean", 0),
-            stats.get("objective_inference_score", {}).get("std", 0),
-            stats.get("avg_n_conditions", {}).get("mean", 0),
+            stats.get("avg_n_properties", {}).get("mean", 0),
+            stats.get("exact_f1", {}).get("mean", 0),
+            stats.get("exact_f1", {}).get("std", 0),
+            stats.get("exact_precision", {}).get("mean", 0),
+            stats.get("exact_recall", {}).get("mean", 0),
+            stats.get("property_recall", {}).get("mean", 0),
             stats.get("avg_confidence", {}).get("mean", 0),
         ])
 
     wandb.log({
         "summary_table": wandb.Table(
             columns=[
-                "level", "description", "n_games",
-                "obj_inf_score_mean", "obj_inf_score_std",
-                "avg_n_conditions", "avg_confidence"
+                "level", "description", "n_games", "n_properties",
+                "exact_f1_mean", "exact_f1_std",
+                "exact_precision", "exact_recall", "property_recall",
+                "avg_confidence"
             ],
             data=summary_rows,
         ),
@@ -378,13 +451,13 @@ def run_experiment():
 
 def print_summary(condition_stats: dict):
     """Print summary tables to console."""
-    print("\n" + "="*70)
-    print("RESULTS SUMMARY")
-    print("="*70)
+    print("\n" + "="*80)
+    print("RESULTS SUMMARY (Principled Evaluation)")
+    print("="*80)
 
     print("\n### By Complexity Level ###\n")
-    print(f"{'Level':<6} | {'Description':<40} | {'Obj Inf Score':<15} | {'Avg Conds':<10}")
-    print("-" * 80)
+    print(f"{'Level':<6} | {'N Props':<8} | {'Exact F1':<10} | {'Exact P':<10} | {'Exact R':<10} | {'Prop Recall':<12}")
+    print("-" * 70)
 
     for level in COMPLEXITY_LEVELS:
         cond_id = f"complexity_{level}"
@@ -392,11 +465,27 @@ def print_summary(condition_stats: dict):
             continue
 
         stats = condition_stats[cond_id]["stats"]
-        obj_score = stats.get("objective_inference_score", {}).get("mean", 0)
-        n_conds = stats.get("avg_n_conditions", {}).get("mean", 0)
-        desc = LEVEL_DESCRIPTIONS[level][:38]
+        n_props = stats.get("avg_n_properties", {}).get("mean", 0)
+        exact_f1 = stats.get("exact_f1", {}).get("mean", 0)
+        exact_p = stats.get("exact_precision", {}).get("mean", 0)
+        exact_r = stats.get("exact_recall", {}).get("mean", 0)
+        prop_r = stats.get("property_recall", {}).get("mean", 0)
 
-        print(f"{level:<6} | {desc:<40} | {obj_score*100:>12.1f}% | {n_conds:>8.1f}")
+        print(f"{level:<6} | {n_props:>6.1f} | {exact_f1*100:>8.1f}% | {exact_p*100:>8.1f}% | {exact_r*100:>8.1f}% | {prop_r*100:>10.1f}%")
+
+    # Legacy score (same as exact F1 for principled mode)
+    print("\n### Overall Objective Inference Score (Exact F1) ###")
+    for level in COMPLEXITY_LEVELS:
+        cond_id = f"complexity_{level}"
+        if cond_id not in condition_stats:
+            continue
+
+        stats = condition_stats[cond_id]["stats"]
+        obj_score = stats.get("objective_inference_score", {}).get("mean", 0)
+        obj_std = stats.get("objective_inference_score", {}).get("std", 0)
+        desc = LEVEL_DESCRIPTIONS[level]
+
+        print(f"  {level}: {obj_score*100:.1f}% ± {obj_std*100:.1f}% ({desc})")
 
     # Check hypothesis
     print("\n### Hypothesis Check ###")
@@ -419,17 +508,18 @@ def print_summary(condition_stats: dict):
 def create_summary_markdown(condition_stats: dict, total_elapsed: float) -> str:
     """Create markdown summary of results."""
     lines = [
-        "# Objective Complexity Effect Experiment Results",
+        "# Objective Complexity Effect Experiment Results (Principled Evaluation)",
         "",
         f"**Date**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
         f"**Runtime**: {total_elapsed/60:.1f} minutes",
         f"**Total Games**: {sum(d['n_games'] for d in condition_stats.values())}",
+        f"**Evaluation Method**: Principled (deterministic overlap scoring)",
         "",
         "## Research Question",
         "",
-        "How does objective complexity affect inference accuracy?",
+        "How does objective complexity (N properties) affect inference accuracy?",
         "",
-        "## Complexity Levels",
+        "## Complexity Levels (Simple Value Functions)",
         "",
     ]
 
@@ -438,14 +528,44 @@ def create_summary_markdown(condition_stats: dict, total_elapsed: float) -> str:
 
     lines.extend([
         "",
+        "## Evaluation Metrics",
+        "",
+        "- **Exact F1**: F1 score for exact (property + value) matches",
+        "- **Exact Precision**: Fraction of predicted properties that exactly match",
+        "- **Exact Recall**: Fraction of actual properties that were exactly matched",
+        "- **Property Recall**: Fraction of properties correctly identified (partial credit for wrong value)",
+        "",
         "## Hypothesis",
         "",
-        "Accuracy: L1 (~70%) > L2 > L3 > L4 > L5 (~30%)",
+        "Accuracy: L1 (~80%) > L2 > L3 > L4 > L5 (~30%)",
         "",
         "## Results",
         "",
-        "| Level | Description | Obj Inf Score (mean) | Obj Inf Score (std) | Avg Conditions |",
-        "|-------|-------------|----------------------|---------------------|----------------|",
+        "| Level | N Props | Exact F1 | Exact P | Exact R | Prop Recall |",
+        "|-------|---------|----------|---------|---------|-------------|",
+    ])
+
+    for level in COMPLEXITY_LEVELS:
+        cond_id = f"complexity_{level}"
+        if cond_id not in condition_stats:
+            continue
+
+        stats = condition_stats[cond_id]["stats"]
+        n_props = stats.get("avg_n_properties", {}).get("mean", 0)
+        exact_f1 = stats.get("exact_f1", {}).get("mean", 0)
+        exact_p = stats.get("exact_precision", {}).get("mean", 0)
+        exact_r = stats.get("exact_recall", {}).get("mean", 0)
+        prop_r = stats.get("property_recall", {}).get("mean", 0)
+
+        lines.append(f"| {level} | {n_props:.1f} | {exact_f1*100:.1f}% | {exact_p*100:.1f}% | {exact_r*100:.1f}% | {prop_r*100:.1f}% |")
+
+    # Overall scores table
+    lines.extend([
+        "",
+        "### Overall Scores (Exact F1)",
+        "",
+        "| Level | Mean ± Std |",
+        "|-------|------------|",
     ])
 
     for level in COMPLEXITY_LEVELS:
@@ -456,9 +576,8 @@ def create_summary_markdown(condition_stats: dict, total_elapsed: float) -> str:
         stats = condition_stats[cond_id]["stats"]
         obj_score = stats.get("objective_inference_score", {}).get("mean", 0)
         obj_std = stats.get("objective_inference_score", {}).get("std", 0)
-        n_conds = stats.get("avg_n_conditions", {}).get("mean", 0)
 
-        lines.append(f"| {level} | {LEVEL_DESCRIPTIONS[level]} | {obj_score*100:.1f}% | {obj_std*100:.1f}% | {n_conds:.1f} |")
+        lines.append(f"| {level} | {obj_score*100:.1f}% ± {obj_std*100:.1f}% |")
 
     # Check hypothesis
     scores_by_level = {}
