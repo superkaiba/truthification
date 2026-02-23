@@ -165,6 +165,64 @@ This file tracks all experiments run in the truthification project.
 
 ---
 
+## 2026-02-21: Theory Context for Objective Inference
+
+**Goal:** Test whether providing theoretical knowledge about strategic communication improves objective inference
+
+**Config:**
+- 10 objects, 10 rounds, 5 selections
+- Conditions: none, brief (~50 words), full (~200 words)
+- L3 complexity (3 properties per agent)
+- 10 seeds per condition (30 games total)
+
+**Duration:** 20.4 hours (1226 minutes)
+
+**Key Result:** Theory context significantly improves inference. Full context: +16.7% (d=0.85, large effect). More detail is better.
+
+**Results:** [results/objective_inference_experiments/README.md](objective_inference_experiments/README.md)
+
+**Raw Data:** `outputs/theory_context_experiment/20260221_131125/`
+
+---
+
+## 2026-02-21: Deception Detection Strategies
+
+**Goal:** Test whether specific deception detection strategies help infer agent objectives
+
+**Config:**
+- 10 objects, 10 rounds, 5 selections
+- Strategies: baseline, consistency, incentive, pattern, combined
+- L3 complexity, 10 seeds per condition (50 games total)
+
+**Duration:** 26.5 hours (1590 minutes)
+
+**Key Result:** Consistency checking works best (+8.3%, d=0.42), but effect smaller than theory context. Combined strategies no better than consistency alone.
+
+**Results:** [results/objective_inference_experiments/README.md](objective_inference_experiments/README.md)
+
+**Raw Data:** `outputs/deception_strategies_experiment/20260221_110535/`
+
+---
+
+## 2026-02-21: Agent Communication Strategy Effect
+
+**Goal:** Test how agent communication strategies affect objective transparency
+
+**Config:**
+- 10 objects, 10 rounds, 5 selections
+- Strategies: natural, honest, deceptive, misdirection, aggressive, subtle, credibility_attack
+- L3 complexity, 10 seeds per condition (70 games total)
+
+**Duration:** 31.4 hours (1885 minutes)
+
+**Key Result:** Agent strategy has largest effect. Aggressive: +23.3% (d=1.07). Misdirection: -15.0% (d=-0.77). 38% spread between best and worst.
+
+**Results:** [results/objective_inference_experiments/README.md](objective_inference_experiments/README.md)
+
+**Raw Data:** `outputs/agent_strategy_inference/20260221_134220/`
+
+---
+
 ## Template for New Experiments
 
 ```markdown
