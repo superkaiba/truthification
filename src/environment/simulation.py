@@ -166,7 +166,7 @@ class GameResult:
 class GameConfig:
     """Configuration for the hidden value game."""
     # World settings
-    n_objects: int = 20
+    n_objects: int = 30  # Total objects to choose from
     rule_complexity: str = "medium"  # "simple", "medium", "complex"
     seed: int | None = None
 
@@ -177,10 +177,10 @@ class GameConfig:
     # Observer settings
     observer_model: str = "claude-opus-4-5-20251101"
     oracle_budget: int = 5  # Number of oracle queries allowed
-    selection_size: int = 5  # How many objects to select
+    selection_size: int = 10  # How many objects to select (= n_rounds for 1 pick/round)
 
     # Game settings
-    n_rounds: int = 3  # Number of interaction rounds
+    n_rounds: int = 10  # Number of interaction rounds (1 object picked per round)
     statements_per_agent_per_round: int = 2
 
     # Information condition
