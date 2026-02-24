@@ -24,6 +24,13 @@ with open("outputs/cot_access_experiment/20260220_174154/condition_stats.json") 
     cot_data = json.load(f)
 
 
+def get_se(stats):
+    """Calculate standard error from stats dict: SE = std / sqrt(n)"""
+    std = stats["std"] * 100
+    n = stats["n"]
+    return std / np.sqrt(n)
+
+
 def plot_theory_context():
     """Plot theory context experiment results."""
     fig, ax = plt.subplots(figsize=(8, 5))
@@ -32,10 +39,10 @@ def plot_theory_context():
     labels = ["None", "Brief", "Full"]
 
     means = [theory_data[c]["stats"]["exact_f1"]["mean"] * 100 for c in conditions]
-    stds = [theory_data[c]["stats"]["exact_f1"]["std"] * 100 for c in conditions]
+    ses = [get_se(theory_data[c]["stats"]["exact_f1"]) for c in conditions]
 
     colors = ['#808080', '#5BA55B', '#2E7D32']
-    bars = ax.bar(labels, means, yerr=stds, capsize=5, color=colors, edgecolor='black', linewidth=1.2)
+    bars = ax.bar(labels, means, yerr=ses, capsize=5, color=colors, edgecolor='black', linewidth=1.2)
 
     for bar, mean in zip(bars, means):
         ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 3,
@@ -59,10 +66,10 @@ def plot_deception_strategies():
     labels = ["Baseline", "Consistency", "Incentive", "Pattern", "Combined"]
 
     means = [deception_data[s]["stats"]["exact_f1"]["mean"] * 100 for s in strategies]
-    stds = [deception_data[s]["stats"]["exact_f1"]["std"] * 100 for s in strategies]
+    ses = [get_se(deception_data[s]["stats"]["exact_f1"]) for s in strategies]
 
     colors = ['#808080', '#5BA55B', '#4A90D9', '#E8A838', '#9B59B6']
-    bars = ax.bar(labels, means, yerr=stds, capsize=5, color=colors, edgecolor='black', linewidth=1.2)
+    bars = ax.bar(labels, means, yerr=ses, capsize=5, color=colors, edgecolor='black', linewidth=1.2)
 
     for bar, mean in zip(bars, means):
         ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 3,
@@ -87,10 +94,10 @@ def plot_agent_strategies():
     labels = ["Aggressive", "Honest", "Subtle", "Natural", "Credibility\nAttack", "Deceptive", "Misdirection"]
 
     means = [agent_strategy_data[s]["stats"]["exact_f1"]["mean"] * 100 for s in strategies]
-    stds = [agent_strategy_data[s]["stats"]["exact_f1"]["std"] * 100 for s in strategies]
+    ses = [get_se(agent_strategy_data[s]["stats"]["exact_f1"]) for s in strategies]
 
     colors = ['#2E7D32', '#5BA55B', '#A5D6A7', '#808080', '#FFAB91', '#EF5350', '#C62828']
-    bars = ax.bar(labels, means, yerr=stds, capsize=5, color=colors, edgecolor='black', linewidth=1.2)
+    bars = ax.bar(labels, means, yerr=ses, capsize=5, color=colors, edgecolor='black', linewidth=1.2)
 
     for bar, mean in zip(bars, means):
         ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 3,
@@ -114,10 +121,10 @@ def plot_cot_access():
     labels = ["Without CoT", "With CoT"]
 
     means = [cot_data[c]["stats"]["exact_f1"]["mean"] * 100 for c in conditions]
-    stds = [cot_data[c]["stats"]["exact_f1"]["std"] * 100 for c in conditions]
+    ses = [get_se(cot_data[c]["stats"]["exact_f1"]) for c in conditions]
 
     colors = ['#808080', '#2E7D32']
-    bars = ax.bar(labels, means, yerr=stds, capsize=5, color=colors, edgecolor='black', linewidth=1.2)
+    bars = ax.bar(labels, means, yerr=ses, capsize=5, color=colors, edgecolor='black', linewidth=1.2)
 
     for bar, mean in zip(bars, means):
         ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 3,
@@ -144,9 +151,9 @@ def plot_all_results():
     ax = axes[0]
     conditions = ["none", "brief", "full"]
     means = [theory_data[c]["stats"]["exact_f1"]["mean"] * 100 for c in conditions]
-    stds = [theory_data[c]["stats"]["exact_f1"]["std"] * 100 for c in conditions]
+    ses = [get_se(theory_data[c]["stats"]["exact_f1"]) for c in conditions]
     colors = ['#808080', '#5BA55B', '#2E7D32']
-    bars = ax.bar(["None", "Brief", "Full"], means, yerr=stds, capsize=4, color=colors, edgecolor='black')
+    bars = ax.bar(["None", "Brief", "Full"], means, yerr=ses, capsize=4, color=colors, edgecolor='black')
     ax.set_ylabel('Exact F1 (%)')
     ax.set_title('Exp 1: Theory Context', fontweight='bold')
     ax.set_ylim(0, 100)
@@ -157,9 +164,9 @@ def plot_all_results():
     ax = axes[1]
     strategies = ["baseline", "consistency", "incentive", "pattern", "combined"]
     means = [deception_data[s]["stats"]["exact_f1"]["mean"] * 100 for s in strategies]
-    stds = [deception_data[s]["stats"]["exact_f1"]["std"] * 100 for s in strategies]
+    ses = [get_se(deception_data[s]["stats"]["exact_f1"]) for s in strategies]
     colors = ['#808080', '#5BA55B', '#4A90D9', '#E8A838', '#9B59B6']
-    bars = ax.bar(["Base", "Consist", "Incent", "Pattern", "Comb"], means, yerr=stds, capsize=4, color=colors, edgecolor='black')
+    bars = ax.bar(["Base", "Consist", "Incent", "Pattern", "Comb"], means, yerr=ses, capsize=4, color=colors, edgecolor='black')
     ax.set_title('Exp 2: Deception Detection', fontweight='bold')
     ax.set_ylim(0, 100)
     for i, m in enumerate(means):
@@ -169,9 +176,9 @@ def plot_all_results():
     ax = axes[2]
     strategies = ["aggressive", "honest", "natural", "deceptive", "misdirection"]
     means = [agent_strategy_data[s]["stats"]["exact_f1"]["mean"] * 100 for s in strategies]
-    stds = [agent_strategy_data[s]["stats"]["exact_f1"]["std"] * 100 for s in strategies]
+    ses = [get_se(agent_strategy_data[s]["stats"]["exact_f1"]) for s in strategies]
     colors = ['#2E7D32', '#5BA55B', '#808080', '#EF5350', '#C62828']
-    bars = ax.bar(["Aggr", "Honest", "Natural", "Decept", "Misdir"], means, yerr=stds, capsize=4, color=colors, edgecolor='black')
+    bars = ax.bar(["Aggr", "Honest", "Natural", "Decept", "Misdir"], means, yerr=ses, capsize=4, color=colors, edgecolor='black')
     ax.set_title('Exp 3: Agent Strategy', fontweight='bold')
     ax.set_ylim(0, 100)
     for i, m in enumerate(means):
@@ -181,22 +188,22 @@ def plot_all_results():
     ax = axes[3]
     conditions = ["without_cot", "with_cot"]
     means = [cot_data[c]["stats"]["exact_f1"]["mean"] * 100 for c in conditions]
-    stds = [cot_data[c]["stats"]["exact_f1"]["std"] * 100 for c in conditions]
+    ses = [get_se(cot_data[c]["stats"]["exact_f1"]) for c in conditions]
     colors = ['#808080', '#2E7D32']
-    bars = ax.bar(["No CoT", "With CoT"], means, yerr=stds, capsize=4, color=colors, edgecolor='black')
+    bars = ax.bar(["No CoT", "With CoT"], means, yerr=ses, capsize=4, color=colors, edgecolor='black')
     ax.set_title('Exp 4: CoT Access ***', fontweight='bold')
     ax.set_ylim(0, 100)
     for i, m in enumerate(means):
         ax.text(i, m + 4, f'{m:.1f}%', ha='center', fontsize=9, fontweight='bold')
 
-    fig.suptitle('Objective Inference Experiments: Results Summary', fontsize=14, fontweight='bold', y=1.02)
+    fig.suptitle('Objective Inference Experiments: Results Summary (error bars = SE)', fontsize=14, fontweight='bold', y=1.02)
     plt.tight_layout()
     plt.savefig(REPORT_DIR / "all_experiments_summary.png", dpi=150, bbox_inches='tight')
     plt.close()
 
 
 if __name__ == "__main__":
-    print("Generating plots...")
+    print("Generating plots with standard error bars...")
     plot_theory_context()
     print("  - exp1_theory_context.png")
     plot_deception_strategies()
