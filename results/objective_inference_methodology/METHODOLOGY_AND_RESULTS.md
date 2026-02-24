@@ -1,13 +1,13 @@
 # Objective Inference Experiments: Methodology and Results
 
 **Date**: 2026-02-22
-**Total Runtime**: ~55 hours (150 games)
+**Total Runtime**: ~61 hours (170 games)
 
 ---
 
 ## Overview
 
-Three experiments testing factors that affect the accuracy of inferring agent objectives from their communication behavior.
+Four experiments testing factors that affect the accuracy of inferring agent objectives from their communication behavior.
 
 ![All Experiments Summary](all_experiments_summary.png)
 
@@ -153,6 +153,55 @@ How does the communication strategy an agent uses affect how easily an external 
 
 ---
 
+## Experiment 4: Chain-of-Thought Access
+
+### Research Question
+
+Does giving the estimator access to agents' chain of thought (internal reasoning) improve its ability to infer their true objectives?
+
+### Methodology
+
+**Independent Variable**: Whether the estimator can see agents' thinking blocks
+
+| Condition | Description |
+|-----------|-------------|
+| `without_cot` | Estimator sees only agent statements (baseline) |
+| `with_cot` | Estimator sees statements + agent internal reasoning |
+
+**Fixed Parameters**:
+- Objects: 10
+- Rounds: 10
+- Oracle budget: 4
+- Agent complexity: L3 (3 properties per agent)
+- Seeds per condition: 10
+- Total games: 20
+- Model: claude-sonnet-4-20250514
+- Deception strategy: baseline
+- Theory context: none
+
+### Results
+
+![Experiment 4 Results](exp4_cot_access.png)
+
+| Condition | Exact F1 | Std Dev | Property Recall | Confidence | n |
+|-----------|----------|---------|-----------------|------------|---|
+| without_cot | 41.7% | 28.4% | 68.3% | 87.8 | 20 |
+| with_cot | 76.7% | 15.7% | 100.0% | 99.0 | 20 |
+
+### Statistical Significance
+
+| Metric | Value |
+|--------|-------|
+| Difference | +35.0% |
+| t-statistic | 3.99 |
+| p-value | 0.00085 |
+| Cohen's d | 1.79 (very large) |
+| Significant | YES (p < 0.001) |
+
+**Raw Data**: `outputs/cot_access_experiment/20260220_174154/`
+
+---
+
 ## Common Experimental Setup
 
 ### Game Structure
@@ -196,6 +245,7 @@ All experiments used the same 10 seeds: `[42, 123, 456, 789, 101, 202, 303, 404,
 - Experiment 1: `experiments/run_theory_context_experiment.py`
 - Experiment 2: `experiments/run_deception_strategies_experiment.py`
 - Experiment 3: `experiments/run_agent_strategy_inference_experiment.py`
+- Experiment 4: `experiments/run_cot_access_experiment.py`
 
 ### Configuration
 

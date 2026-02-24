@@ -20,6 +20,9 @@ with open("outputs/deception_strategies_experiment/20260221_110535/condition_sta
 with open("outputs/agent_strategy_inference/20260221_134220/condition_stats.json") as f:
     agent_strategy_data = json.load(f)
 
+with open("outputs/cot_access_experiment/20260220_174154/condition_stats.json") as f:
+    cot_data = json.load(f)
+
 
 def plot_theory_context():
     """Plot theory context experiment results."""
@@ -103,9 +106,39 @@ def plot_agent_strategies():
     plt.close()
 
 
+def plot_cot_access():
+    """Plot CoT access experiment results."""
+    fig, ax = plt.subplots(figsize=(6, 5))
+
+    conditions = ["without_cot", "with_cot"]
+    labels = ["Without CoT", "With CoT"]
+
+    means = [cot_data[c]["stats"]["exact_f1"]["mean"] * 100 for c in conditions]
+    stds = [cot_data[c]["stats"]["exact_f1"]["std"] * 100 for c in conditions]
+
+    colors = ['#808080', '#2E7D32']
+    bars = ax.bar(labels, means, yerr=stds, capsize=5, color=colors, edgecolor='black', linewidth=1.2)
+
+    for bar, mean in zip(bars, means):
+        ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 3,
+                f'{mean:.1f}%', ha='center', va='bottom', fontsize=12, fontweight='bold')
+
+    ax.set_ylabel('Exact F1 Score (%)', fontsize=12)
+    ax.set_xlabel('Estimator Access to Agent Thinking', fontsize=12)
+    ax.set_title('Experiment 4: Chain-of-Thought Access', fontsize=14, fontweight='bold')
+    ax.set_ylim(0, 100)
+
+    # Add significance annotation
+    ax.annotate('p < 0.001 ***', xy=(0.5, 85), ha='center', fontsize=11, fontweight='bold')
+
+    plt.tight_layout()
+    plt.savefig(REPORT_DIR / "exp4_cot_access.png", dpi=150, bbox_inches='tight')
+    plt.close()
+
+
 def plot_all_results():
-    """Plot all three experiments side by side."""
-    fig, axes = plt.subplots(1, 3, figsize=(16, 5))
+    """Plot all four experiments side by side."""
+    fig, axes = plt.subplots(1, 4, figsize=(18, 5))
 
     # Experiment 1: Theory Context
     ax = axes[0]
@@ -116,7 +149,7 @@ def plot_all_results():
     bars = ax.bar(["None", "Brief", "Full"], means, yerr=stds, capsize=4, color=colors, edgecolor='black')
     ax.set_ylabel('Exact F1 (%)')
     ax.set_title('Exp 1: Theory Context', fontweight='bold')
-    ax.set_ylim(0, 75)
+    ax.set_ylim(0, 100)
     for i, m in enumerate(means):
         ax.text(i, m + 4, f'{m:.1f}%', ha='center', fontsize=9, fontweight='bold')
 
@@ -128,7 +161,7 @@ def plot_all_results():
     colors = ['#808080', '#5BA55B', '#4A90D9', '#E8A838', '#9B59B6']
     bars = ax.bar(["Base", "Consist", "Incent", "Pattern", "Comb"], means, yerr=stds, capsize=4, color=colors, edgecolor='black')
     ax.set_title('Exp 2: Deception Detection', fontweight='bold')
-    ax.set_ylim(0, 75)
+    ax.set_ylim(0, 100)
     for i, m in enumerate(means):
         ax.text(i, m + 4, f'{m:.1f}%', ha='center', fontsize=9, fontweight='bold')
 
@@ -140,7 +173,19 @@ def plot_all_results():
     colors = ['#2E7D32', '#5BA55B', '#808080', '#EF5350', '#C62828']
     bars = ax.bar(["Aggr", "Honest", "Natural", "Decept", "Misdir"], means, yerr=stds, capsize=4, color=colors, edgecolor='black')
     ax.set_title('Exp 3: Agent Strategy', fontweight='bold')
-    ax.set_ylim(0, 75)
+    ax.set_ylim(0, 100)
+    for i, m in enumerate(means):
+        ax.text(i, m + 4, f'{m:.1f}%', ha='center', fontsize=9, fontweight='bold')
+
+    # Experiment 4: CoT Access
+    ax = axes[3]
+    conditions = ["without_cot", "with_cot"]
+    means = [cot_data[c]["stats"]["exact_f1"]["mean"] * 100 for c in conditions]
+    stds = [cot_data[c]["stats"]["exact_f1"]["std"] * 100 for c in conditions]
+    colors = ['#808080', '#2E7D32']
+    bars = ax.bar(["No CoT", "With CoT"], means, yerr=stds, capsize=4, color=colors, edgecolor='black')
+    ax.set_title('Exp 4: CoT Access ***', fontweight='bold')
+    ax.set_ylim(0, 100)
     for i, m in enumerate(means):
         ax.text(i, m + 4, f'{m:.1f}%', ha='center', fontsize=9, fontweight='bold')
 
@@ -158,6 +203,8 @@ if __name__ == "__main__":
     print("  - exp2_deception_strategies.png")
     plot_agent_strategies()
     print("  - exp3_agent_strategies.png")
+    plot_cot_access()
+    print("  - exp4_cot_access.png")
     plot_all_results()
     print("  - all_experiments_summary.png")
     print(f"\nPlots saved to: {REPORT_DIR}")
