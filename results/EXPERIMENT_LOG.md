@@ -223,6 +223,59 @@ This file tracks all experiments run in the truthification project.
 
 ---
 
+## 2026-02-26: Controlled Theory Context Experiment (Phase 2)
+
+**Goal:** Test theory context effect using saved game trajectories (within-subjects design)
+
+**Config:**
+- Same 10 game trajectories from Phase 1
+- Conditions: none, full (~200 words), strategy_list (~250 words), comprehensive (~5000 words)
+- L3 complexity
+- 40 inferences (10 seeds × 4 conditions)
+
+**Duration:** 26.9 minutes
+
+**Key Result:** Full context significantly helps (+6.7%, p=0.037, d=0.77). Comprehensive helps more (+10.0%, p=0.024, d=0.86), but NOT significantly better than full (p=0.51). Use "full" - best cost/performance ratio.
+
+**Results:** [results/controlled_context_experiment/](controlled_context_experiment/) (TODO: create README)
+
+**Raw Data:** `outputs/controlled_context_experiment/phase2_20260226_001215/`
+
+**W&B:** https://wandb.ai/thomasjiralerspong/truthification/runs/ui6w0zwt
+
+---
+
+## 2026-02-26: Model Comparison Experiment
+
+**Goal:** Compare 7 Claude models as estimator on same game trajectories
+
+**Config:**
+- Same 10 game trajectories (within-subjects)
+- Models: Haiku 4.5, Sonnet 4, Sonnet 4.5, Sonnet 4.6, Opus 4, Opus 4.5, Opus 4.6
+- Theory context: full (~200 words)
+- 70 inferences (10 seeds × 7 models)
+
+**Duration:** 58.3 minutes
+
+**Key Result:** **No significant differences between models!** Surprisingly, Haiku 4.5 (cheapest) has highest mean F1 (43.3%). All Opus models tie at 40.0%. Task difficulty varies more by game than by model.
+
+| Model | Mean F1 | p vs Sonnet 4 |
+|-------|---------|---------------|
+| Haiku 4.5 | 43.3% | 0.43 |
+| Opus 4/4.5/4.6 | 40.0% | 0.34-0.59 |
+| Sonnet 4/4.5 | 38.3% | - |
+| Sonnet 4.6 | 36.7% | 0.68 |
+
+**Implication:** Use Haiku 4.5 for production - same or better performance at 1/15th the cost.
+
+**Results:** [results/model_comparison_experiment/README.md](model_comparison_experiment/README.md)
+
+**Raw Data:** `outputs/model_comparison_experiment/20260226_004501/`
+
+**W&B:** https://wandb.ai/thomasjiralerspong/truthification/runs/79u273sy
+
+---
+
 ## Template for New Experiments
 
 ```markdown
