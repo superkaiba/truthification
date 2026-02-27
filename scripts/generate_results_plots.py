@@ -302,6 +302,85 @@ def fig6_agent_strategy_inference():
     plt.close()
     print("Saved fig6_agent_strategy_inference.png")
 
+def fig6b_agent_strategy_values():
+    """Figure 6b: Agent Communication Strategy Effect on Judge/Agent Values."""
+    import json
+    from pathlib import Path
+
+    base_dir = OUTPUTS_DIR / "agent_strategy_inference/20260221_134220"
+
+    # Collect data by strategy
+    strategy_data = {}
+
+    for game_file in base_dir.glob('game_*.json'):
+        data = json.load(open(game_file))
+        strategy = data['condition']['agent_communication_strategy']
+
+        if strategy not in strategy_data:
+            strategy_data[strategy] = {
+                'total_value': [],
+                'agent_values': {'Agent_A': [], 'Agent_B': []},
+            }
+
+        metrics = data['metrics']
+        strategy_data[strategy]['total_value'].append(metrics['total_value'])
+
+        for agent, value in metrics['agent_cumulative_values'].items():
+            strategy_data[strategy]['agent_values'][agent].append(value)
+
+    # Order by judge value
+    strategies = ['honest', 'credibility_attack', 'aggressive', 'deceptive', 'natural', 'subtle', 'misdirection']
+    strategy_labels = ['Honest', 'Credibility\nAttack', 'Aggressive', 'Deceptive', 'Natural', 'Subtle', 'Misdirection']
+
+    judge_means = []
+    judge_ses = []
+    agent_a_means = []
+    agent_b_means = []
+
+    for strat in strategies:
+        if strat in strategy_data:
+            d = strategy_data[strat]
+            n = len(d['total_value'])
+            judge_means.append(np.mean(d['total_value']))
+            judge_ses.append(np.std(d['total_value']) / np.sqrt(n))
+            agent_a_means.append(np.mean(d['agent_values']['Agent_A']))
+            agent_b_means.append(np.mean(d['agent_values']['Agent_B']))
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+
+    # Left plot: Judge value
+    colors = plt.cm.RdYlGn(np.linspace(0.8, 0.2, len(strategies)))
+    bars1 = ax1.bar(range(len(strategies)), judge_means, yerr=judge_ses, capsize=4,
+                    color=colors, edgecolor='black', width=0.7)
+    ax1.set_xticks(range(len(strategies)))
+    ax1.set_xticklabels(strategy_labels, fontsize=9)
+    ax1.set_ylabel('Judge Total Value')
+    ax1.set_title('Judge Value by Agent Communication Strategy')
+    ax1.set_ylim(0, 250)
+
+    for bar, mean in zip(bars1, judge_means):
+        ax1.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 8,
+                f'{mean:.0f}', ha='center', va='bottom', fontsize=9)
+
+    # Right plot: Agent values (grouped bar)
+    x = np.arange(len(strategies))
+    width = 0.35
+
+    bars2a = ax2.bar(x - width/2, agent_a_means, width, label='Agent A', color='#5DA5DA', edgecolor='black')
+    bars2b = ax2.bar(x + width/2, agent_b_means, width, label='Agent B', color='#FAA43A', edgecolor='black')
+
+    ax2.set_xticks(x)
+    ax2.set_xticklabels(strategy_labels, fontsize=9)
+    ax2.set_ylabel('Agent Cumulative Value')
+    ax2.set_title('Agent Values by Communication Strategy')
+    ax2.set_ylim(0, 10)
+    ax2.legend()
+
+    plt.tight_layout()
+    plt.savefig(PLOTS_DIR / "fig6b_agent_strategy_values.png", dpi=150, bbox_inches='tight')
+    plt.close()
+    print("Saved fig6b_agent_strategy_values.png")
+
 def fig7_deception_strategies():
     """Figure 7: Deception Detection Strategies."""
     data = load_json(OUTPUTS_DIR / "deception_strategies_experiment/20260221_110535/condition_stats.json")
@@ -479,6 +558,7 @@ def main():
     fig4_search_space()
     fig5_theory_context()
     fig6_agent_strategy_inference()
+    fig6b_agent_strategy_values()
     fig7_deception_strategies()
     fig8_model_comparison()
     fig9_f1_evolution()
