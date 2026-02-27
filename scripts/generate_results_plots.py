@@ -204,24 +204,24 @@ def fig4_search_space():
 
 def fig5_theory_context():
     """Figure 5: Theory Context Effect on Inference."""
-    data = load_json(OUTPUTS_DIR / "theory_context_experiment/20260221_131125/condition_stats.json")
+    # Use controlled context experiment which has all 4 conditions
+    data = load_json(OUTPUTS_DIR / "controlled_context_experiment/phase2_20260226_001215/results.json")
 
-    contexts = ['none', 'brief', 'full']
-    context_labels = ['No Context', 'Brief Context', 'Full Context']
+    contexts = ['none', 'full', 'strategy_list', 'comprehensive']
+    context_labels = ['None', 'Full\n(~200 words)', 'Strategy List\n(~250 words)', 'Comprehensive\n(~5000 words)']
 
     means = []
     ses = []
 
     for ctx in contexts:
-        mean = data[ctx]["stats"]["exact_f1"]["mean"] * 100
-        std = data[ctx]["stats"]["exact_f1"]["std"] * 100
-        n = data[ctx]["stats"]["exact_f1"]["n"]
+        mean = data["stats"][ctx]["mean"] * 100
+        stderr = data["stats"][ctx]["stderr"] * 100
         means.append(mean)
-        ses.append(std / np.sqrt(n))
+        ses.append(stderr)
 
-    fig, ax = plt.subplots(figsize=(7, 5))
+    fig, ax = plt.subplots(figsize=(9, 5))
 
-    colors = ['#ff9999', '#99ccff', '#99ff99']
+    colors = ['#ff9999', '#99ccff', '#ffcc99', '#99ff99']
     bars = ax.bar(range(len(contexts)), means, yerr=ses, capsize=5,
                   color=colors, edgecolor='black', width=0.6)
 
@@ -230,7 +230,7 @@ def fig5_theory_context():
     ax.set_xlabel('Theory Context')
     ax.set_ylabel('Exact F1 (%)')
     ax.set_title('Effect of Theory Context on Objective Inference')
-    ax.set_ylim(0, 70)
+    ax.set_ylim(0, 60)
 
     # Add value labels
     for bar, mean, se in zip(bars, means, ses):
