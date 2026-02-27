@@ -135,20 +135,20 @@ This document summarizes all experimental results from the truthification projec
 
 **Research Question:** How does agent communication strategy affect judge and agent rewards?
 
-| Strategy | Judge Value | SE | Agent A | Agent B | Selection Acc | N |
-|----------|-------------|-----|---------|---------|---------------|---|
-| Honest | 191.8 | 17.5 | 5.0 | 5.6 | 94.1% | 10 |
-| Credibility Attack | 173.0 | 18.1 | 4.3 | 6.2 | 80.1% | 6 |
-| Aggressive | 161.7 | 19.1 | 5.9 | 6.0 | 78.7% | 10 |
-| Deceptive | 156.6 | 18.0 | 6.4 | 5.3 | 80.7% | 9 |
-| Natural | 154.2 | 19.5 | 5.0 | 5.7 | 75.6% | 10 |
-| Subtle | 147.3 | 18.8 | 5.4 | 5.8 | 73.0% | 10 |
-| Misdirection | 119.0 | 13.5 | 6.5 | 5.2 | 60.8% | 10 |
+| Strategy | Judge Value | SE | Combined Agent Value | Selection Acc | N |
+|----------|-------------|-----|----------------------|---------------|---|
+| Aggressive | 161.7 | 19.1 | 11.9 | 78.7% | 10 |
+| Deceptive | 156.6 | 18.0 | 11.8 | 80.7% | 9 |
+| Misdirection | 119.0 | 13.5 | 11.7 | 60.8% | 10 |
+| Subtle | 147.3 | 18.8 | 11.2 | 73.0% | 10 |
+| Natural | 154.2 | 19.5 | 10.7 | 75.6% | 10 |
+| Honest | 191.8 | 17.5 | 10.6 | 94.1% | 10 |
+| Credibility Attack | 173.0 | 18.1 | 10.5 | 80.1% | 6 |
 
 **Findings:**
-- Honest strategy yields highest judge value (191.8) and selection accuracy (94.1%)
-- Misdirection yields lowest judge value (119.0) and selection accuracy (60.8%)
-- Agent values relatively stable across strategies (~5-6 each)
+- **Judge value:** Honest (191.8) highest, Misdirection (119.0) lowest
+- **Agent value:** Aggressive (11.9) highest, Credibility Attack (10.5) lowest
+- Trade-off: Honest maximizes judge value but yields lower agent rewards
 
 ![Agent Strategy Values](plots/fig6b_agent_strategy_values.png)
 

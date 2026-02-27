@@ -328,31 +328,51 @@ def fig6b_agent_strategy_values():
         for agent, value in metrics['agent_cumulative_values'].items():
             strategy_data[strategy]['agent_values'][agent].append(value)
 
-    # Order by judge value
+    # Calculate combined agent values and sort
     strategies = ['honest', 'credibility_attack', 'aggressive', 'deceptive', 'natural', 'subtle', 'misdirection']
-    strategy_labels = ['Honest', 'Credibility\nAttack', 'Aggressive', 'Deceptive', 'Natural', 'Subtle', 'Misdirection']
 
-    judge_means = []
-    judge_ses = []
-    agent_a_means = []
-    agent_b_means = []
-
+    combined_values = []
     for strat in strategies:
         if strat in strategy_data:
             d = strategy_data[strat]
-            n = len(d['total_value'])
-            judge_means.append(np.mean(d['total_value']))
-            judge_ses.append(np.std(d['total_value']) / np.sqrt(n))
-            agent_a_means.append(np.mean(d['agent_values']['Agent_A']))
-            agent_b_means.append(np.mean(d['agent_values']['Agent_B']))
+            agent_a_mean = np.mean(d['agent_values']['Agent_A'])
+            agent_b_mean = np.mean(d['agent_values']['Agent_B'])
+            combined_values.append((strat, agent_a_mean + agent_b_mean))
+
+    # Sort by combined agent value (highest to lowest)
+    combined_values.sort(key=lambda x: x[1], reverse=True)
+    strategies_sorted = [x[0] for x in combined_values]
+
+    strategy_labels_map = {
+        'honest': 'Honest', 'credibility_attack': 'Credibility\nAttack',
+        'aggressive': 'Aggressive', 'deceptive': 'Deceptive',
+        'natural': 'Natural', 'subtle': 'Subtle', 'misdirection': 'Misdirection'
+    }
+    strategy_labels = [strategy_labels_map[s] for s in strategies_sorted]
+
+    judge_means = []
+    judge_ses = []
+    combined_agent_means = []
+    combined_agent_ses = []
+
+    for strat in strategies_sorted:
+        d = strategy_data[strat]
+        n = len(d['total_value'])
+        judge_means.append(np.mean(d['total_value']))
+        judge_ses.append(np.std(d['total_value']) / np.sqrt(n))
+
+        # Combined agent values per game
+        combined_per_game = [a + b for a, b in zip(d['agent_values']['Agent_A'], d['agent_values']['Agent_B'])]
+        combined_agent_means.append(np.mean(combined_per_game))
+        combined_agent_ses.append(np.std(combined_per_game) / np.sqrt(n))
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
 
-    # Left plot: Judge value
-    colors = plt.cm.RdYlGn(np.linspace(0.8, 0.2, len(strategies)))
-    bars1 = ax1.bar(range(len(strategies)), judge_means, yerr=judge_ses, capsize=4,
+    # Left plot: Judge value (keep same order as agent values for comparison)
+    colors = plt.cm.RdYlGn(np.linspace(0.8, 0.2, len(strategies_sorted)))
+    bars1 = ax1.bar(range(len(strategies_sorted)), judge_means, yerr=judge_ses, capsize=4,
                     color=colors, edgecolor='black', width=0.7)
-    ax1.set_xticks(range(len(strategies)))
+    ax1.set_xticks(range(len(strategies_sorted)))
     ax1.set_xticklabels(strategy_labels, fontsize=9)
     ax1.set_ylabel('Judge Total Value')
     ax1.set_title('Judge Value by Agent Communication Strategy')
@@ -362,19 +382,20 @@ def fig6b_agent_strategy_values():
         ax1.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 8,
                 f'{mean:.0f}', ha='center', va='bottom', fontsize=9)
 
-    # Right plot: Agent values (grouped bar)
-    x = np.arange(len(strategies))
-    width = 0.35
+    # Right plot: Combined agent values (sorted highest to lowest)
+    colors2 = plt.cm.Blues(np.linspace(0.8, 0.3, len(strategies_sorted)))
+    bars2 = ax2.bar(range(len(strategies_sorted)), combined_agent_means, yerr=combined_agent_ses,
+                    capsize=4, color=colors2, edgecolor='black', width=0.7)
 
-    bars2a = ax2.bar(x - width/2, agent_a_means, width, label='Agent A', color='#5DA5DA', edgecolor='black')
-    bars2b = ax2.bar(x + width/2, agent_b_means, width, label='Agent B', color='#FAA43A', edgecolor='black')
-
-    ax2.set_xticks(x)
+    ax2.set_xticks(range(len(strategies_sorted)))
     ax2.set_xticklabels(strategy_labels, fontsize=9)
-    ax2.set_ylabel('Agent Cumulative Value')
-    ax2.set_title('Agent Values by Communication Strategy')
-    ax2.set_ylim(0, 10)
-    ax2.legend()
+    ax2.set_ylabel('Combined Agent Value (A + B)')
+    ax2.set_title('Combined Agent Values by Communication Strategy\n(sorted highest to lowest)')
+    ax2.set_ylim(0, 16)
+
+    for bar, mean in zip(bars2, combined_agent_means):
+        ax2.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.3,
+                f'{mean:.1f}', ha='center', va='bottom', fontsize=9)
 
     plt.tight_layout()
     plt.savefig(PLOTS_DIR / "fig6b_agent_strategy_values.png", dpi=150, bbox_inches='tight')
