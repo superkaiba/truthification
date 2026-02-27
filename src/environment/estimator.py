@@ -88,7 +88,7 @@ class Estimator:
     thinking_budget: int = 5000  # Token budget for thinking
     sees_agent_thinking: bool = False  # Whether to include agents' CoT in prompts
     deception_strategy: str = "baseline"  # Deception detection strategy: baseline, consistency, incentive, pattern, combined
-    theory_context: str = "none"  # Theory context for inference: none, brief, full
+    theory_context: str = "none"  # Theory context: none, brief, full, strategy_list, comprehensive
     _client: anthropic.Anthropic | None = field(default=None, repr=False)
 
     def __post_init__(self):

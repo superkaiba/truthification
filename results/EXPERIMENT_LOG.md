@@ -276,6 +276,42 @@ This file tracks all experiments run in the truthification project.
 
 ---
 
+## 2026-02-26: F1 Evolution Over Statements
+
+**Goal:** Test how objective inference accuracy changes as the estimator sees more agent statements
+
+**Config:**
+- Same 10 game trajectories (within-subjects)
+- Checkpoints: 6, 12, 18, 24, 30, 36, 42, 48 statements
+- Model: Haiku 4.5 (established as cost-effective)
+- Theory context: full
+- 80 inferences (10 seeds × 8 checkpoints)
+
+**Duration:** 40.4 minutes
+
+**Key Result:** **F1 does NOT monotonically increase with more statements!** Peak at 24 statements (50.0%), significant drop at 42 (35.0%). Early statements may be most informative.
+
+| Statements | Mean F1 |
+|------------|---------|
+| 6 | 40.0% |
+| 12 | 46.7% |
+| 18 | 43.3% |
+| **24** | **50.0%** |
+| 30 | 48.3% |
+| 36 | 48.3% |
+| 42 | 35.0% |
+| 48 | 46.7% |
+
+**Implication:** Consider stopping inference early (~24 statements) - later statements may add noise/deception.
+
+**Results:** [results/f1_evolution_experiment/README.md](f1_evolution_experiment/README.md)
+
+**Raw Data:** `outputs/f1_evolution_experiment/20260226_132316/`
+
+**W&B:** https://wandb.ai/thomasjiralerspong/truthification/runs/ku8nkcni
+
+---
+
 ## Template for New Experiments
 
 ```markdown
