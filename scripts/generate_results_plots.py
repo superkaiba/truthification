@@ -204,24 +204,36 @@ def fig4_search_space():
 
 def fig5_theory_context():
     """Figure 5: Theory Context Effect on Inference."""
-    # Use controlled context experiment which has all 4 conditions
-    data = load_json(OUTPUTS_DIR / "controlled_context_experiment/phase2_20260226_001215/results.json")
+    # Combine data from two experiments:
+    # - Original: none, brief, full
+    # - Controlled: none, full, strategy_list, comprehensive
+    data_original = load_json(OUTPUTS_DIR / "theory_context_experiment/20260221_131125/condition_stats.json")
+    data_controlled = load_json(OUTPUTS_DIR / "controlled_context_experiment/phase2_20260226_001215/results.json")
 
-    contexts = ['none', 'full', 'strategy_list', 'comprehensive']
-    context_labels = ['None', 'Full\n(~200 words)', 'Strategy List\n(~250 words)', 'Comprehensive\n(~5000 words)']
+    # Build combined data - use controlled for none/full (more recent), original for brief
+    contexts = ['none', 'brief', 'full', 'strategy_list', 'comprehensive']
+    context_labels = ['None', 'Brief\n(~50 words)', 'Full\n(~200 words)', 'Strategy List\n(~250 words)', 'Comprehensive\n(~5000 words)']
 
     means = []
     ses = []
 
     for ctx in contexts:
-        mean = data["stats"][ctx]["mean"] * 100
-        stderr = data["stats"][ctx]["stderr"] * 100
+        if ctx == 'brief':
+            # From original experiment
+            mean = data_original[ctx]["stats"]["exact_f1"]["mean"] * 100
+            std = data_original[ctx]["stats"]["exact_f1"]["std"] * 100
+            n = data_original[ctx]["stats"]["exact_f1"]["n"]
+            se = std / np.sqrt(n)
+        else:
+            # From controlled experiment
+            mean = data_controlled["stats"][ctx]["mean"] * 100
+            se = data_controlled["stats"][ctx]["stderr"] * 100
         means.append(mean)
-        ses.append(stderr)
+        ses.append(se)
 
-    fig, ax = plt.subplots(figsize=(9, 5))
+    fig, ax = plt.subplots(figsize=(10, 5))
 
-    colors = ['#ff9999', '#99ccff', '#ffcc99', '#99ff99']
+    colors = ['#ff9999', '#ffcccc', '#99ccff', '#ffcc99', '#99ff99']
     bars = ax.bar(range(len(contexts)), means, yerr=ses, capsize=5,
                   color=colors, edgecolor='black', width=0.6)
 

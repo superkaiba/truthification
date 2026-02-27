@@ -12,7 +12,7 @@ This document summarizes all experimental results from the truthification projec
 | 2 | Oracle Budget Effect | Objective F1 | Peak at budget=6 (27.1%) | 6 conditions |
 | 3 | Objective Complexity | Objective F1 | L1: 39.5% → L5: 16.4% | 5 levels |
 | 4 | Search Space Constraint | Objective F1 | Freeform: 30.5% → MC-8: 94.9% | 6 modes |
-| 5 | Theory Context | Exact F1 | None: 33.3% → Comprehensive: 43.3% | 4 conditions |
+| 5 | Theory Context | Exact F1 | None: 33.3% → Brief: 46.7% | 5 conditions |
 | 6 | Deception Strategies | Exact F1 | Baseline: 36.7% → Combined: 45.0% | 5 strategies |
 | 7 | Agent Communication Strategy | Exact F1 | Aggressive: 55.0% → Misdirection: 16.7% | 7 strategies |
 | 8 | Controlled Theory Context | Exact F1 | None: 33.3% → Comprehensive: 43.3% | 4 conditions |
@@ -95,14 +95,17 @@ This document summarizes all experimental results from the truthification projec
 
 **Research Question:** Does providing theory context improve inference?
 
-| Context | Description | Exact F1 | Std | SE | N |
-|---------|-------------|----------|-----|-----|---|
-| None | No theory provided | 33.3% | 20.8% | 6.6% | 10 |
-| Full | ~200 words: Crawford-Sobel, preference leakage, bias correction | 40.0% | 17.9% | 5.7% | 10 |
-| Strategy List | ~250 words: descriptions of 6 agent strategies | 36.7% | 27.0% | 8.5% | 10 |
-| Comprehensive | ~5000 words: full academic framework (info econ, IRL, linguistics, bias correction) | 43.3% | 25.1% | 7.9% | 10 |
+| Context | Description | Exact F1 | SE | N |
+|---------|-------------|----------|-----|---|
+| None | No theory provided | 33.3% | 6.6% | 10 |
+| Brief | ~50 words: "preferences leak through patterns" | 46.7% | 7.0% | 20 |
+| Full | ~200 words: Crawford-Sobel, preference leakage, bias correction | 40.0% | 5.7% | 10 |
+| Strategy List | ~250 words: descriptions of 6 agent strategies | 36.7% | 8.5% | 10 |
+| Comprehensive | ~5000 words: full academic framework (info econ, IRL, linguistics, bias correction) | 43.3% | 7.9% | 10 |
 
-**Trend:** Comprehensive context provides +10.0 percentage points over no context
+**Note:** Brief context from original experiment; others from controlled experiment.
+
+**Finding:** Brief context (46.7%) outperforms longer contexts - more detail may not help.
 
 ![Theory Context Effect](plots/fig5_theory_context.png)
 
