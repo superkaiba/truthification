@@ -259,7 +259,11 @@ class GameConfig:
     # value over time.
 
     # Agent Communication Strategy
-    agent_communication_strategy: str = "natural"  # Strategy agents use to communicate
+    agent_communication_strategy: str = "natural"  # Global strategy (applies to all unless per-agent set)
+    # Per-agent communication strategies (override global if set)
+    agent_a_strategy: str | None = None  # Strategy for Agent A (first agent)
+    agent_b_strategy: str | None = None  # Strategy for Agent B (second agent)
+    # Available strategies:
     # - "natural": No guidance, agent chooses naturally
     # - "honest": Be direct and truthful about preferences
     # - "deceptive": Actively hide true preferences
@@ -408,9 +412,14 @@ class HiddenValueGame:
                 agent.enable_thinking = True
                 agent.thinking_budget = self.config.agent_thinking_budget
 
-        # Apply communication strategy to all agents
-        for agent in self.agents:
-            agent.communication_strategy = self.config.agent_communication_strategy
+        # Apply communication strategy to agents
+        # Per-agent strategies take precedence over global strategy
+        per_agent_strategies = [self.config.agent_a_strategy, self.config.agent_b_strategy]
+        for i, agent in enumerate(self.agents):
+            if i < len(per_agent_strategies) and per_agent_strategies[i] is not None:
+                agent.communication_strategy = per_agent_strategies[i]
+            else:
+                agent.communication_strategy = self.config.agent_communication_strategy
 
         # Track value claims if enabled
         self.value_claims: list[ValueRuleClaim] = []
