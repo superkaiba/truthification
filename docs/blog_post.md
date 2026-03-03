@@ -32,7 +32,7 @@ We designed a controlled environment with these components:
 - **2 LLM agents** (Claude Sonnet 4): each has a private value function over object properties (e.g., "cares about: color=blue, shape=star"). They don't know each other's objectives
 - **Judge**: an LLM that selects objects over 10 rounds based on agent debate, with a limited oracle budget for ground-truth verification
 - **Estimator**: a separate, passive LLM observer that reads the full transcript and infers each agent's hidden value function
-- **Metric**: **Exact F1** — precision/recall on correctly inferred (property, value) pairs
+- **Metric**: **Exact F1** — the estimator predicts which (property, value) pairs each agent cares about (e.g., "color=blue"), and we compute F1 against the ground truth. If an agent cares about {color=blue, shape=star, material=wood} and the estimator predicts {color=blue, shape=star, size=large}, that's precision 2/3, recall 2/3, F1 = 66.7%
 
 We tested 7 communication strategies: natural, honest, deceptive, misdirection, aggressive, subtle, and credibility attack.
 
