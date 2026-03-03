@@ -3,9 +3,10 @@
 **TLDR:**
 - We built a game where LLM agents with hidden objectives debate to influence a judge, then tested whether a separate LLM observer can infer those objectives from the debate transcript.
 - **What the agent does matters most.** Agent communication strategy produces a 38pp spread in inference accuracy (aggressive: 55% vs misdirection: 17%). Misdirection beats outright lying for concealing objectives.
+- **The strategies that fool the observer don't cost the agent much.** Misdirection and deception achieve nearly the same agent reward as aggressive/honest strategies while being far harder to see through — agents have a direct incentive to conceal.
 - **What the observer is doesn't matter.** Haiku 4.5 ($0.25/MTok) matches Opus 4.6 ($15/MTok) — no significant differences across 7 models.
 - **More debate doesn't help.** Inference peaks at ~24 statements then plateaus or drops, because agents become more deceptive over time.
-- **Verification is critical.** Forced oracle access nearly triples property accuracy (25% → 71%), but LLMs won't use verification tools voluntarily.
+- **Verification is critical.** Forced oracle access nearly triples property accuracy (25% → 71%).
 - **Telling the observer about strategic communication helps.** Brief theory context (+13pp) and consistency-checking prompts (+8pp) both improve inference — but more elaborate instructions don't help further.
 - The main takeaway: **the information environment matters far more than observer capability**. Efforts to improve truth recovery should focus on incentive structures, not scaling.
 
