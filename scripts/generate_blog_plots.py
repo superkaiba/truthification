@@ -279,7 +279,62 @@ def plot_effect_of_context():
 
 
 # ============================================================================
-# Plot 5: Model Comparison
+# Plot 5: Strategy Effect on Game Outcomes
+# ============================================================================
+
+def plot_strategy_game_outcomes():
+    # Data from EXPERIMENTAL_RESULTS_SUMMARY.md section 4.2
+    # Sorted by judge value descending
+    strategies = ["Honest", "Credibility\nAttack", "Aggressive", "Deceptive", "Natural", "Subtle", "Misdirection"]
+    judge_values = [191.8, 173.0, 161.7, 156.6, 154.2, 147.3, 119.0]
+    judge_ses =    [17.5,  18.1,  19.1,  18.0,  19.5,  18.8,  13.5]
+    agent_values = [10.6,  10.5,  11.9,  11.8,  10.7,  11.2,  11.7]
+    selection_acc = [94.1, 80.1,  78.7,  80.7,  75.6,  73.0,  60.8]
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+
+    # Left: Judge value
+    x = np.arange(len(strategies))
+    bars1 = ax1.bar(x, judge_values, yerr=judge_ses, capsize=4,
+                    color=COLORS["primary"], edgecolor="white", linewidth=0.5, width=0.6)
+    ax1.set_xticks(x)
+    ax1.set_xticklabels(strategies, fontsize=8)
+    ax1.set_ylabel("Judge Total Value")
+    ax1.set_title("Judge Reward by Agent Strategy")
+    ax1.set_ylim(0, 240)
+
+    for bar, val, se in zip(bars1, judge_values, judge_ses):
+        ax1.text(bar.get_x() + bar.get_width() / 2, val + se + 3,
+                 f"{val:.0f}", ha="center", va="bottom",
+                 fontsize=8, fontweight="600", color=COLORS["dark"])
+
+    # Right: Agent value (combined A+B)
+    # Sort by agent value descending for this panel
+    agent_order = np.argsort(agent_values)[::-1]
+    strat_agent = [strategies[i] for i in agent_order]
+    av_sorted = [agent_values[i] for i in agent_order]
+
+    bars2 = ax2.bar(np.arange(len(strat_agent)), av_sorted,
+                    color=COLORS["secondary"], edgecolor="white", linewidth=0.5, width=0.6)
+    ax2.set_xticks(np.arange(len(strat_agent)))
+    ax2.set_xticklabels(strat_agent, fontsize=8)
+    ax2.set_ylabel("Combined Agent Value (A + B)")
+    ax2.set_title("Agent Reward by Agent Strategy")
+    ax2.set_ylim(0, 15)
+
+    for bar, val in zip(bars2, av_sorted):
+        ax2.text(bar.get_x() + bar.get_width() / 2, val + 0.2,
+                 f"{val:.1f}", ha="center", va="bottom",
+                 fontsize=8, fontweight="600", color=COLORS["dark"])
+
+    plt.tight_layout()
+    plt.savefig(PLOTS_DIR / "fig6b_strategy_game_outcomes.png", dpi=150, bbox_inches="tight")
+    plt.close()
+    print("Saved fig6b_strategy_game_outcomes.png")
+
+
+# ============================================================================
+# Plot 6: Model Comparison
 # ============================================================================
 
 def plot_model_comparison():
@@ -326,5 +381,6 @@ if __name__ == "__main__":
     plot_oracle_effect()
     plot_f1_evolution()
     plot_effect_of_context()
+    plot_strategy_game_outcomes()
     plot_model_comparison()
     print("\nAll blog plots generated.")

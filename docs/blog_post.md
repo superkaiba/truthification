@@ -57,7 +57,20 @@ Across 70 games, communication strategy produced a **38pp spread** — the large
 
 Aggressive advocacy makes objectives obvious — the estimator just identifies which objects each agent pushed. **Misdirection beats outright deception** for concealment because lying still draws attention to the right dimensions, while misdirection shifts attention to irrelevant ones.
 
-Strategy also affects game outcomes. Honest agents maximize judge value (191.8) but sacrifice agent reward (10.6), while aggressive agents maximize their own reward (11.9) at the judge's expense.
+### Strategy also shapes game outcomes
+
+Communication strategy doesn't just affect inference — it changes how much value each player extracts from the game.
+
+![Strategy Game Outcomes](../results/plots/fig6b_strategy_game_outcomes.png)
+
+The left panel shows the judge's total value (how good the selected objects were); the right panel shows the combined agent reward (how well the selected objects matched agent preferences). The rankings are nearly inverted:
+
+- **Honest agents are best for the judge** (192 judge value, 94% selection accuracy) — when agents truthfully reveal their preferences, the judge makes well-informed decisions. But honest agents sacrifice their own reward (10.6, lowest).
+- **Aggressive agents maximize their own reward** (11.9) by pushing hard for their preferred objects — but the judge still does reasonably well (162).
+- **Misdirection destroys judge performance** (119, worst by far) while keeping agent reward high (11.7). By flooding the debate with irrelevant information, misdirecting agents prevent the judge from learning anything useful.
+- **Deceptive agents get the best of both worlds** — high agent reward (11.8) without tanking the judge (157). Direct lies are less disruptive to the judge than misdirection because they still contain structural information about the relevant dimensions.
+
+This reveals a fundamental tension: the strategy that maximizes transparency (honest) is worst for the agents, while the strategy that maximizes concealment (misdirection) is worst for the judge.
 
 ### Oracle access is transformative
 
