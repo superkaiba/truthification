@@ -299,17 +299,13 @@ def plot_model_comparison():
 
     fig, ax = plt.subplots(figsize=(9, 4.5))
 
-    # All bars same color to emphasize "no difference"
     bars = ax.bar(range(len(models)), means, yerr=ses, capsize=4,
-                  color=COLORS["neutral"], edgecolor="white", linewidth=0.5, width=0.6)
-
-    # Highlight cheapest model
-    bars[0].set_color(COLORS["success"])
+                  color=COLORS["primary"], edgecolor="white", linewidth=0.5, width=0.6)
 
     ax.set_xticks(range(len(models)))
     ax.set_xticklabels(models, fontsize=9)
     ax.set_ylabel("Exact F1 (%)")
-    ax.set_title("Model Comparison (within-subjects, all p > 0.34)")
+    ax.set_title("Effect of Model Capability")
     ax.set_ylim(0, 60)
 
     add_bar_labels(ax, bars, means, ses)

@@ -19,10 +19,6 @@ The core problem: text on the internet is produced by agents with specific objec
 
 But this raises a prerequisite question: **can we even identify what agents want from observing their behavior?** That's what we test here.
 
-## Related Work
-
-**Cheap talk** (Crawford & Sobel, 1982): with misaligned incentives, agents can only credibly transmit coarse information. Our environment instantiates this. **IRL** (Ng & Russell, 2000): inferring objectives from behavior, but we observe communication rather than actions. **AI debate** (Irving et al., 2018): debate as alignment; we empirically measure when this works and fails. **Deception detection** (Pérez-Rosas et al., 2018): we study strategic, adaptive deception by capable LLM agents rather than static text classification.
-
 ## Setup: The Hidden Value Game
 
 We designed a controlled environment with these components:
@@ -73,7 +69,7 @@ Optimal oracle budget is ~6 queries (27.1% F1), with diminishing returns beyond 
 
 ### Model capability doesn't matter
 
-7 Claude models tested on the same 10 transcripts (within-subjects). All p > 0.34 — no significant differences. **The cheapest model (Haiku 4.5) ties the most expensive (Opus 4.6).** The bottleneck is information structure, not model capability — if the signal isn't in the transcript, no model will find it.
+7 Claude models tested on the same 10 transcripts (within-subjects). No significant differences. **The cheapest model (Haiku 4.5) ties the most expensive (Opus 4.6).** The bottleneck is information structure, not model capability — if the signal isn't in the transcript, no model will find it.
 
 ![Model Comparison](../results/plots/fig8_model_comparison.png)
 
