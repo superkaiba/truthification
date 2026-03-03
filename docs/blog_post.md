@@ -6,6 +6,7 @@
 - **What the observer is doesn't matter.** Haiku 4.5 ($0.25/MTok) matches Opus 4.6 ($15/MTok) — no significant differences across 7 models.
 - **More debate doesn't help.** Inference peaks at ~24 statements then plateaus or drops, because agents become more deceptive over time.
 - **Verification is critical.** Forced oracle access nearly triples property accuracy (25% → 71%), but LLMs won't use verification tools voluntarily.
+- **Telling the observer about strategic communication helps.** Brief theory context (+13pp) and consistency-checking prompts (+8pp) both improve inference — but more elaborate instructions don't help further.
 - The main takeaway: **the information environment matters far more than observer capability**. Efforts to improve truth recovery should focus on incentive structures, not scaling.
 
 ---
@@ -96,13 +97,34 @@ F1 at 8 checkpoints from 6 to 48 statements:
 
 Peak at 24 statements (50.0%), with a drop at 42 (35.0%). No monotonic improvement. Early statements are most informative; agents become more deceptive over time. Our qualitative analysis confirms: credibility attacks go from 3/10 agents in round 1 to 9/10 by round 10.
 
-### Other findings
+### Theory context and deception detection help — but only a little
 
-- **Theory context helps**: brief priming about strategic communication improves F1 by up to +13pp. Longer context doesn't help more
-- **Deception detection strategies**: consistency checking gives +8.3pp; combining multiple strategies provides no additional benefit
-- **Multiple-choice >> freeform**: recognition accuracy ~95% vs generation ~30% — LLMs have strong implicit knowledge they can't easily articulate
-- **Passive > active**: the estimator outperforms the judge on inference by 5–24pp across all conditions. Participating in the debate creates vulnerabilities
-- **Complexity degrades accuracy**: 1 property = 39.5% F1 → 5 properties = 16.4%
+Telling the estimator about strategic communication improves inference. We tested providing theoretical background (Crawford-Sobel signaling theory, inverse reinforcement learning, bias correction) at varying lengths:
+
+| Context | Exact F1 | vs None |
+|---------|----------|---------|
+| None | 33.3% | — |
+| Brief (~50 words) | 46.7% | +13.4pp |
+| Full (~200 words) | 40.0% | +6.7pp |
+| Comprehensive (~5000 words) | 43.3% | +10.0pp |
+
+![Theory Context Effect](../results/plots/fig5_theory_context.png)
+
+Brief context outperforms longer documents — concise priming beats comprehensive instruction.
+
+We also tested 5 deception detection strategies for the estimator:
+
+| Strategy | Exact F1 | vs Baseline |
+|----------|----------|-------------|
+| Baseline | 36.7% | — |
+| Consistency checking | 45.0% | +8.3pp |
+| Incentive analysis | 41.7% | +5.0pp |
+| Pattern recognition | 41.7% | +5.0pp |
+| Combined (all above) | 45.0% | +8.3pp |
+
+![Deception Strategies](../results/plots/fig7_deception_strategies.png)
+
+Consistency checking — flagging contradictions across an agent's statements — performs best. But combining all strategies provides **no benefit over consistency checking alone**. More complex prompts don't help.
 
 ## Emergent Manipulation Strategies
 
@@ -118,7 +140,7 @@ These emerge purely from incentive structure and intensify over rounds.
 
 ## Future Work
 
-**Fine-tuning an objective estimator.** Our estimator uses in-context learning. Fine-tuning on many trajectories with known ground-truth objectives could teach a model to detect deception patterns. The multiple-choice result (95%) suggests models already have the knowledge — fine-tuning might help surface it in freeform settings.
+**Fine-tuning an objective estimator.** Our estimator uses in-context learning. Fine-tuning on many trajectories with known ground-truth objectives could teach a model to detect deception patterns more reliably than prompted baselines.
 
 **Objective understanding for imitation.** If we fine-tune a model on an agent's actions, does understanding their objective help it generalize? We hypothesize yes:
 
