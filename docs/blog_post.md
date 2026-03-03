@@ -13,7 +13,7 @@
 
 ## Motivation
 
-This work is part of the [contextualization project](https://github.com/superkaiba/truthification), which aims to build systems that reliably estimate statement truth by conditioning on source identity and trust.
+This work is part of the contextualization project, which aims to build systems that reliably estimate statement truth by conditioning on source identity and trust.
 
 The core problem: text on the internet is produced by agents with specific objectives, but standard LLMs are trained on raw text, which **marginalizes over** author identity and goals — the same sentence means different things depending on who said it and why. The core theoretical insight ([agentic model of text generation](agentic-model-of-text-generation.md)) is that we can reverse this loss by explicitly conditioning on agent identity. "This product is excellent" carries entirely different information depending on whether it comes from a paid reviewer or a verified purchaser. If we can model the source, we can extract more accurate signal.
 
@@ -71,11 +71,11 @@ Forced oracle queries nearly triple property accuracy (25% → 71%):
 
 Optimal oracle budget is ~6 queries (27.1% F1), with diminishing returns beyond that — agents learn to "spin" oracle results (422 documented instances across 56 games).
 
-Critical finding: **LLMs don't voluntarily use verification tools.** When oracle use was optional, judges declined to query. Verification must be mandatory.
-
 ### Model capability doesn't matter
 
-7 Claude models tested on the same 10 transcripts (within-subjects): Haiku 4.5 (43.3%), Opus 4/4.5/4.6 (40.0%), Sonnet 4/4.5 (38.3%), Sonnet 4.6 (36.7%). All p > 0.34. **The cheapest model ties the most expensive.** The bottleneck is information structure, not model capability — if the signal isn't in the transcript, no model will find it.
+7 Claude models tested on the same 10 transcripts (within-subjects). All p > 0.34 — no significant differences. **The cheapest model (Haiku 4.5) ties the most expensive (Opus 4.6).** The bottleneck is information structure, not model capability — if the signal isn't in the transcript, no model will find it.
+
+![Model Comparison](../results/plots/fig8_model_comparison.png)
 
 ### More statements don't help
 

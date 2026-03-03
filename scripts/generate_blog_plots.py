@@ -279,6 +279,48 @@ def plot_effect_of_context():
 
 
 # ============================================================================
+# Plot 5: Model Comparison
+# ============================================================================
+
+def plot_model_comparison():
+    # Data from EXPERIMENTAL_RESULTS_SUMMARY.md (within-subjects, n=10)
+    models = ["Haiku 4.5", "Opus 4", "Opus 4.5", "Opus 4.6",
+              "Sonnet 4", "Sonnet 4.5", "Sonnet 4.6"]
+    means = [43.3, 40.0, 40.0, 40.0, 38.3, 38.3, 36.7]
+    stds = [19.6, 27.4, 26.3, 25.1, 27.3, 24.9, 27.0]
+    n = 10
+    ses = [s / np.sqrt(n) for s in stds]
+
+    # Sort by mean descending
+    order = np.argsort(means)[::-1]
+    models = [models[i] for i in order]
+    means = [means[i] for i in order]
+    ses = [ses[i] for i in order]
+
+    fig, ax = plt.subplots(figsize=(9, 4.5))
+
+    # All bars same color to emphasize "no difference"
+    bars = ax.bar(range(len(models)), means, yerr=ses, capsize=4,
+                  color=COLORS["neutral"], edgecolor="white", linewidth=0.5, width=0.6)
+
+    # Highlight cheapest model
+    bars[0].set_color(COLORS["success"])
+
+    ax.set_xticks(range(len(models)))
+    ax.set_xticklabels(models, fontsize=9)
+    ax.set_ylabel("Exact F1 (%)")
+    ax.set_title("Model Comparison (within-subjects, all p > 0.34)")
+    ax.set_ylim(0, 60)
+
+    add_bar_labels(ax, bars, means, ses)
+
+    plt.tight_layout()
+    plt.savefig(PLOTS_DIR / "fig8_model_comparison.png", dpi=150, bbox_inches="tight")
+    plt.close()
+    print("Saved fig8_model_comparison.png")
+
+
+# ============================================================================
 # Main
 # ============================================================================
 
@@ -288,4 +330,5 @@ if __name__ == "__main__":
     plot_oracle_effect()
     plot_f1_evolution()
     plot_effect_of_context()
+    plot_model_comparison()
     print("\nAll blog plots generated.")
