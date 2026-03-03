@@ -13,13 +13,11 @@
 
 ## Motivation
 
-This work is part of the [truthification project](https://github.com/superkaiba/truthification), which aims to build systems that reliably estimate statement truth by conditioning on source identity and trust.
+This work is part of the [contextualization project](https://github.com/superkaiba/truthification), which aims to build systems that reliably estimate statement truth by conditioning on source identity and trust.
 
-The core theoretical insight ([agentic model of text generation](agentic-model-of-text-generation.md)): text on the internet is produced by agents with specific objectives. Standard LLMs are trained on raw text, which **marginalizes over** author identity and goals — the same sentence means different things depending on who said it and why. Truthification proposes to reverse this by explicitly conditioning on agent identity.
+The core problem: text on the internet is produced by agents with specific objectives, but standard LLMs are trained on raw text, which **marginalizes over** author identity and goals — the same sentence means different things depending on who said it and why. The core theoretical insight ([agentic model of text generation](agentic-model-of-text-generation.md)) is that we can reverse this loss by explicitly conditioning on agent identity. "This product is excellent" carries entirely different information depending on whether it comes from a paid reviewer or a verified purchaser. If we can model the source, we can extract more accurate signal.
 
 But this raises a prerequisite question: **can we even identify what agents want from observing their behavior?** That's what we test here.
-
-This also connects to **contextualization** — the problem that "this product is excellent" carries entirely different information depending on whether it comes from a paid reviewer or a verified purchaser. If we can infer agent objectives, we can reason about how those objectives distort their communication.
 
 ## Related Work
 
@@ -187,7 +185,7 @@ These emerge purely from incentive structure and intensify over rounds.
 
 Behavioral cloning copies (state, action) pairs. Objective-conditioned imitation captures *why* the agent acts, enabling transfer to new situations. The quality of objective inference (F1) should correlate with imitation quality.
 
-**From objective inference to truthification.** This work validates a prerequisite — agent objectives are inferable from behavior. The path forward: objective inference → bias correction → trust calibration → full truthification (conditioning on source identity to produce calibrated truth estimates).
+**From objective inference to contextualization.** This work validates a prerequisite — agent objectives are inferable from behavior. The path forward: objective inference → bias correction → trust calibration → full contextualization (conditioning on source identity to produce calibrated truth estimates).
 
 ---
 
