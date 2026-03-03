@@ -23,16 +23,16 @@ COLORS = {
     "light": "#edf2f4",       # Light bg
 }
 
-# Gradient for ranked bars (green=best to red=worst)
-STRATEGY_COLORS = [
-    "#06d6a0",  # Aggressive (best) - teal
-    "#43aa8b",  # Honest
-    "#90be6d",  # Subtle
-    "#8d99ae",  # Natural (baseline) - gray
-    "#f9c74f",  # Credibility Attack - yellow
-    "#f8961e",  # Deceptive - orange
-    "#ef476f",  # Misdirection (worst) - red
-]
+# Fixed color per strategy (consistent across all plots)
+STRATEGY_COLOR_MAP = {
+    "aggressive":       "#06d6a0",  # teal
+    "honest":           "#43aa8b",  # green
+    "subtle":           "#90be6d",  # lime
+    "natural":          "#8d99ae",  # gray
+    "credibility_attack": "#f9c74f",  # yellow
+    "deceptive":        "#f8961e",  # orange
+    "misdirection":     "#ef476f",  # red
+}
 
 def setup_style():
     """Apply unified plot style."""
@@ -116,7 +116,8 @@ def plot_agent_strategy():
     means_r = means[::-1]
     ses_r = ses[::-1]
     labels_r = labels[::-1]
-    colors_r = STRATEGY_COLORS[::-1]
+    strategies_r = strategies[::-1]
+    colors_r = [STRATEGY_COLOR_MAP[s] for s in strategies_r]
 
     y = np.arange(len(strategies))
     bars = ax.barh(y, means_r, xerr=ses_r, capsize=4,
@@ -284,21 +285,22 @@ def plot_effect_of_context():
 
 def plot_strategy_game_outcomes():
     # Data from EXPERIMENTAL_RESULTS_SUMMARY.md section 4.2
-    # Sorted by judge value descending
-    strategies = ["Honest", "Credibility\nAttack", "Aggressive", "Deceptive", "Natural", "Subtle", "Misdirection"]
-    judge_values = [191.8, 173.0, 161.7, 156.6, 154.2, 147.3, 119.0]
-    judge_ses =    [17.5,  18.1,  19.1,  18.0,  19.5,  18.8,  13.5]
-    agent_values = [10.6,  10.5,  11.9,  11.8,  10.7,  11.2,  11.7]
-    selection_acc = [94.1, 80.1,  78.7,  80.7,  75.6,  73.0,  60.8]
+    # Keys match STRATEGY_COLOR_MAP
+    strategy_keys =  ["honest", "credibility_attack", "aggressive", "deceptive", "natural", "subtle", "misdirection"]
+    labels =         ["Honest", "Credibility\nAttack", "Aggressive", "Deceptive", "Natural", "Subtle", "Misdirection"]
+    judge_values =   [191.8, 173.0, 161.7, 156.6, 154.2, 147.3, 119.0]
+    judge_ses =      [17.5,  18.1,  19.1,  18.0,  19.5,  18.8,  13.5]
+    agent_values =   [10.6,  10.5,  11.9,  11.8,  10.7,  11.2,  11.7]
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 
-    # Left: Judge value
-    x = np.arange(len(strategies))
+    # Left: Judge value (sorted by judge value desc — already sorted)
+    x = np.arange(len(labels))
+    judge_colors = [STRATEGY_COLOR_MAP[k] for k in strategy_keys]
     bars1 = ax1.bar(x, judge_values, yerr=judge_ses, capsize=4,
-                    color=COLORS["primary"], edgecolor="white", linewidth=0.5, width=0.6)
+                    color=judge_colors, edgecolor="white", linewidth=0.5, width=0.6)
     ax1.set_xticks(x)
-    ax1.set_xticklabels(strategies, fontsize=8)
+    ax1.set_xticklabels(labels, fontsize=8)
     ax1.set_ylabel("Judge Total Value")
     ax1.set_title("Judge Reward by Agent Strategy")
     ax1.set_ylim(0, 240)
@@ -308,16 +310,17 @@ def plot_strategy_game_outcomes():
                  f"{val:.0f}", ha="center", va="bottom",
                  fontsize=8, fontweight="600", color=COLORS["dark"])
 
-    # Right: Agent value (combined A+B)
-    # Sort by agent value descending for this panel
+    # Right: Agent value — sort by agent value descending
     agent_order = np.argsort(agent_values)[::-1]
-    strat_agent = [strategies[i] for i in agent_order]
+    labels_agent = [labels[i] for i in agent_order]
+    keys_agent = [strategy_keys[i] for i in agent_order]
     av_sorted = [agent_values[i] for i in agent_order]
+    agent_colors = [STRATEGY_COLOR_MAP[k] for k in keys_agent]
 
-    bars2 = ax2.bar(np.arange(len(strat_agent)), av_sorted,
-                    color=COLORS["secondary"], edgecolor="white", linewidth=0.5, width=0.6)
-    ax2.set_xticks(np.arange(len(strat_agent)))
-    ax2.set_xticklabels(strat_agent, fontsize=8)
+    bars2 = ax2.bar(np.arange(len(labels_agent)), av_sorted,
+                    color=agent_colors, edgecolor="white", linewidth=0.5, width=0.6)
+    ax2.set_xticks(np.arange(len(labels_agent)))
+    ax2.set_xticklabels(labels_agent, fontsize=8)
     ax2.set_ylabel("Combined Agent Value (A + B)")
     ax2.set_title("Agent Reward by Agent Strategy")
     ax2.set_ylim(0, 15)
