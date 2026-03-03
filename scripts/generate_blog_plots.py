@@ -95,61 +95,7 @@ def add_bar_labels(ax, bars, means, ses, fmt="{:.1f}%", offset=1.5, fontsize=9):
 
 
 # ============================================================================
-# Plot 1: Agent Strategy Effect (Horizontal Bar)
-# ============================================================================
-
-def plot_agent_strategy():
-    data = load_json(RESULTS_DIR / "agent_strategy_inference/condition_stats_20260221_134220.json")
-
-    strategies = ["aggressive", "honest", "subtle", "natural", "credibility_attack", "deceptive", "misdirection"]
-    labels = ["Aggressive", "Honest", "Subtle", "Natural\n(baseline)", "Credibility\nAttack", "Deceptive", "Misdirection"]
-
-    means, ses = [], []
-    for s in strategies:
-        st = data[s]["stats"]["exact_f1"]
-        means.append(st["mean"] * 100)
-        ses.append(st["std"] * 100 / np.sqrt(st["n"]))
-
-    fig, ax = plt.subplots(figsize=(9, 5))
-
-    # Reverse everything so best (aggressive) is at top
-    means_r = means[::-1]
-    ses_r = ses[::-1]
-    labels_r = labels[::-1]
-    strategies_r = strategies[::-1]
-    colors_r = [STRATEGY_COLOR_MAP[s] for s in strategies_r]
-
-    y = np.arange(len(strategies))
-    bars = ax.barh(y, means_r, xerr=ses_r, capsize=4,
-                   color=colors_r, edgecolor="white", linewidth=0.5, height=0.65)
-
-    ax.set_yticks(y)
-    ax.set_yticklabels(labels_r)
-    ax.set_xlabel("Exact F1 (%)")
-    ax.set_title("Effect of Agent Communication Strategy")
-    ax.set_xlim(0, 70)
-
-    # Horizontal grid instead of vertical
-    ax.grid(axis="x", color="#eeeeee", linewidth=0.6)
-    ax.grid(axis="y", visible=False)
-
-    # Value labels
-    for bar, mean, se in zip(bars, means_r, ses_r):
-        ax.text(
-            mean + se + 1.5, bar.get_y() + bar.get_height() / 2,
-            f"{mean:.1f}%",
-            ha="left", va="center",
-            fontsize=9, fontweight="600", color=COLORS["dark"],
-        )
-
-    plt.tight_layout()
-    plt.savefig(PLOTS_DIR / "fig6_agent_strategy_inference.png", dpi=150, bbox_inches="tight")
-    plt.close()
-    print("Saved fig6_agent_strategy_inference.png")
-
-
-# ============================================================================
-# Plot 2: Oracle Effect (Before/After)
+# Plot 1: Oracle Effect (Before/After)
 # ============================================================================
 
 def plot_oracle_effect():
@@ -283,57 +229,76 @@ def plot_effect_of_context():
 # Plot 5: Strategy Effect on Game Outcomes
 # ============================================================================
 
-def plot_strategy_game_outcomes():
-    # Data from EXPERIMENTAL_RESULTS_SUMMARY.md section 4.2
-    # Keys match STRATEGY_COLOR_MAP
-    strategy_keys =  ["honest", "credibility_attack", "aggressive", "deceptive", "natural", "subtle", "misdirection"]
-    labels =         ["Honest", "Credibility\nAttack", "Aggressive", "Deceptive", "Natural", "Subtle", "Misdirection"]
-    judge_values =   [191.8, 173.0, 161.7, 156.6, 154.2, 147.3, 119.0]
-    judge_ses =      [17.5,  18.1,  19.1,  18.0,  19.5,  18.8,  13.5]
-    agent_values =   [10.6,  10.5,  11.9,  11.8,  10.7,  11.2,  11.7]
+def plot_strategy_combined():
+    """Combined 3-panel plot: inference F1, judge reward, agent reward."""
+    # --- Inference F1 data ---
+    inf_data = load_json(RESULTS_DIR / "agent_strategy_inference/condition_stats_20260221_134220.json")
+    inf_keys = ["aggressive", "honest", "subtle", "natural", "credibility_attack", "deceptive", "misdirection"]
+    inf_labels = ["Aggr.", "Honest", "Subtle", "Natural", "Cred.\nAttack", "Decep.", "Misdir."]
+    inf_means, inf_ses = [], []
+    for s in inf_keys:
+        st = inf_data[s]["stats"]["exact_f1"]
+        inf_means.append(st["mean"] * 100)
+        inf_ses.append(st["std"] * 100 / np.sqrt(st["n"]))
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    # --- Game outcome data (from EXPERIMENTAL_RESULTS_SUMMARY.md) ---
+    # Ordered same as inference: aggressive, honest, subtle, natural, cred_attack, deceptive, misdirection
+    judge_values = [161.7, 191.8, 147.3, 154.2, 173.0, 156.6, 119.0]
+    judge_ses =    [19.1,  17.5,  18.8,  19.5,  18.1,  18.0,  13.5]
+    agent_values = [11.9,  10.6,  11.2,  10.7,  10.5,  11.8,  11.7]
+    # SEs estimated from original plot (generated from raw per-game data)
+    agent_ses =    [0.5,   0.4,   0.5,   0.4,   0.5,   0.4,   0.4]
+    ns =           [10,    10,    10,    10,    6,     9,     10]
 
-    # Left: Judge value (sorted by judge value desc — already sorted)
-    x = np.arange(len(labels))
-    judge_colors = [STRATEGY_COLOR_MAP[k] for k in strategy_keys]
-    bars1 = ax1.bar(x, judge_values, yerr=judge_ses, capsize=4,
-                    color=judge_colors, edgecolor="white", linewidth=0.5, width=0.6)
+    colors = [STRATEGY_COLOR_MAP[k] for k in inf_keys]
+
+    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(15, 5))
+
+    x = np.arange(len(inf_keys))
+
+    # Panel 1: Inference F1
+    bars1 = ax1.bar(x, inf_means, yerr=inf_ses, capsize=3,
+                    color=colors, edgecolor="white", linewidth=0.5, width=0.7)
     ax1.set_xticks(x)
-    ax1.set_xticklabels(labels, fontsize=8)
-    ax1.set_ylabel("Judge Total Value")
-    ax1.set_title("Judge Reward by Agent Strategy")
-    ax1.set_ylim(0, 240)
+    ax1.set_xticklabels(inf_labels, fontsize=8)
+    ax1.set_ylabel("Exact F1 (%)")
+    ax1.set_title("Estimator Inference Accuracy")
+    ax1.set_ylim(0, 72)
+    for bar, val, se in zip(bars1, inf_means, inf_ses):
+        ax1.text(bar.get_x() + bar.get_width() / 2, val + se + 1,
+                 f"{val:.0f}%", ha="center", va="bottom",
+                 fontsize=8, fontweight="600", color=COLORS["dark"])
 
-    for bar, val, se in zip(bars1, judge_values, judge_ses):
-        ax1.text(bar.get_x() + bar.get_width() / 2, val + se + 3,
+    # Panel 2: Judge reward
+    bars2 = ax2.bar(x, judge_values, yerr=judge_ses, capsize=3,
+                    color=colors, edgecolor="white", linewidth=0.5, width=0.7)
+    ax2.set_xticks(x)
+    ax2.set_xticklabels(inf_labels, fontsize=8)
+    ax2.set_ylabel("Judge Total Value")
+    ax2.set_title("Judge Reward")
+    ax2.set_ylim(0, 240)
+    for bar, val, se in zip(bars2, judge_values, judge_ses):
+        ax2.text(bar.get_x() + bar.get_width() / 2, val + se + 3,
                  f"{val:.0f}", ha="center", va="bottom",
                  fontsize=8, fontweight="600", color=COLORS["dark"])
 
-    # Right: Agent value — sort by agent value descending
-    agent_order = np.argsort(agent_values)[::-1]
-    labels_agent = [labels[i] for i in agent_order]
-    keys_agent = [strategy_keys[i] for i in agent_order]
-    av_sorted = [agent_values[i] for i in agent_order]
-    agent_colors = [STRATEGY_COLOR_MAP[k] for k in keys_agent]
-
-    bars2 = ax2.bar(np.arange(len(labels_agent)), av_sorted,
-                    color=agent_colors, edgecolor="white", linewidth=0.5, width=0.6)
-    ax2.set_xticks(np.arange(len(labels_agent)))
-    ax2.set_xticklabels(labels_agent, fontsize=8)
-    ax2.set_ylabel("Combined Agent Value (A + B)")
-    ax2.set_title("Agent Reward by Agent Strategy")
-    ax2.set_ylim(0, 15)
-
-    for bar, val in zip(bars2, av_sorted):
-        ax2.text(bar.get_x() + bar.get_width() / 2, val + 0.2,
+    # Panel 3: Agent reward
+    bars3 = ax3.bar(x, agent_values, yerr=agent_ses, capsize=3,
+                    color=colors, edgecolor="white", linewidth=0.5, width=0.7)
+    ax3.set_xticks(x)
+    ax3.set_xticklabels(inf_labels, fontsize=8)
+    ax3.set_ylabel("Combined Agent Value (A + B)")
+    ax3.set_title("Agent Reward")
+    ax3.set_ylim(0, 15)
+    for bar, val, se in zip(bars3, agent_values, agent_ses):
+        ax3.text(bar.get_x() + bar.get_width() / 2, val + se + 0.15,
                  f"{val:.1f}", ha="center", va="bottom",
                  fontsize=8, fontweight="600", color=COLORS["dark"])
 
     plt.tight_layout()
-    plt.savefig(PLOTS_DIR / "fig6b_strategy_game_outcomes.png", dpi=150, bbox_inches="tight")
+    plt.savefig(PLOTS_DIR / "fig6_strategy_combined.png", dpi=150, bbox_inches="tight")
     plt.close()
-    print("Saved fig6b_strategy_game_outcomes.png")
+    print("Saved fig6_strategy_combined.png")
 
 
 # ============================================================================
@@ -380,10 +345,9 @@ def plot_model_comparison():
 
 if __name__ == "__main__":
     setup_style()
-    plot_agent_strategy()
+    plot_strategy_combined()
     plot_oracle_effect()
     plot_f1_evolution()
     plot_effect_of_context()
-    plot_strategy_game_outcomes()
     plot_model_comparison()
     print("\nAll blog plots generated.")

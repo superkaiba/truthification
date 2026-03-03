@@ -51,21 +51,15 @@ Across 11 experiments and 500+ games, we varied agent strategy, oracle budget, e
 
 ### Agent strategy is the dominant factor
 
-Across 70 games, communication strategy produced a **38pp spread** — the largest effect of any variable tested.
+Across 70 games, communication strategy produced a **38pp spread** in inference accuracy — the largest effect of any variable tested. The three panels below show, for each strategy: how accurately the estimator infers objectives (left), how much value the judge extracts (middle), and how much value the agents earn (right).
 
-![Agent Strategy Effect](../results/plots/fig6_agent_strategy_inference.png)
+![Strategy Combined](../results/plots/fig6_strategy_combined.png)
 
-Aggressive advocacy makes objectives obvious — the estimator just identifies which objects each agent pushed. **Misdirection beats outright deception** for concealment because lying still draws attention to the right dimensions, while misdirection shifts attention to irrelevant ones.
+Aggressive advocacy makes objectives obvious (55% F1) — the estimator just identifies which objects each agent pushed. **Misdirection beats outright deception** for concealment (17% vs 24% F1) because lying still draws attention to the right dimensions, while misdirection shifts attention to irrelevant ones.
 
-### The strategies that fool the estimator also reward the agents
+The concerning finding is in the rightmost panel: **the strategies that best conceal objectives also give agents the highest reward.** Misdirection and deception both achieve high agent reward (11.7 and 11.8) while being the hardest for the estimator to see through. Conversely, honesty — the strategy that makes inference easiest (47% F1) — gives agents the lowest reward (10.6).
 
-The strategies that best conceal objectives from the estimator are also the ones that give agents the highest reward — which is bad news for inference.
-
-![Strategy Game Outcomes](../results/plots/fig6b_strategy_game_outcomes.png)
-
-Misdirection and deception both achieve high agent reward (11.7 and 11.8) while being the hardest for the estimator to see through (16.7% and 24.1% F1). Conversely, honesty — the strategy that makes inference easiest (46.7% F1) — gives agents the lowest reward (10.6). Agents have a direct incentive to use the strategies that defeat the estimator.
-
-This means we can't count on agents to inadvertently reveal their objectives. The strategies that are good for agents are precisely the ones that make objective inference hard. Any real-world deployment of objective inference would face this adversarial pressure: agents who discover their objectives are being inferred will shift toward misdirection, which is both effective at concealment and rewarding for them.
+Agents have a direct incentive to use the strategies that defeat the estimator. Any real-world deployment of objective inference would face this adversarial pressure: agents who discover their objectives are being inferred will shift toward misdirection, which is both effective at concealment and rewarding for them.
 
 ### Oracle access is transformative
 
