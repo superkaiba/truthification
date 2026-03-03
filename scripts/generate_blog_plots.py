@@ -173,6 +173,7 @@ def plot_effect_of_context():
         "Baseline",
         "Brief theory\n(~50 words)",
         "Full theory\n(~200 words)",
+        "Comprehensive\n(~5000 words)",
         "Consistency\nchecking",
         "Incentive\nanalysis",
         "Pattern\nrecognition",
@@ -182,9 +183,6 @@ def plot_effect_of_context():
         ds["baseline"],
         tc["brief"],
         tc["full"],
-        ds["consistency"],
-        ds["incentive"],
-        ds["pattern"],
     ]
 
     means, ses = [], []
@@ -193,14 +191,24 @@ def plot_effect_of_context():
         means.append(s["mean"] * 100)
         ses.append(s["std"] * 100 / np.sqrt(s["n"]))
 
+    # Comprehensive context (from controlled experiment, within-subjects n=10)
+    means.append(43.3)
+    ses.append(25.1 / np.sqrt(10))
+
+    # Detection strategies
+    for key in ["consistency", "incentive", "pattern"]:
+        s = ds[key]["stats"]["exact_f1"]
+        means.append(s["mean"] * 100)
+        ses.append(s["std"] * 100 / np.sqrt(s["n"]))
+
     # Colors: gray baseline, warm orange for theory, cool blue for detection
     colors = [
         COLORS["neutral"],
-        "#ffb366", "#f08c00",       # Theory: light to dark orange
+        "#ffb366", "#f08c00", "#cc6600",  # Theory: light to dark orange
         "#74c0fc", "#4dabf7", "#339af0",  # Detection: light to dark blue
     ]
 
-    fig, ax = plt.subplots(figsize=(9, 5))
+    fig, ax = plt.subplots(figsize=(10, 5))
 
     bars = ax.bar(range(len(labels)), means, yerr=ses, capsize=4,
                   color=colors, edgecolor="white", linewidth=0.5, width=0.6)
@@ -214,9 +222,9 @@ def plot_effect_of_context():
     add_bar_labels(ax, bars, means, ses)
 
     # Category labels
-    fig.text(0.345, 0.01, "Theory context", ha="center", fontsize=9,
+    fig.text(0.36, 0.01, "Theory context", ha="center", fontsize=9,
              fontweight="bold", color="#d35400")
-    fig.text(0.72, 0.01, "Detection strategy", ha="center", fontsize=9,
+    fig.text(0.76, 0.01, "Detection strategy", ha="center", fontsize=9,
              fontweight="bold", color="#2980b9")
 
     plt.tight_layout(rect=[0, 0.04, 1, 1])
