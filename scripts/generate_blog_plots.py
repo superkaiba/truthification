@@ -175,17 +175,6 @@ def plot_oracle_effect():
 
     add_bar_labels(ax, bars, means, ses, offset=2)
 
-    # Improvement annotation
-    mid_x, mid_y = 0.5, (means[0] + means[1]) / 2
-    ax.annotate(
-        f"+{means[1] - means[0]:.0f}pp",
-        xy=(mid_x, mid_y), fontsize=12, fontweight="bold",
-        ha="center", va="center", color=COLORS["dark"],
-        bbox=dict(boxstyle="round,pad=0.3", facecolor=COLORS["light"], edgecolor="#cccccc", linewidth=0.5),
-    )
-    ax.annotate("", xy=(1, means[1] - 5), xytext=(0, means[0] + 5),
-                arrowprops=dict(arrowstyle="->", color=COLORS["neutral"], lw=1.5))
-
     plt.tight_layout()
     plt.savefig(PLOTS_DIR / "fig1_forced_oracle.png", dpi=150, bbox_inches="tight")
     plt.close()
@@ -212,16 +201,6 @@ def plot_f1_evolution():
     ax.errorbar(stmts, means, yerr=ses, marker="o", capsize=4,
                 linewidth=2, markersize=7, color=COLORS["primary"],
                 markerfacecolor="white", markeredgewidth=2)
-
-    # Mark peak
-    peak_idx = np.argmax(means)
-    ax.scatter([stmts[peak_idx]], [means[peak_idx]], color=COLORS["accent"],
-               s=120, zorder=5, marker="D", edgecolors="white", linewidth=1.5)
-    ax.annotate(f"Peak: {means[peak_idx]:.0f}%",
-                xy=(stmts[peak_idx], means[peak_idx]),
-                xytext=(stmts[peak_idx] + 4, means[peak_idx] + 4),
-                fontsize=9, fontweight="600", color=COLORS["accent"],
-                arrowprops=dict(arrowstyle="-", color=COLORS["accent"], lw=1))
 
     ax.set_xlabel("Number of Agent Statements")
     ax.set_ylabel("Exact F1 (%)")

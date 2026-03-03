@@ -57,16 +57,6 @@ Across 11 experiments and 500+ games, we varied agent strategy, oracle budget, e
 
 Across 70 games, communication strategy produced a **38pp spread** — the largest effect of any variable tested.
 
-| Strategy | Exact F1 | vs Natural |
-|----------|----------|------------|
-| **Aggressive** | **55.0%** | +23.3% (d=1.07) |
-| Honest | 46.7% | +15.0% (d=0.77) |
-| Subtle | 35.0% | +3.3% |
-| Natural | 31.7% | — |
-| Credibility Attack | 30.6% | -1.1% |
-| Deceptive | 24.1% | -7.6% |
-| **Misdirection** | **16.7%** | -15.0% (d=-0.77) |
-
 ![Agent Strategy Effect](../results/plots/fig6_agent_strategy_inference.png)
 
 Aggressive advocacy makes objectives obvious — the estimator just identifies which objects each agent pushed. **Misdirection beats outright deception** for concealment because lying still draws attention to the right dimensions, while misdirection shifts attention to irrelevant ones.
@@ -75,12 +65,7 @@ Strategy also affects game outcomes. Honest agents maximize judge value (191.8) 
 
 ### Oracle access is transformative
 
-Forced oracle queries nearly triple property accuracy:
-
-| Condition | Property Accuracy |
-|-----------|-------------------|
-| No Oracle | 25.3% ± 7.6% |
-| Forced Oracle | 70.7% ± 10.4% |
+Forced oracle queries nearly triple property accuracy (25% → 71%):
 
 ![Oracle Effect](../results/plots/fig1_forced_oracle.png)
 
@@ -90,16 +75,7 @@ Critical finding: **LLMs don't voluntarily use verification tools.** When oracle
 
 ### Model capability doesn't matter
 
-7 Claude models tested on the same 10 transcripts (within-subjects):
-
-| Model | Exact F1 |
-|-------|----------|
-| Haiku 4.5 | 43.3% |
-| Opus 4/4.5/4.6 | 40.0% |
-| Sonnet 4/4.5 | 38.3% |
-| Sonnet 4.6 | 36.7% |
-
-All p > 0.34. **The cheapest model ties the most expensive.** The bottleneck is information structure, not model capability — if the signal isn't in the transcript, no model will find it.
+7 Claude models tested on the same 10 transcripts (within-subjects): Haiku 4.5 (43.3%), Opus 4/4.5/4.6 (40.0%), Sonnet 4/4.5 (38.3%), Sonnet 4.6 (36.7%). All p > 0.34. **The cheapest model ties the most expensive.** The bottleneck is information structure, not model capability — if the signal isn't in the transcript, no model will find it.
 
 ### More statements don't help
 
@@ -121,15 +97,6 @@ Telling the estimator about strategic communication improves inference. We teste
 - **Consistency checking**: Flag contradictions across an agent's statements
 - **Incentive analysis**: Ask what the agent would gain if their claims were believed
 - **Pattern recognition**: Track which objects/properties are repeatedly advocated
-
-| Context | Exact F1 | vs Baseline |
-|---------|----------|-------------|
-| Baseline (no context) | 36.7% | — |
-| Brief theory (~50 words) | 46.7% | +10.0pp |
-| Full theory (~200 words) | 53.3% | +16.6pp |
-| Consistency checking | 45.0% | +8.3pp |
-| Incentive analysis | 41.7% | +5.0pp |
-| Pattern recognition | 41.7% | +5.0pp |
 
 ![Effect of Context](../results/plots/fig5_effect_of_context.png)
 
