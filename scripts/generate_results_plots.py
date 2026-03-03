@@ -438,9 +438,6 @@ def fig7_deception_strategies():
         ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + se + 1,
                 f'{mean:.1f}%', ha='center', va='bottom', fontsize=9)
 
-    # Add horizontal line for baseline
-    ax.axhline(y=means[0], color='gray', linestyle='--', alpha=0.5, label='Baseline')
-
     plt.tight_layout()
     plt.savefig(PLOTS_DIR / "fig7_deception_strategies.png", dpi=150, bbox_inches='tight')
     plt.close()
