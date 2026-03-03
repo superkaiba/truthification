@@ -70,7 +70,7 @@ Across 70 games, communication strategy produced a **38pp spread** in inference 
 
 ![Strategy Combined](../results/plots/fig6_strategy_combined.png)
 
-Aggressive advocacy makes objectives obvious (55% F1) — the estimator just identifies which objects each agent pushed. **Misdirection beats outright deception** for concealment (17% vs 24% F1) because lying still draws attention to the right dimensions, while misdirection shifts attention to irrelevant ones.
+For reference, a random-guessing baseline achieves ~17% F1 on this task (3 properties out of 18 possible property-value pairs). Aggressive advocacy makes objectives obvious (55% F1) — the estimator just identifies which objects each agent pushed. **Misdirection reduces inference to random chance** (17% F1), and beats outright deception (24%) for concealment because lying still draws attention to the right dimensions, while misdirection shifts attention to irrelevant ones.
 
 The concerning finding is in the rightmost panel: **the strategies that best conceal objectives also give agents the highest reward.** Misdirection and deception both achieve high agent reward (11.7 and 11.8) while being the hardest for the estimator to see through. Conversely, honesty — the strategy that makes inference easiest (47% F1) — gives agents the lowest reward (10.6).
 
