@@ -109,41 +109,31 @@ F1 at 8 checkpoints from 6 to 48 statements:
 
 Peak at 24 statements (50.0%), with a drop at 42 (35.0%). No monotonic improvement. Early statements are most informative; agents become more deceptive over time. Our qualitative analysis confirms: credibility attacks go from 3/10 agents in round 1 to 9/10 by round 10.
 
-### Theory context and deception detection help — but only a little
+### Giving the observer context helps — but only a little
 
-Telling the estimator about strategic communication improves inference. We tested four levels of theoretical context prepended to the estimator's prompt:
+Telling the estimator about strategic communication improves inference. We tested two types of additional context prepended to the estimator's prompt:
 
-- **None**: No additional context
+**Theory context** — background about strategic communication:
 - **Brief** (~50 words): *"Agents have conflicting interests and will strategically distort their statements. However, preference orderings leak through behavior patterns — agents cannot fully hide what they want. Focus on which objects/properties they consistently advocate across all statements, not individual claims."*
 - **Full** (~200 words): Covers Crawford-Sobel partial revelation, IRL preference leakage, and bias correction. Includes concrete inference strategy: *"Don't trust individual claims — look at patterns across ALL statements. Ask: which objects would benefit if these claims were believed?"*
-- **Strategy List** (~250 words): Describes each of the 7 communication strategies and what to look for in each case
-- **Comprehensive** (~5000 words): Full academic framework covering information economics, inverse reinforcement learning, linguistics of deception, and statistical bias correction
 
-| Context | Exact F1 | vs None |
-|---------|----------|---------|
-| None | 33.3% | — |
-| Brief (~50 words) | 46.7% | +13.4pp |
-| Full (~200 words) | 40.0% | +6.7pp |
-| Strategy List (~250 words) | 36.7% | +3.4pp |
-| Comprehensive (~5000 words) | 43.3% | +10.0pp |
+**Detection strategy** — specific instructions for identifying deception:
+- **Consistency checking**: Flag contradictions across an agent's statements
+- **Incentive analysis**: Ask what the agent would gain if their claims were believed
+- **Pattern recognition**: Track which objects/properties are repeatedly advocated
 
-![Theory Context Effect](../results/plots/fig5_theory_context.png)
-
-Brief context outperforms longer documents — concise priming beats comprehensive instruction.
-
-We also tested 5 deception detection strategies for the estimator:
-
-| Strategy | Exact F1 | vs Baseline |
-|----------|----------|-------------|
-| Baseline | 36.7% | — |
+| Context | Exact F1 | vs Baseline |
+|---------|----------|-------------|
+| Baseline (no context) | 36.7% | — |
+| Brief theory (~50 words) | 46.7% | +10.0pp |
+| Full theory (~200 words) | 53.3% | +16.6pp |
 | Consistency checking | 45.0% | +8.3pp |
 | Incentive analysis | 41.7% | +5.0pp |
 | Pattern recognition | 41.7% | +5.0pp |
-| Combined (all above) | 45.0% | +8.3pp |
 
-![Deception Strategies](../results/plots/fig7_deception_strategies.png)
+![Effect of Context](../results/plots/fig5_effect_of_context.png)
 
-Consistency checking — flagging contradictions across an agent's statements — performs best. But combining all strategies provides **no benefit over consistency checking alone**. More complex prompts don't help.
+Full theory context provides the largest gain (+16.6pp). Consistency checking is the best detection strategy (+8.3pp), but combining all detection strategies provides **no benefit over consistency checking alone**. More elaborate context doesn't always help more — the within-subjects controlled experiment found brief context (46.7%) outperformed comprehensive (~5000 word) context (43.3%).
 
 ## Emergent Manipulation Strategies
 
