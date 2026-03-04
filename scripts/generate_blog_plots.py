@@ -95,37 +95,41 @@ def add_bar_labels(ax, bars, means, ses, fmt="{:.1f}%", offset=1.5, fontsize=9):
 
 
 # ============================================================================
-# Plot 1: Oracle Effect (Before/After)
+# Plot 1: Oracle Budget Effect on Objective Inference F1
 # ============================================================================
 
-def plot_oracle_effect():
-    data = load_json(RESULTS_DIR / "forced_oracle_test/results_20260213_164112.json")
+def plot_oracle_budget():
+    # Data from EXPERIMENTAL_RESULTS_SUMMARY.md section 2.2
+    budgets = [0, 1, 2, 4, 6, 8]
+    means =   [5.0, 14.5, 12.5, 21.0, 27.1, 21.7]
+    stds =    [8.5, 26.4, 13.8, 17.1, 20.4, 18.9]
+    ns =      [10,  10,   10,   10,   7,    6]
+    ses = [s / np.sqrt(n) for s, n in zip(stds, ns)]
 
-    no_oracle = [r["property_accuracy"] for r in data["no_oracle"]]
-    forced = [r["property_accuracy"] for r in data["forced_oracle"]]
+    fig, ax = plt.subplots(figsize=(8, 5))
 
-    means = [np.mean(no_oracle) * 100, np.mean(forced) * 100]
-    ses = [np.std(no_oracle) / np.sqrt(len(no_oracle)) * 100,
-           np.std(forced) / np.sqrt(len(forced)) * 100]
+    ax.fill_between(budgets, [m - s for m, s in zip(means, ses)],
+                    [m + s for m, s in zip(means, ses)],
+                    alpha=0.15, color=COLORS["primary"])
+    ax.errorbar(budgets, means, yerr=ses, marker="o", capsize=4,
+                linewidth=2, markersize=7, color=COLORS["primary"],
+                markerfacecolor="white", markeredgewidth=2)
 
-    fig, ax = plt.subplots(figsize=(6, 5))
+    ax.set_xlabel("Oracle Budget (number of queries)")
+    ax.set_ylabel("Exact F1 (%)")
+    ax.set_title("Effect of Oracle Budget on Objective Inference")
+    ax.set_ylim(0, 45)
+    ax.set_xticks(budgets)
 
-    colors = [COLORS["danger"], COLORS["success"]]
-    bars = ax.bar([0, 1], means, yerr=ses, capsize=5,
-                  color=colors, edgecolor="white", linewidth=0.5, width=0.55, zorder=3)
-
-    ax.set_xticks([0, 1])
-    ax.set_xticklabels(["No Oracle\n(budget = 0)", "Forced Oracle\n(budget = 8)"])
-    ax.set_ylabel("Property Accuracy (%)")
-    ax.set_title("Effect of Oracle Access")
-    ax.set_ylim(0, 95)
-
-    add_bar_labels(ax, bars, means, ses, offset=2)
+    # Label each point
+    for b, m, s in zip(budgets, means, ses):
+        ax.text(b, m + s + 1.5, f"{m:.1f}%",
+                ha="center", va="bottom", fontsize=9, fontweight="600", color=COLORS["dark"])
 
     plt.tight_layout()
-    plt.savefig(PLOTS_DIR / "fig1_forced_oracle.png", dpi=150, bbox_inches="tight")
+    plt.savefig(PLOTS_DIR / "fig1_oracle_budget.png", dpi=150, bbox_inches="tight")
     plt.close()
-    print("Saved fig1_forced_oracle.png")
+    print("Saved fig1_oracle_budget.png")
 
 
 # ============================================================================
@@ -354,7 +358,7 @@ def plot_model_comparison():
 if __name__ == "__main__":
     setup_style()
     plot_strategy_combined()
-    plot_oracle_effect()
+    plot_oracle_budget()
     plot_f1_evolution()
     plot_effect_of_context()
     plot_model_comparison()
