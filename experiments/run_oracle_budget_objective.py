@@ -47,7 +47,8 @@ BASE_CONFIG = {
     "infer_agent_objectives": True,
     "use_agent_value_functions": True,
     "agent_value_function_complexity": "L3",  # Medium complexity
-    "objective_inference_mode": "freeform",  # Standard freeform inference
+    "objective_inference_mode": "principled",  # Principled inference (consistent with other experiments)
+    "use_simple_value_functions": True,
     "enable_agent_thinking": True,
     "agent_thinking_budget": 5000,
     "force_oracle": True,  # Ensure oracle is used when available
