@@ -1,0 +1,368 @@
+{
+  "oracle_budget_0": {
+    "condition": {
+      "condition_id": "oracle_budget_0",
+      "oracle_budget": 0
+    },
+    "n_games": 10,
+    "stats": {
+      "total_value": {
+        "mean": 120.6,
+        "std": 50.44733227172011,
+        "n": 10
+      },
+      "selection_accuracy": {
+        "mean": 0.6126809648840114,
+        "std": 0.22564625538174535,
+        "n": 10
+      },
+      "property_accuracy": {
+        "mean": 0.31,
+        "std": 0.23156472577277876,
+        "n": 10
+      },
+      "rule_inference_accuracy": {
+        "mean": 0.7949999999999999,
+        "std": 0.10124228365658294,
+        "n": 10
+      },
+      "objective_inference_score": {
+        "mean": 0.16666666666666666,
+        "std": 0.19245008972987523,
+        "n": 10
+      },
+      "per_agent_objective_scores": {
+        "Agent_A": {
+          "mean": 0.16666666666666666,
+          "std": 0.17568209223157663,
+          "n": 10
+        },
+        "Agent_B": {
+          "mean": 0.16666666666666666,
+          "std": 0.32394177193585,
+          "n": 10
+        }
+      },
+      "estimator_property_accuracy": {
+        "mean": 0.452,
+        "std": 0.12007405122580721,
+        "n": 10
+      },
+      "actual_oracle_queries": {
+        "mean": 0,
+        "std": 0.0,
+        "n": 10
+      },
+      "avg_confidence": {
+        "mean": 85.5,
+        "std": 7.591546545162482,
+        "n": 20
+      }
+    }
+  },
+  "oracle_budget_1": {
+    "condition": {
+      "condition_id": "oracle_budget_1",
+      "oracle_budget": 1
+    },
+    "n_games": 10,
+    "stats": {
+      "total_value": {
+        "mean": 156.4,
+        "std": 68.23195732206428,
+        "n": 10
+      },
+      "selection_accuracy": {
+        "mean": 0.7469886804313773,
+        "std": 0.1602188827741098,
+        "n": 10
+      },
+      "property_accuracy": {
+        "mean": 0.39,
+        "std": 0.11935009193312104,
+        "n": 10
+      },
+      "rule_inference_accuracy": {
+        "mean": 0.7266666666666667,
+        "std": 0.1505545305418162,
+        "n": 10
+      },
+      "objective_inference_score": {
+        "mean": 0.3333333333333333,
+        "std": 0.2078698548207745,
+        "n": 10
+      },
+      "per_agent_objective_scores": {
+        "Agent_A": {
+          "mean": 0.3333333333333333,
+          "std": 0.31426968052735443,
+          "n": 10
+        },
+        "Agent_B": {
+          "mean": 0.3333333333333333,
+          "std": 0.2222222222222222,
+          "n": 10
+        }
+      },
+      "estimator_property_accuracy": {
+        "mean": 0.554,
+        "std": 0.07121173436387512,
+        "n": 10
+      },
+      "actual_oracle_queries": {
+        "mean": 1,
+        "std": 0.0,
+        "n": 10
+      },
+      "avg_confidence": {
+        "mean": 88.5,
+        "std": 6.708203932499369,
+        "n": 20
+      }
+    }
+  },
+  "oracle_budget_2": {
+    "condition": {
+      "condition_id": "oracle_budget_2",
+      "oracle_budget": 2
+    },
+    "n_games": 10,
+    "stats": {
+      "total_value": {
+        "mean": 149.6,
+        "std": 53.444051742608984,
+        "n": 10
+      },
+      "selection_accuracy": {
+        "mean": 0.7399687482303117,
+        "std": 0.17869742342788006,
+        "n": 10
+      },
+      "property_accuracy": {
+        "mean": 0.472,
+        "std": 0.12407882799073963,
+        "n": 10
+      },
+      "rule_inference_accuracy": {
+        "mean": 0.755,
+        "std": 0.18774983355518587,
+        "n": 10
+      },
+      "objective_inference_score": {
+        "mean": 0.3,
+        "std": 0.23306863292670033,
+        "n": 10
+      },
+      "per_agent_objective_scores": {
+        "Agent_A": {
+          "mean": 0.3,
+          "std": 0.24595492912420727,
+          "n": 10
+        },
+        "Agent_B": {
+          "mean": 0.3,
+          "std": 0.33147630867058436,
+          "n": 10
+        }
+      },
+      "estimator_property_accuracy": {
+        "mean": 0.548,
+        "std": 0.09003702941938205,
+        "n": 10
+      },
+      "actual_oracle_queries": {
+        "mean": 2,
+        "std": 0.0,
+        "n": 10
+      },
+      "avg_confidence": {
+        "mean": 90,
+        "std": 4.8666426339228765,
+        "n": 20
+      }
+    }
+  },
+  "oracle_budget_4": {
+    "condition": {
+      "condition_id": "oracle_budget_4",
+      "oracle_budget": 4
+    },
+    "n_games": 10,
+    "stats": {
+      "total_value": {
+        "mean": 178.5,
+        "std": 55.05401388131881,
+        "n": 10
+      },
+      "selection_accuracy": {
+        "mean": 0.8800202005407127,
+        "std": 0.08819775553531314,
+        "n": 10
+      },
+      "property_accuracy": {
+        "mean": 0.46,
+        "std": 0.2334285520001546,
+        "n": 10
+      },
+      "rule_inference_accuracy": {
+        "mean": 0.6849999999999999,
+        "std": 0.17646214576755234,
+        "n": 10
+      },
+      "objective_inference_score": {
+        "mean": 0.39999999999999997,
+        "std": 0.23830678432808017,
+        "n": 10
+      },
+      "per_agent_objective_scores": {
+        "Agent_A": {
+          "mean": 0.36666666666666664,
+          "std": 0.33147630867058436,
+          "n": 10
+        },
+        "Agent_B": {
+          "mean": 0.4333333333333333,
+          "std": 0.27442420078285484,
+          "n": 10
+        }
+      },
+      "estimator_property_accuracy": {
+        "mean": 0.622,
+        "std": 0.12053584068188554,
+        "n": 10
+      },
+      "actual_oracle_queries": {
+        "mean": 4,
+        "std": 0.0,
+        "n": 10
+      },
+      "avg_confidence": {
+        "mean": 85,
+        "std": 5.619514869490164,
+        "n": 20
+      }
+    }
+  },
+  "oracle_budget_6": {
+    "condition": {
+      "condition_id": "oracle_budget_6",
+      "oracle_budget": 6
+    },
+    "n_games": 10,
+    "stats": {
+      "total_value": {
+        "mean": 148.2,
+        "std": 64.75560893767341,
+        "n": 10
+      },
+      "selection_accuracy": {
+        "mean": 0.739116126126134,
+        "std": 0.21689733265603875,
+        "n": 10
+      },
+      "property_accuracy": {
+        "mean": 0.536,
+        "std": 0.2006212573205763,
+        "n": 10
+      },
+      "rule_inference_accuracy": {
+        "mean": 0.66,
+        "std": 0.17763883459298968,
+        "n": 10
+      },
+      "objective_inference_score": {
+        "mean": 0.5,
+        "std": 0.26057865332352387,
+        "n": 10
+      },
+      "per_agent_objective_scores": {
+        "Agent_A": {
+          "mean": 0.5666666666666667,
+          "std": 0.31622776601683794,
+          "n": 10
+        },
+        "Agent_B": {
+          "mean": 0.4333333333333333,
+          "std": 0.3531166351571267,
+          "n": 10
+        }
+      },
+      "estimator_property_accuracy": {
+        "mean": 0.65,
+        "std": 0.11440668201153675,
+        "n": 10
+      },
+      "actual_oracle_queries": {
+        "mean": 6,
+        "std": 0.0,
+        "n": 10
+      },
+      "avg_confidence": {
+        "mean": 90.25,
+        "std": 5.954874164563805,
+        "n": 20
+      }
+    }
+  },
+  "oracle_budget_8": {
+    "condition": {
+      "condition_id": "oracle_budget_8",
+      "oracle_budget": 8
+    },
+    "n_games": 10,
+    "stats": {
+      "total_value": {
+        "mean": 141.1,
+        "std": 43.30114188897204,
+        "n": 10
+      },
+      "selection_accuracy": {
+        "mean": 0.7131292732944916,
+        "std": 0.19685851905794463,
+        "n": 10
+      },
+      "property_accuracy": {
+        "mean": 0.58,
+        "std": 0.07831560082980488,
+        "n": 10
+      },
+      "rule_inference_accuracy": {
+        "mean": 0.52,
+        "std": 0.24404006956964167,
+        "n": 10
+      },
+      "objective_inference_score": {
+        "mean": 0.41666666666666663,
+        "std": 0.21154925294066412,
+        "n": 10
+      },
+      "per_agent_objective_scores": {
+        "Agent_A": {
+          "mean": 0.4333333333333333,
+          "std": 0.27442420078285484,
+          "n": 10
+        },
+        "Agent_B": {
+          "mean": 0.39999999999999997,
+          "std": 0.21081851067789195,
+          "n": 10
+        }
+      },
+      "estimator_property_accuracy": {
+        "mean": 0.648,
+        "std": 0.059777364723893035,
+        "n": 10
+      },
+      "actual_oracle_queries": {
+        "mean": 8,
+        "std": 0.0,
+        "n": 10
+      },
+      "avg_confidence": {
+        "mean": 90,
+        "std": 6.06976978666884,
+        "n": 20
+      }
+    }
+  }
+}

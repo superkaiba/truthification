@@ -99,12 +99,12 @@ def add_bar_labels(ax, bars, means, ses, fmt="{:.1f}%", offset=1.5, fontsize=9):
 # ============================================================================
 
 def plot_oracle_budget():
-    # Data from EXPERIMENTAL_RESULTS_SUMMARY.md section 2.2
+    # Data from oracle_budget_objective experiment (principled inference, 10 seeds per condition)
     budgets = [0, 1, 2, 4, 6, 8]
-    means =   [5.0, 14.5, 12.5, 21.0, 27.1, 21.7]
-    stds =    [8.5, 26.4, 13.8, 17.1, 20.4, 18.9]
-    ns =      [10,  10,   10,   10,   7,    6]
-    ses = [s / np.sqrt(n) for s, n in zip(stds, ns)]
+    means =   [16.7, 33.3, 30.0, 40.0, 50.0, 41.7]
+    stds =    [19.2, 20.8, 23.3, 23.8, 26.1, 21.2]
+    n = 10
+    ses = [s / np.sqrt(n) for s in stds]
 
     fig, ax = plt.subplots(figsize=(8, 5))
 
@@ -116,9 +116,9 @@ def plot_oracle_budget():
                 markerfacecolor="white", markeredgewidth=2)
 
     ax.set_xlabel("Oracle Budget (number of queries)")
-    ax.set_ylabel("Exact F1 (%)")
+    ax.set_ylabel("Objective Inference Score (%)")
     ax.set_title("Effect of Oracle Budget on Objective Inference")
-    ax.set_ylim(0, 45)
+    ax.set_ylim(0, 70)
     ax.set_xticks(budgets)
 
     # Label each point

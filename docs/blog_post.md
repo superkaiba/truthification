@@ -6,9 +6,9 @@
 - **The strategies that fool the observer don't cost the agent much.** Misdirection and deception achieve nearly the same agent reward as aggressive/honest strategies while being far harder to see through, so agents have a direct incentive to conceal.
 - **What the observer is doesn't matter.** Haiku 4.5 ($0.25/MTok) matches Opus 4.6 ($15/MTok), with no significant differences across 7 models.
 - **More debate doesn't help.** Inference peaks at ~24 statements then plateaus or drops, because agents become more deceptive over time.
-- **Verification helps, but has diminishing returns.** Oracle queries improve F1 from 5% (no oracle) to 27% (budget=6), but decline past that as agents learn to spin results.
+- **Verification helps, but has diminishing returns.** Oracle queries improve inference from 17% (no oracle) to 50% (budget=6), but decline past that as agents learn to spin results.
 - **Telling the observer about strategic communication helps.** Brief theory context (+13pp) and consistency-checking prompts (+8pp) both improve inference, but more elaborate instructions don't help further.
-- The main takeaway: **the information environment matters far more than observer capability**. Efforts to improve truth recovery should focus on incentive structures, not scaling.
+- The main takeaway: **inference performance is shaped by both the information environment (agent strategy, verification) and the observer's analytical approach (context, detection strategy), though not model capability.** This makes observer design a promising area for future research.
 
 ---
 
@@ -82,7 +82,7 @@ Giving the judge access to an oracle (which reveals the true value of a queried 
 
 ![Oracle Budget](../results/plots/fig1_oracle_budget.png)
 
-With no oracle, F1 is 5%, barely above random. Performance climbs with budget, peaking at 6 queries (27.1% F1), then drops at budget=8 (21.7%). The decline likely reflects agents learning to "spin" oracle results: we documented 422 instances of agents reframing oracle revelations to support their narrative across 56 games. More verification gives agents more material to spin.
+With no oracle, inference scores 16.7%, near random chance. Performance climbs with budget, peaking at 6 queries (50.0%), then drops at budget=8 (41.7%). The decline likely reflects agents learning to "spin" oracle results: we documented 422 instances of agents reframing oracle revelations to support their narrative across 60 games. More verification gives agents more material to spin.
 
 ### Model capability doesn't matter
 
@@ -150,13 +150,11 @@ These emerge purely from incentive structure and intensify over rounds.
 
 **Fine-tuning an objective estimator.** Our estimator uses in-context learning. Fine-tuning on many trajectories with known ground-truth objectives could teach a model to detect deception patterns more reliably than prompted baselines.
 
-**Objective understanding for imitation.** If we fine-tune a model on an agent's actions, does understanding their objective help it generalize? We hypothesize yes:
+**Objective understanding for prediction.** If we can model the world, is the best way to predict an agent's actions in a completely different environment to model their objective? Behavioral cloning copies (state, action) pairs from one setting, but an inferred objective should transfer across settings. Testing whether objective inference quality correlates with out-of-distribution action prediction would validate this.
 
-> **The most efficient way to imitate someone is to understand their objective.**
+**Improving estimator strategies.** Our results show that observer design matters — theory context and detection strategies both improve inference — but we've only scratched the surface. Future work should explore richer prompting strategies, chain-of-thought reasoning about agent incentives, and multi-round estimation that updates beliefs as new evidence arrives.
 
-Behavioral cloning copies (state, action) pairs. Objective-conditioned imitation captures *why* the agent acts, enabling transfer to new situations. The quality of objective inference (F1) should correlate with imitation quality.
-
-**From objective inference to contextualization.** This work validates a prerequisite: agent objectives are inferable from behavior. The path forward is objective inference, then bias correction, then trust calibration, then full contextualization (conditioning on source identity to produce calibrated truth estimates).
+**From objective inference to contextualization.** This work shows that agent objectives are at least partially inferable from behavior, establishing a foundation for the broader contextualization pipeline: objective inference, then bias correction, then trust calibration, then full contextualization (conditioning on source identity to produce calibrated truth estimates).
 
 ---
 
